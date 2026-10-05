@@ -6,29 +6,99 @@
 <title>Валютный Радар</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-  :root { --bg:#0f1a2e; --card:#1b2a4e; --accent:#2E86DE; --green:#00D9A3; --red:#ff5470; --text:#e6ecf5; }
+  :root { --bg:#0f1a2e; --card:#1b2a4e; --accent:#2E86DE; --green:#00D9A3; --red:#ff5470; --text:#e6ecf5; --muted:#8fa3bf; }
   * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-  body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; padding:16px 16px 80px; min-height:100vh; }
+  body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; padding:16px 16px 90px; min-height:100vh; }
   h1 { font-size:22px; margin-bottom:4px; text-align:center; }
-  .sub { text-align:center; font-size:13px; color:#8fa3bf; margin-bottom:20px; }
-  .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
-  .card { background:var(--card); border-radius:14px; padding:14px; }
-  .card .code { font-weight:700; font-size:17px; letter-spacing:.5px; }
-  .card .name { font-size:12px; color:#8fa3bf; margin-top:2px; margin-bottom:10px; }
+  .sub { text-align:center; font-size:13px; color:var(--muted); margin-bottom:20px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+  .card { background:var(--card); border-radius:14px; padding:14px; cursor:pointer; transition:transform .15s; }
+  .card:active { transform:scale(.97); }
+  .card.sel { outline:2px solid var(--accent); }
+  .card .code { font-weight:700; font-size:17px; }
+  .card .name { font-size:12px; color:var(--muted); margin:2px 0 10px; }
   .card .rate { font-size:20px; font-weight:800; }
   .card .trend { font-size:13px; margin-top:6px; font-weight:600; }
-  .up { color:var(--green); } .down { color:var(--red); } .flat { color:#8fa3bf; }
+  .up { color:var(--green); } .down { color:var(--red); } .flat { color:var(--muted); }
   .btn { width:100%; padding:15px; background:var(--accent); color:white; border:none; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer; margin-top:8px; }
-  .updated { text-align:center; font-size:12px; color:#8fa3bf; margin-top:14px; }
-  .loading { text-align:center; color:#8fa3bf; padding:40px 0; }
+  .btn.sec { background:var(--card); color:var(--text); }
+  .btn:active { opacity:.85; }
+  .updated { text-align:center; font-size:12px; color:var(--muted); margin-top:14px; }
+  .loading { text-align:center; color:var(--muted); padding:40px 0; }
+  canvas { width:100%; background:var(--card); border-radius:14px; padding:8px; margin-bottom:14px; }
+  .section { background:var(--card); border-radius:14px; padding:14px; margin-bottom:10px; }
+  .section h3 { font-size:15px; margin-bottom:10px; }
+  .row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #253456; }
+  .row:last-child { border:none; }
+  .total { font-size:18px; font-weight:800; color:var(--green); text-align:right; margin-top:10px; }
+  input, select { width:100%; padding:12px; background:#0f1a2e; border:1px solid #253456; border-radius:10px; color:var(--text); font-size:15px; margin-bottom:8px; }
+  .nav { position:fixed; bottom:0; left:0; right:0; background:var(--card); display:flex; padding:8px 0; border-top:1px solid #253456; }
+  .nav button { flex:1; background:none; border:none; color:var(--muted); font-size:12px; padding:8px; cursor:pointer; }
+  .nav button.active { color:var(--accent); font-weight:700; }
+  .nav button span { display:block; font-size:20px; margin-bottom:2px; }
+  .page { display:none; } .page.active { display:block; }
+  .del { background:var(--red); color:white; border:none; border-radius:8px; padding:4px 10px; font-size:12px; cursor:pointer; }
 </style>
 </head>
 <body>
-<h1>⚡ Валютный Радар</h1>
-<div class="sub">Курсы к рублю в реальном времени</div>
-<div id="list"><div class="loading">Загрузка...</div></div>
-<button class="btn" onclick="load()">🔄 Обновить</button>
-<div class="updated" id="upd"></div>
+
+<div class="page active" id="page-rates">
+  <h1>⚡ Валютный Радар</h1>
+  <div class="sub">Курсы к рублю в реальном времени</div>
+  <canvas id="chart" height="180"></canvas>
+  <div id="list"><div class="loading">Загрузка...</div></div>
+  <button class="btn" onclick="load()">🔄 Обновить</button>
+  <div class="updated" id="upd"></div>
+</div>
+
+<div class="page" id="page-portfolio">
+  <h1>💼 Портфель</h1>
+  <div class="sub">Добавляй валюты — считаем в рублях</div>
+  <div class="section">
+    <h3>Добавить</h3>
+    <select id="pf-code"></select>
+    <input type="number" id="pf-amount" placeholder="Сумма" step="0.01">
+    <button class="btn" onclick="addToPortfolio()">Добавить</button>
+  </div>
+  <div class="section">
+    <h3>Мои активы</h3>
+    <div id="pf-list"><div class="loading">Пусто</div></div>
+    <div class="total" id="pf-total"></div>
+  </div>
+</div>
+
+<div class="page" id="page-more">
+  <h1>⚙️ Ещё</h1>
+  <div class="sub">Настройки и действия</div>
+  <div class="section">
+    <h3>🌐 Язык / Language</h3>
+    <button class="btn sec" onclick="sendCmd('/lang ru')">🇷🇺 Русский</button>
+    <button class="btn sec" onclick="sendCmd('/lang en')">🇬🇧 English</button>
+  </div>
+  <div class="section">
+    <h3>🔔 Подписки</h3>
+    <button class="btn sec" onclick="showHint('/subscribe USD 2')">Подписаться на изменение</button>
+    <button class="btn sec" onclick="sendCmd('/mysubs')">Мои подписки</button>
+    <button class="btn sec" onclick="showHint('/digest 09:00')">Ежедневная сводка</button>
+  </div>
+  <div class="section">
+    <h3>🎯 Целевой курс</h3>
+    <button class="btn sec" onclick="showHint('/alert USD > 95')">Создать алерт</button>
+    <button class="btn sec" onclick="sendCmd('/myalerts')">Мои алерты</button>
+  </div>
+  <div class="section">
+    <h3>📊 Аналитика</h3>
+    <button class="btn sec" onclick="showHint('/history USD 30')">История</button>
+    <button class="btn sec" onclick="showHint('/compare USD EUR')">Сравнить валюты</button>
+    <button class="btn sec" onclick="sendCmd('/rate')">Курсы в чат</button>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="active" onclick="nav('rates', this)"><span>💱</span>Курсы</button>
+  <button onclick="nav('portfolio', this)"><span>💼</span>Портфель</button>
+  <button onclick="nav('more', this)"><span>⚙️</span>Ещё</button>
+</div>
 
 <script>
 const CURRENCIES = ['USD','EUR','KZT','GBP','CNY','JPY','TRY','UAH','AED'];
@@ -37,36 +107,156 @@ const NAMES = {USD:'Доллар 🇺🇸',EUR:'Евро 🇪🇺',KZT:'Тенг
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#0f1a2e'); tg.setBackgroundColor('#0f1a2e'); }
 
+let rates = {};
+let history = {};
+let selected = 'USD';
+
+// ── Навигация ──
+function nav(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (id === 'portfolio') renderPortfolio();
+}
+
+// ── Данные ──
 async function load() {
   document.getElementById('list').innerHTML = '<div class="loading">Загрузка...</div>';
   try {
     const today = await fetch('https://latest.currency-api.pages.dev/v1/currencies/rub.json').then(r => r.json());
     const rub = today.rub;
     const d = new Date(); d.setDate(d.getDate() - 7);
-    const weekAgo = d.toISOString().slice(0,10);
-    const old = await fetch(`https://${weekAgo}.currency-api.pages.dev/v1/currencies/rub.json`).then(r => r.json());
+    const old = await fetch(`https://${d.toISOString().slice(0,10)}.currency-api.pages.dev/v1/currencies/rub.json`).then(r => r.json());
 
-    const html = CURRENCIES.map(c => {
-      const rate = 1 / rub[c.toLowerCase()];
-      const oldRate = 1 / old.rub[c.toLowerCase()];
-      const diff = rate - oldRate;
-      const pct = (diff / oldRate) * 100;
-      let cls = 'flat', arrow = '➖';
-      if (diff > 0.01) { cls = 'up'; arrow = '📈'; }
-      else if (diff < -0.01) { cls = 'down'; arrow = '📉'; }
-      return `<div class="card">
-        <div class="code">${c}</div>
-        <div class="name">${NAMES[c]}</div>
-        <div class="rate">${rate.toFixed(2)} ₽</div>
-        <div class="trend ${cls}">${arrow} ${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</div>
-      </div>`;
-    }).join('');
-    document.getElementById('list').innerHTML = `<div class="grid">${html}</div>`;
+    rates = {};
+    CURRENCIES.forEach(c => rates[c] = 1 / rub[c.toLowerCase()]);
+    history = {};
+    CURRENCIES.forEach(c => history[c] = 1 / old.rub[c.toLowerCase()]);
+
+    renderRates();
+    drawChart();
     document.getElementById('upd').textContent = 'Обновлено: ' + new Date().toLocaleTimeString('ru-RU');
   } catch(e) {
     document.getElementById('list').innerHTML = '<div class="loading" style="color:#ff5470">⚠️ Ошибка загрузки</div>';
   }
 }
+
+function renderRates() {
+  const html = CURRENCIES.map(c => {
+    const rate = rates[c], oldRate = history[c];
+    const diff = rate - oldRate;
+    const pct = (diff / oldRate) * 100;
+    let cls = 'flat', arrow = '➖';
+    if (diff > 0.01) { cls = 'up'; arrow = '📈'; } else if (diff < -0.01) { cls = 'down'; arrow = '📉'; }
+    return `<div class="card ${c === selected ? 'sel' : ''}" onclick="selectCur('${c}')">
+      <div class="code">${c}</div><div class="name">${NAMES[c]}</div>
+      <div class="rate">${rate.toFixed(2)} ₽</div>
+      <div class="trend ${cls}">${arrow} ${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</div>
+    </div>`;
+  }).join('');
+  document.getElementById('list').innerHTML = `<div class="grid">${html}</div>`;
+}
+
+function selectCur(c) { selected = c; renderRates(); drawChart(); }
+
+// ── График ──
+async function drawChart() {
+  const c = selected.toLowerCase();
+  const labels = [], values = [];
+  for (let i = 14; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().slice(0,10);
+    try {
+      const data = await fetch(`https://${dateStr}.currency-api.pages.dev/v1/currencies/rub.json`).then(r => r.json());
+      const rate = data.rub[c];
+      if (rate) { labels.push(dateStr.slice(5)); values.push(1 / rate); }
+    } catch(e) {}
+  }
+  const canvas = document.getElementById('chart');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth - 16, h = 180 - 16;
+  canvas.width = w * dpr; canvas.height = h * dpr;
+  canvas.style.height = (h + 16) + 'px';
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
+
+  if (!values.length) return;
+
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = max - min || 1;
+  const pad = 10;
+  const stepX = (w - pad * 2) / (values.length - 1 || 1);
+
+  ctx.strokeStyle = '#2E86DE'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  values.forEach((v, i) => {
+    const x = pad + i * stepX;
+    const y = h - pad - ((v - min) / range) * (h - pad * 2);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  ctx.fillStyle = 'rgba(46,134,222,0.15)';
+  ctx.lineTo(w - pad, h - pad); ctx.lineTo(pad, h - pad); ctx.closePath(); ctx.fill();
+
+  ctx.fillStyle = '#e6ecf5'; ctx.font = 'bold 12px sans-serif';
+  ctx.fillText(`${selected}: ${values[values.length-1].toFixed(2)} ₽`, 8, 16);
+}
+
+// ── Портфель ──
+function getPortfolio() { try { return JSON.parse(localStorage.getItem('pf') || '{}'); } catch(e) { return {}; } }
+function savePortfolio(p) { localStorage.setItem('pf', JSON.stringify(p)); }
+
+function addToPortfolio() {
+  const code = document.getElementById('pf-code').value;
+  const amount = parseFloat(document.getElementById('pf-amount').value);
+  if (!amount || amount <= 0) { tg?.showAlert('Введи сумму'); return; }
+  const pf = getPortfolio();
+  pf[code] = (pf[code] || 0) + amount;
+  savePortfolio(pf);
+  document.getElementById('pf-amount').value = '';
+  renderPortfolio();
+  tg?.HapticFeedback?.notificationOccurred('success');
+}
+
+function removeFromPortfolio(code) {
+  const pf = getPortfolio();
+  delete pf[code];
+  savePortfolio(pf);
+  renderPortfolio();
+}
+
+function renderPortfolio() {
+  const pf = getPortfolio();
+  const list = document.getElementById('pf-list');
+  const totalEl = document.getElementById('pf-total');
+  const codes = Object.keys(pf);
+  if (!codes.length) { list.innerHTML = '<div class="loading">Пусто</div>'; totalEl.textContent = ''; return; }
+  let total = 0;
+  list.innerHTML = codes.map(c => {
+    const value = pf[c] * (rates[c] || 0);
+    total += value;
+    return `<div class="row"><span><b>${c}</b> ${pf[c].toFixed(2)}</span>
+      <span>${value.toFixed(2)} ₽ <button class="del" onclick="removeFromPortfolio('${c}')">✕</button></span></div>`;
+  }).join('');
+  totalEl.textContent = 'Итого: ' + total.toFixed(2) + ' ₽';
+}
+
+// ── Действия через бота ──
+function sendCmd(cmd) {
+  if (tg) { tg.sendData(JSON.stringify({cmd})); tg.close(); }
+  else alert('Команда для бота: ' + cmd);
+}
+function showHint(cmd) {
+  tg?.showAlert(`Напиши боту в чат:\n${cmd}`);
+}
+
+// ── Инициализация ──
+const sel = document.getElementById('pf-code');
+CURRENCIES.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = `${c} — ${NAMES[c]}`; sel.appendChild(o); });
+
 load();
 </script>
 </body>
