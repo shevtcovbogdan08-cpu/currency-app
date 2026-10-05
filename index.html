@@ -6,13 +6,14 @@
 <title>Валютный Радар</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-  :root { --bg:#0f1a2e; --card:#1b2a4e; --accent:#2E86DE; --green:#00D9A3; --red:#ff5470; --text:#e6ecf5; --muted:#8fa3bf; }
+  :root { --bg:#0f1a2e; --card:#1b2a4e; --accent:#2E86DE; --green:#00D9A3; --red:#ff5470; --text:#e6ecf5; --muted:#8fa3bf; --border:#253456; }
+  body.light { --bg:#f4f6fa; --card:#ffffff; --accent:#2E86DE; --green:#00a878; --red:#e63946; --text:#1a2332; --muted:#6b7a90; --border:#e1e6ee; }
   * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-  body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; padding:16px 16px 90px; min-height:100vh; }
+  body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; padding:16px 16px 90px; min-height:100vh; transition:background .3s,color .3s; }
   h1 { font-size:22px; margin-bottom:4px; text-align:center; }
   .sub { text-align:center; font-size:13px; color:var(--muted); margin-bottom:20px; }
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
-  .card { background:var(--card); border-radius:14px; padding:14px; cursor:pointer; transition:transform .15s; }
+  .card { background:var(--card); border-radius:14px; padding:14px; cursor:pointer; transition:transform .15s,background .3s; }
   .card:active { transform:scale(.97); }
   .card.sel { outline:2px solid var(--accent); }
   .card .code { font-weight:700; font-size:17px; }
@@ -21,31 +22,40 @@
   .card .trend { font-size:13px; margin-top:6px; font-weight:600; }
   .up { color:var(--green); } .down { color:var(--red); } .flat { color:var(--muted); }
   .btn { width:100%; padding:15px; background:var(--accent); color:white; border:none; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer; margin-top:8px; }
-  .btn.sec { background:var(--card); color:var(--text); }
+  .btn.sec { background:var(--card); color:var(--text); border:1px solid var(--border); }
   .btn:active { opacity:.85; }
   .updated { text-align:center; font-size:12px; color:var(--muted); margin-top:14px; }
   .loading { text-align:center; color:var(--muted); padding:40px 0; }
-  canvas { width:100%; background:var(--card); border-radius:14px; padding:8px; margin-bottom:14px; }
+  canvas { width:100%; background:var(--card); border-radius:14px; padding:8px; margin-bottom:14px; display:block; }
   .section { background:var(--card); border-radius:14px; padding:14px; margin-bottom:10px; }
   .section h3 { font-size:15px; margin-bottom:10px; }
-  .row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #253456; }
+  .row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); }
   .row:last-child { border:none; }
   .total { font-size:18px; font-weight:800; color:var(--green); text-align:right; margin-top:10px; }
-  input, select { width:100%; padding:12px; background:#0f1a2e; border:1px solid #253456; border-radius:10px; color:var(--text); font-size:15px; margin-bottom:8px; }
-  .nav { position:fixed; bottom:0; left:0; right:0; background:var(--card); display:flex; padding:8px 0; border-top:1px solid #253456; }
-  .nav button { flex:1; background:none; border:none; color:var(--muted); font-size:12px; padding:8px; cursor:pointer; }
+  input, select { width:100%; padding:12px; background:var(--bg); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:15px; margin-bottom:8px; }
+  .nav { position:fixed; bottom:0; left:0; right:0; background:var(--card); display:flex; padding:6px 0; border-top:1px solid var(--border); transition:background .3s; }
+  .nav button { flex:1; background:none; border:none; color:var(--muted); font-size:11px; padding:8px 4px; cursor:pointer; }
   .nav button.active { color:var(--accent); font-weight:700; }
   .nav button span { display:block; font-size:20px; margin-bottom:2px; }
   .page { display:none; } .page.active { display:block; }
   .del { background:var(--red); color:white; border:none; border-radius:8px; padding:4px 10px; font-size:12px; cursor:pointer; }
+  .stat-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px; }
+  .stat-item { background:var(--bg); border-radius:10px; padding:10px; text-align:center; }
+  .stat-item .lbl { font-size:11px; color:var(--muted); }
+  .stat-item .val { font-size:15px; font-weight:700; margin-top:4px; }
+  .theme-btn { position:absolute; top:16px; right:16px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:8px 12px; color:var(--text); cursor:pointer; font-size:16px; }
+  .range { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-bottom:4px; }
 </style>
 </head>
 <body>
+
+<button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
 
 <div class="page active" id="page-rates">
   <h1>⚡ Валютный Радар</h1>
   <div class="sub">Курсы к рублю в реальном времени</div>
   <canvas id="chart" height="180"></canvas>
+  <div class="range"><span id="rmin">—</span><span id="rmax">—</span></div>
   <div id="list"><div class="loading">Загрузка...</div></div>
   <button class="btn" onclick="load()">🔄 Обновить</button>
   <div class="updated" id="upd"></div>
@@ -67,11 +77,28 @@
   </div>
 </div>
 
+<div class="page" id="page-crypto">
+  <h1>💰 Крипта</h1>
+  <div class="sub">Курсы в рублях и долларах</div>
+  <div id="crypto-list"><div class="loading">Загрузка...</div></div>
+  <button class="btn" onclick="loadCrypto()">🔄 Обновить</button>
+</div>
+
+<div class="page" id="page-stats">
+  <h1>📊 Статистика</h1>
+  <div class="sub">Мин / среднее / макс за 30 дней</div>
+  <div class="section">
+    <h3>Выбери валюту</h3>
+    <select id="stats-code"></select>
+  </div>
+  <div class="stat-grid" id="stats-grid"></div>
+  <canvas id="stats-chart" height="180"></canvas>
+</div>
+
 <div class="page" id="page-more">
   <h1>⚙️ Ещё</h1>
-  <div class="sub">Настройки и действия</div>
   <div class="section">
-    <h3>🌐 Язык / Language</h3>
+    <h3>🌐 Язык</h3>
     <button class="btn sec" onclick="sendCmd('/lang ru')">🇷🇺 Русский</button>
     <button class="btn sec" onclick="sendCmd('/lang en')">🇬🇧 English</button>
   </div>
@@ -87,29 +114,44 @@
     <button class="btn sec" onclick="sendCmd('/myalerts')">Мои алерты</button>
   </div>
   <div class="section">
-    <h3>📊 Аналитика</h3>
-    <button class="btn sec" onclick="showHint('/history USD 30')">История</button>
-    <button class="btn sec" onclick="showHint('/compare USD EUR')">Сравнить валюты</button>
-    <button class="btn sec" onclick="sendCmd('/rate')">Курсы в чат</button>
+    <h3>💱 Конвертер между валютами</h3>
+    <input type="number" id="cv-amount" placeholder="Сумма" value="100">
+    <select id="cv-from"></select>
+    <select id="cv-to"></select>
+    <button class="btn" onclick="convertPair()">Конвертировать</button>
+    <div id="cv-result" style="text-align:center;margin-top:10px;font-size:18px;font-weight:700"></div>
   </div>
 </div>
 
 <div class="nav">
   <button class="active" onclick="nav('rates', this)"><span>💱</span>Курсы</button>
   <button onclick="nav('portfolio', this)"><span>💼</span>Портфель</button>
+  <button onclick="nav('crypto', this)"><span>💰</span>Крипта</button>
+  <button onclick="nav('stats', this)"><span>📊</span>Стата</button>
   <button onclick="nav('more', this)"><span>⚙️</span>Ещё</button>
 </div>
 
 <script>
-const CURRENCIES = ['USD','EUR','KZT','GBP','CNY','JPY','TRY','UAH','AED'];
-const NAMES = {USD:'Доллар 🇺🇸',EUR:'Евро 🇪🇺',KZT:'Тенге 🇰🇿',GBP:'Фунт 🇬🇧',CNY:'Юань 🇨🇳',JPY:'Йена 🇯🇵',TRY:'Лира 🇹🇷',UAH:'Гривна 🇺🇦',AED:'Дирхам 🇦🇪'};
+const CURRENCIES = ['USD','EUR','KZT','GBP','CNY','JPY','TRY','UAH','AED','CHF','CAD','AUD','KRW','INR','BRL'];
+const NAMES = {USD:'Доллар 🇺🇸',EUR:'Евро 🇪🇺',KZT:'Тенге 🇰🇿',GBP:'Фунт 🇬🇧',CNY:'Юань 🇨🇳',JPY:'Йена 🇯🇵',TRY:'Лира 🇹🇷',UAH:'Гривна 🇺🇦',AED:'Дирхам 🇦🇪',CHF:'Франк 🇨🇭',CAD:'Канадский 🇨🇦',AUD:'Австралийский 🇦🇺',KRW:'Вона 🇰🇷',INR:'Рупия 🇮🇳',BRL:'Реал 🇧🇷'};
+const CRYPTO = ['bitcoin','ethereum','the-open-network','solana','binancecoin','tether'];
+const CRYPTO_NAMES = {bitcoin:'BTC',ethereum:'ETH','the-open-network':'TON',solana:'SOL',binancecoin:'BNB',tether:'USDT'};
 
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#0f1a2e'); tg.setBackgroundColor('#0f1a2e'); }
 
-let rates = {};
-let history = {};
-let selected = 'USD';
+let rates = {}, history = {}, selected = 'USD';
+
+// ── Тема ──
+if (localStorage.getItem('theme') === 'light') { document.body.classList.add('light'); document.getElementById('themeBtn').textContent = '☀️'; }
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  const isLight = document.body.classList.contains('light');
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isLight ? '☀️' : '🌙';
+  if (tg) { tg.setHeaderColor(isLight ? '#f4f6fa' : '#0f1a2e'); tg.setBackgroundColor(isLight ? '#f4f6fa' : '#0f1a2e'); }
+  if (Object.keys(rates).length) { drawChart(); drawStats(); }
+}
 
 // ── Навигация ──
 function nav(id, btn) {
@@ -118,9 +160,11 @@ function nav(id, btn) {
   document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   if (id === 'portfolio') renderPortfolio();
+  if (id === 'crypto') loadCrypto();
+  if (id === 'stats') loadStats();
 }
 
-// ── Данные ──
+// ── Курсы ──
 async function load() {
   document.getElementById('list').innerHTML = '<div class="loading">Загрузка...</div>';
   try {
@@ -129,24 +173,21 @@ async function load() {
     const d = new Date(); d.setDate(d.getDate() - 7);
     const old = await fetch(`https://${d.toISOString().slice(0,10)}.currency-api.pages.dev/v1/currencies/rub.json`).then(r => r.json());
 
-    rates = {};
-    CURRENCIES.forEach(c => rates[c] = 1 / rub[c.toLowerCase()]);
-    history = {};
-    CURRENCIES.forEach(c => history[c] = 1 / old.rub[c.toLowerCase()]);
-
-    renderRates();
-    drawChart();
+    rates = {}; history = {};
+    CURRENCIES.forEach(c => {
+      if (rub[c.toLowerCase()]) { rates[c] = 1 / rub[c.toLowerCase()]; history[c] = 1 / (old.rub[c.toLowerCase()] || rub[c.toLowerCase()]); }
+    });
+    renderRates(); drawChart();
     document.getElementById('upd').textContent = 'Обновлено: ' + new Date().toLocaleTimeString('ru-RU');
   } catch(e) {
-    document.getElementById('list').innerHTML = '<div class="loading" style="color:#ff5470">⚠️ Ошибка загрузки</div>';
+    document.getElementById('list').innerHTML = '<div class="loading" style="color:var(--red)">⚠️ Ошибка загрузки</div>';
   }
 }
 
 function renderRates() {
-  const html = CURRENCIES.map(c => {
+  const html = Object.keys(rates).map(c => {
     const rate = rates[c], oldRate = history[c];
-    const diff = rate - oldRate;
-    const pct = (diff / oldRate) * 100;
+    const diff = rate - oldRate, pct = (diff / oldRate) * 100;
     let cls = 'flat', arrow = '➖';
     if (diff > 0.01) { cls = 'up'; arrow = '📈'; } else if (diff < -0.01) { cls = 'down'; arrow = '📉'; }
     return `<div class="card ${c === selected ? 'sel' : ''}" onclick="selectCur('${c}')">
@@ -160,34 +201,34 @@ function renderRates() {
 
 function selectCur(c) { selected = c; renderRates(); drawChart(); }
 
-// ── График ──
 async function drawChart() {
   const c = selected.toLowerCase();
   const labels = [], values = [];
   for (let i = 14; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().slice(0,10);
+    const ds = d.toISOString().slice(0,10);
     try {
-      const data = await fetch(`https://${dateStr}.currency-api.pages.dev/v1/currencies/rub.json`).then(r => r.json());
-      const rate = data.rub[c];
-      if (rate) { labels.push(dateStr.slice(5)); values.push(1 / rate); }
+      const data = await fetch(`https://${ds}.currency-api.pages.dev/v1/currencies/rub.json`).then(r => r.json());
+      const r = data.rub[c];
+      if (r) { labels.push(ds.slice(5)); values.push(1 / r); }
     } catch(e) {}
   }
-  const canvas = document.getElementById('chart');
+  paintChart('chart', values, selected, labels);
+}
+
+function paintChart(canvasId, values, label, labels) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas || !values.length) return;
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
-  const w = canvas.clientWidth - 16, h = 180 - 16;
+  const w = canvas.clientWidth - 16, h = canvas.clientHeight - 16;
   canvas.width = w * dpr; canvas.height = h * dpr;
-  canvas.style.height = (h + 16) + 'px';
-  ctx.scale(dpr, dpr);
+  ctx.setTransform(1,0,0,1,0,0); ctx.scale(dpr, dpr);
   ctx.clearRect(0, 0, w, h);
 
-  if (!values.length) return;
-
-  const min = Math.min(...values), max = Math.max(...values);
-  const range = max - min || 1;
-  const pad = 10;
-  const stepX = (w - pad * 2) / (values.length - 1 || 1);
+  const isLight = document.body.classList.contains('light');
+  const min = Math.min(...values), max = Math.max(...values), range = max - min || 1;
+  const pad = 10, stepX = (w - pad * 2) / (values.length - 1 || 1);
 
   ctx.strokeStyle = '#2E86DE'; ctx.lineWidth = 2;
   ctx.beginPath();
@@ -197,12 +238,14 @@ async function drawChart() {
     i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
   });
   ctx.stroke();
-
   ctx.fillStyle = 'rgba(46,134,222,0.15)';
   ctx.lineTo(w - pad, h - pad); ctx.lineTo(pad, h - pad); ctx.closePath(); ctx.fill();
-
-  ctx.fillStyle = '#e6ecf5'; ctx.font = 'bold 12px sans-serif';
-  ctx.fillText(`${selected}: ${values[values.length-1].toFixed(2)} ₽`, 8, 16);
+  ctx.fillStyle = isLight ? '#1a2332' : '#e6ecf5';
+  ctx.font = 'bold 12px sans-serif';
+  ctx.fillText(`${label}: ${values[values.length-1].toFixed(2)} ₽`, 8, 16);
+  const rmin = document.getElementById('rmin'), rmax = document.getElementById('rmax');
+  if (rmin) rmin.textContent = '↓ ' + min.toFixed(2);
+  if (rmax) rmax.textContent = '↑ ' + max.toFixed(2);
 }
 
 // ── Портфель ──
@@ -222,10 +265,7 @@ function addToPortfolio() {
 }
 
 function removeFromPortfolio(code) {
-  const pf = getPortfolio();
-  delete pf[code];
-  savePortfolio(pf);
-  renderPortfolio();
+  const pf = getPortfolio(); delete pf[code]; savePortfolio(pf); renderPortfolio();
 }
 
 function renderPortfolio() {
@@ -236,27 +276,96 @@ function renderPortfolio() {
   if (!codes.length) { list.innerHTML = '<div class="loading">Пусто</div>'; totalEl.textContent = ''; return; }
   let total = 0;
   list.innerHTML = codes.map(c => {
-    const value = pf[c] * (rates[c] || 0);
-    total += value;
+    const value = pf[c] * (rates[c] || 0); total += value;
     return `<div class="row"><span><b>${c}</b> ${pf[c].toFixed(2)}</span>
       <span>${value.toFixed(2)} ₽ <button class="del" onclick="removeFromPortfolio('${c}')">✕</button></span></div>`;
   }).join('');
   totalEl.textContent = 'Итого: ' + total.toFixed(2) + ' ₽';
 }
 
+// ── Крипта ──
+async function loadCrypto() {
+  document.getElementById('crypto-list').innerHTML = '<div class="loading">Загрузка...</div>';
+  try {
+    const ids = CRYPTO.join(',');
+    const data = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=rub,usd&include_24hr_change=true`).then(r => r.json());
+    const html = CRYPTO.map(id => {
+      const d = data[id];
+      if (!d) return '';
+      const change = d.rub_24h_change || 0;
+      const cls = change > 0 ? 'up' : (change < 0 ? 'down' : 'flat');
+      const arrow = change > 0 ? '📈' : (change < 0 ? '📉' : '➖');
+      return `<div class="card"><div class="code">${CRYPTO_NAMES[id]}</div>
+        <div class="name">${id}</div>
+        <div class="rate">${d.rub.toLocaleString('ru-RU')} ₽</div>
+        <div class="trend ${cls}">${arrow} ${change.toFixed(2)}% / ${d.usd}$</div></div>`;
+    }).join('');
+    document.getElementById('crypto-list').innerHTML = `<div class="grid">${html}</div>`;
+  } catch(e) {
+    document.getElementById('crypto-list').innerHTML = '<div class="loading" style="color:var(--red)">⚠️ Ошибка</div>';
+  }
+}
+
+// ── Статистика ──
+let statsValues = [], statsCode = 'USD';
+async function loadStats() {
+  statsCode = document.getElementById('stats-code').value || 'USD';
+  const c = statsCode.toLowerCase();
+  const values = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0,10);
+    try {
+      const data = await fetch(`https://${ds}.currency-api.pages.dev/v1/currencies/rub.json`).then(r => r.json());
+      const r = data.rub[c];
+      if (r) values.push(1 / r);
+    } catch(e) {}
+  }
+  statsValues = values;
+  if (!values.length) { document.getElementById('stats-grid').innerHTML = '<div class="loading">Нет данных</div>'; return; }
+  const min = Math.min(...values), max = Math.max(...values);
+  const avg = values.reduce((a,b) => a+b, 0) / values.length;
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-item"><div class="lbl">Мин</div><div class="val down">${min.toFixed(2)} ₽</div></div>
+    <div class="stat-item"><div class="lbl">Среднее</div><div class="val">${avg.toFixed(2)} ₽</div></div>
+    <div class="stat-item"><div class="lbl">Макс</div><div class="val up">${max.toFixed(2)} ₽</div></div>`;
+  paintChart('stats-chart', values, statsCode, []);
+}
+
+// ── Конвертер между валютами ──
+async function convertPair() {
+  const amount = parseFloat(document.getElementById('cv-amount').value);
+  const from = document.getElementById('cv-from').value;
+  const to = document.getElementById('cv-to').value;
+  if (!amount) return;
+  const res = document.getElementById('cv-result');
+  res.textContent = '...';
+  try {
+    if (from === to) { res.textContent = `${amount} ${from} = ${amount} ${to}`; return; }
+    const data = await fetch(`https://latest.currency-api.pages.dev/v1/currencies/${from.toLowerCase()}.json`).then(r => r.json());
+    const rate = data[from.toLowerCase()][to.toLowerCase()];
+    res.textContent = `${amount} ${from} = ${(amount * rate).toFixed(4)} ${to}`;
+  } catch(e) { res.textContent = '⚠️ Ошибка'; }
+}
+
 // ── Действия через бота ──
-function sendCmd(cmd) {
-  if (tg) { tg.sendData(JSON.stringify({cmd})); tg.close(); }
-  else alert('Команда для бота: ' + cmd);
-}
-function showHint(cmd) {
-  tg?.showAlert(`Напиши боту в чат:\n${cmd}`);
-}
+function sendCmd(cmd) { if (tg) { tg.sendData(JSON.stringify({cmd})); tg.close(); } else alert(cmd); }
+function showHint(cmd) { tg?.showAlert(`Напиши боту в чат:\n${cmd}`); }
 
 // ── Инициализация ──
-const sel = document.getElementById('pf-code');
-CURRENCIES.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = `${c} — ${NAMES[c]}`; sel.appendChild(o); });
-
+function fillSelects() {
+  const pf = document.getElementById('pf-code');
+  const cvFrom = document.getElementById('cv-from'), cvTo = document.getElementById('cv-to');
+  const st = document.getElementById('stats-code');
+  CURRENCIES.forEach(c => {
+    [pf, cvFrom, cvTo, st].forEach(sel => {
+      const o = document.createElement('option'); o.value = c; o.textContent = `${c} — ${NAMES[c]}`;
+      sel.appendChild(o);
+    });
+  });
+  cvFrom.value = 'USD'; cvTo.value = 'EUR';
+}
+fillSelects();
 load();
 </script>
 </body>
