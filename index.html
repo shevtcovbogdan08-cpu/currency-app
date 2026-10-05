@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Валютный Радар</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root { --bg:#0f1a2e; --card:#1b2a4e; --accent:#2E86DE; --green:#00D9A3; --red:#ff5470; --text:#e6ecf5; }
+  * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; padding:16px 16px 80px; min-height:100vh; }
+  h1 { font-size:22px; margin-bottom:4px; text-align:center; }
+  .sub { text-align:center; font-size:13px; color:#8fa3bf; margin-bottom:20px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+  .card { background:var(--card); border-radius:14px; padding:14px; }
+  .card .code { font-weight:700; font-size:17px; letter-spacing:.5px; }
+  .card .name { font-size:12px; color:#8fa3bf; margin-top:2px; margin-bottom:10px; }
+  .card .rate { font-size:20px; font-weight:800; }
+  .card .trend { font-size:13px; margin-top:6px; font-weight:600; }
+  .up { color:var(--green); } .down { color:var(--red); } .flat { color:#8fa3bf; }
+  .btn { width:100%; padding:15px; background:var(--accent); color:white; border:none; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer; margin-top:8px; }
+  .updated { text-align:center; font-size:12px; color:#8fa3bf; margin-top:14px; }
+  .loading { text-align:center; color:#8fa3bf; padding:40px 0; }
+</style>
+</head>
+<body>
+<h1>⚡ Валютный Радар</h1>
+<div class="sub">Курсы к рублю в реальном времени</div>
+<div id="list"><div class="loading">Загрузка...</div></div>
+<button class="btn" onclick="load()">🔄 Обновить</button>
+<div class="updated" id="upd"></div>
+
+<script>
+const CURRENCIES = ['USD','EUR','KZT','GBP','CNY','JPY','TRY','UAH','AED'];
+const NAMES = {USD:'Доллар 🇺🇸',EUR:'Евро 🇪🇺',KZT:'Тенге 🇰🇿',GBP:'Фунт 🇬🇧',CNY:'Юань 🇨🇳',JPY:'Йена 🇯🇵',TRY:'Лира 🇹🇷',UAH:'Гривна 🇺🇦',AED:'Дирхам 🇦🇪'};
+
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#0f1a2e'); tg.setBackgroundColor('#0f1a2e'); }
+
+async function load() {
+  document.getElementById('list').innerHTML = '<div class="loading">Загрузка...</div>';
+  try {
+    const today = await fetch('https://latest.currency-api.pages.dev/v1/currencies/rub.json').then(r => r.json());
+    const rub = today.rub;
+    const d = new Date(); d.setDate(d.getDate() - 7);
+    const weekAgo = d.toISOString().slice(0,10);
+    const old = await fetch(`https://${weekAgo}.currency-api.pages.dev/v1/currencies/rub.json`).then(r => r.json());
+
+    const html = CURRENCIES.map(c => {
+      const rate = 1 / rub[c.toLowerCase()];
+      const oldRate = 1 / old.rub[c.toLowerCase()];
+      const diff = rate - oldRate;
+      const pct = (diff / oldRate) * 100;
+      let cls = 'flat', arrow = '➖';
+      if (diff > 0.01) { cls = 'up'; arrow = '📈'; }
+      else if (diff < -0.01) { cls = 'down'; arrow = '📉'; }
+      return `<div class="card">
+        <div class="code">${c}</div>
+        <div class="name">${NAMES[c]}</div>
+        <div class="rate">${rate.toFixed(2)} ₽</div>
+        <div class="trend ${cls}">${arrow} ${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</div>
+      </div>`;
+    }).join('');
+    document.getElementById('list').innerHTML = `<div class="grid">${html}</div>`;
+    document.getElementById('upd').textContent = 'Обновлено: ' + new Date().toLocaleTimeString('ru-RU');
+  } catch(e) {
+    document.getElementById('list').innerHTML = '<div class="loading" style="color:#ff5470">⚠️ Ошибка загрузки</div>';
+  }
+}
+load();
+</script>
+</body>
+</html>
