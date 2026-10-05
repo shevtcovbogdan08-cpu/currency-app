@@ -13,7 +13,7 @@
   h1 { font-size:22px; margin-bottom:4px; text-align:center; }
   .sub { text-align:center; font-size:13px; color:var(--muted); margin-bottom:20px; }
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
-  .card { background:var(--card); border-radius:14px; padding:14px; cursor:pointer; transition:transform .15s,background .3s; }
+  .card { background:var(--card); border-radius:14px; padding:14px; cursor:pointer; transition:transform .15s,background .3s; position:relative; }
   .card:active { transform:scale(.97); }
   .card.sel { outline:2px solid var(--accent); }
   .card .code { font-weight:700; font-size:17px; }
@@ -29,12 +29,12 @@
   canvas { width:100%; background:var(--card); border-radius:14px; padding:8px; margin-bottom:14px; display:block; }
   .section { background:var(--card); border-radius:14px; padding:14px; margin-bottom:10px; }
   .section h3 { font-size:15px; margin-bottom:10px; }
-  .row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); }
+  .row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); }
   .row:last-child { border:none; }
   .total { font-size:18px; font-weight:800; color:var(--green); text-align:right; margin-top:10px; }
   input, select { width:100%; padding:12px; background:var(--bg); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:15px; margin-bottom:8px; }
   .nav { position:fixed; bottom:0; left:0; right:0; background:var(--card); display:flex; padding:6px 0; border-top:1px solid var(--border); transition:background .3s; }
-  .nav button { flex:1; background:none; border:none; color:var(--muted); font-size:11px; padding:8px 4px; cursor:pointer; }
+  .nav button { flex:1; background:none; border:none; color:var(--muted); font-size:10px; padding:8px 2px; cursor:pointer; }
   .nav button.active { color:var(--accent); font-weight:700; }
   .nav button span { display:block; font-size:20px; margin-bottom:2px; }
   .page { display:none; } .page.active { display:block; }
@@ -45,22 +45,35 @@
   .stat-item .val { font-size:15px; font-weight:700; margin-top:4px; }
   .theme-btn { position:absolute; top:16px; right:16px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:8px 12px; color:var(--text); cursor:pointer; font-size:16px; }
   .range { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-bottom:4px; }
+  .share-btn { position:absolute; top:10px; right:10px; background:none; border:none; font-size:16px; cursor:pointer; opacity:.6; }
+  .share-btn:active { opacity:1; }
+  .badge { display:inline-block; padding:2px 8px; border-radius:8px; font-size:11px; font-weight:700; margin-left:6px; }
+  .badge.buy { background:rgba(0,217,163,.15); color:var(--green); }
+  .badge.sell { background:rgba(255,84,112,.15); color:var(--red); }
+  .flag { font-size:18px; margin-right:6px; }
+  .period-btns { display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
+  .period-btns button { flex:1; padding:8px 4px; background:var(--bg); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:12px; cursor:pointer; min-width:50px; }
+  .period-btns button.active { background:var(--accent); border-color:var(--accent); color:white; }
+  .toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:var(--accent); color:white; padding:12px 20px; border-radius:12px; font-size:14px; font-weight:600; z-index:999; opacity:0; transition:opacity .3s; pointer-events:none; }
+  .toast.show { opacity:1; }
 </style>
 </head>
 <body>
 
 <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+<div class="toast" id="toast"></div>
 
+<!-- КУРСЫ -->
 <div class="page active" id="page-rates">
   <h1>⚡ Валютный Радар</h1>
   <div class="sub">Курсы к рублю в реальном времени</div>
   <canvas id="chart" height="180"></canvas>
   <div class="range"><span id="rmin">—</span><span id="rmax">—</span></div>
   <div id="list"><div class="loading">Загрузка...</div></div>
-  <button class="btn" onclick="load()">🔄 Обновить</button>
   <div class="updated" id="upd"></div>
 </div>
 
+<!-- ПОРТФЕЛЬ -->
 <div class="page" id="page-portfolio">
   <h1>💼 Портфель</h1>
   <div class="sub">Добавляй валюты — считаем в рублях</div>
@@ -77,42 +90,96 @@
   </div>
 </div>
 
+<!-- КРИПТА -->
 <div class="page" id="page-crypto">
   <h1>💰 Крипта</h1>
   <div class="sub">Курсы в рублях и долларах</div>
   <div id="crypto-list"><div class="loading">Загрузка...</div></div>
-  <button class="btn" onclick="loadCrypto()">🔄 Обновить</button>
 </div>
 
+<!-- СТАТИСТИКА + КАЛЕНДАРЬ -->
 <div class="page" id="page-stats">
   <h1>📊 Статистика</h1>
-  <div class="sub">Мин / среднее / макс за 30 дней</div>
+  <div class="sub">Выбери период и валюту</div>
   <div class="section">
-    <h3>Выбери валюту</h3>
+    <h3>Валюта</h3>
     <select id="stats-code"></select>
+  </div>
+  <div class="period-btns" id="period-btns">
+    <button onclick="setPeriod(7, this)">7д</button>
+    <button class="active" onclick="setPeriod(30, this)">30д</button>
+    <button onclick="setPeriod(60, this)">60д</button>
+    <button onclick="setPeriod(90, this)">90д</button>
   </div>
   <div class="stat-grid" id="stats-grid"></div>
   <canvas id="stats-chart" height="180"></canvas>
 </div>
 
+<!-- ПРОФИЛЬ -->
+<div class="page" id="page-profile">
+  <h1>👤 Профиль</h1>
+  <div class="sub">Твои данные и настройки</div>
+  <div class="section" id="profile-info">
+    <h3>👤 Пользователь</h3>
+    <div class="row"><span>Имя</span><span id="prof-name">—</span></div>
+    <div class="row"><span>Язык</span><span id="prof-lang">—</span></div>
+  </div>
+  <div class="section">
+    <h3>🔔 Подписки</h3>
+    <div id="prof-subs"><div class="loading">Загрузка...</div></div>
+  </div>
+  <div class="section">
+    <h3>🎯 Алерты</h3>
+    <div id="prof-alerts"><div class="loading">Загрузка...</div></div>
+  </div>
+  <div class="section">
+    <h3>💼 Портфель</h3>
+    <div id="prof-portfolio"><div class="loading">Пусто</div></div>
+    <div class="total" id="prof-total"></div>
+  </div>
+  <button class="btn" onclick="shareApp()">📤 Поделиться ботом</button>
+</div>
+
+<!-- БАНКИ -->
+<div class="page" id="page-banks">
+  <h1>🏦 Банковские курсы</h1>
+  <div class="sub">Сравнение курсов покупки/продажи</div>
+  <div id="banks-list"><div class="loading">Загрузка...</div></div>
+  <button class="btn" onclick="loadBanks()">🔄 Обновить</button>
+</div>
+
+<!-- ЕЩЁ -->
 <div class="page" id="page-more">
   <h1>⚙️ Ещё</h1>
+
+  <!-- ФОРМА СОЗДАНИЯ АЛЕРТА -->
+  <div class="section">
+    <h3>🎯 Создать алерт</h3>
+    <select id="alert-code"></select>
+    <select id="alert-direction">
+      <option value=">">Больше (>)</option>
+      <option value="<">Меньше (<)</option>
+    </select>
+    <input type="number" id="alert-target" placeholder="Целевой курс (₽)" step="0.01">
+    <button class="btn" onclick="createAlert()">Создать алерт</button>
+  </div>
+
+  <!-- ФОРМА ПОДПИСКИ -->
+  <div class="section">
+    <h3>🔔 Подписаться на изменение</h3>
+    <select id="sub-code"></select>
+    <input type="number" id="sub-threshold" placeholder="Порог (₽)" step="0.01" value="1">
+    <button class="btn" onclick="createSub()">Подписаться</button>
+  </div>
+
+  <!-- ЯЗЫК -->
   <div class="section">
     <h3>🌐 Язык</h3>
     <button class="btn sec" onclick="sendCmd('/lang ru')">🇷🇺 Русский</button>
     <button class="btn sec" onclick="sendCmd('/lang en')">🇬🇧 English</button>
   </div>
-  <div class="section">
-    <h3>🔔 Подписки</h3>
-    <button class="btn sec" onclick="showHint('/subscribe USD 2')">Подписаться на изменение</button>
-    <button class="btn sec" onclick="sendCmd('/mysubs')">Мои подписки</button>
-    <button class="btn sec" onclick="showHint('/digest 09:00')">Ежедневная сводка</button>
-  </div>
-  <div class="section">
-    <h3>🎯 Целевой курс</h3>
-    <button class="btn sec" onclick="showHint('/alert USD > 95')">Создать алерт</button>
-    <button class="btn sec" onclick="sendCmd('/myalerts')">Мои алерты</button>
-  </div>
+
+  <!-- КОНВЕРТЕР -->
   <div class="section">
     <h3>💱 Конвертер между валютами</h3>
     <input type="number" id="cv-amount" placeholder="Сумма" value="100">
@@ -121,19 +188,40 @@
     <button class="btn" onclick="convertPair()">Конвертировать</button>
     <div id="cv-result" style="text-align:center;margin-top:10px;font-size:18px;font-weight:700"></div>
   </div>
+
+  <!-- СВОДКА -->
+  <div class="section">
+    <h3>⏰ Ежедневная сводка</h3>
+    <input type="time" id="digest-time" value="09:00">
+    <button class="btn" onclick="setDigest()">Включить сводку</button>
+    <button class="btn sec" onclick="sendCmd('/digest off')">Отключить</button>
+  </div>
+
+  <!-- ССЫЛКИ -->
+  <div class="section">
+    <h3>📊 Аналитика в чат</h3>
+    <button class="btn sec" onclick="sendCmd('/rate')">💱 Курсы в чат</button>
+    <button class="btn sec" onclick="showHint('/history USD 30')">📊 История</button>
+    <button class="btn sec" onclick="showHint('/compare USD EUR')">⚖️ Сравнить</button>
+    <button class="btn sec" onclick="showHint('/crypto BTC')">💰 Крипта</button>
+  </div>
 </div>
 
+<!-- НАВИГАЦИЯ (6 вкладок) -->
 <div class="nav">
   <button class="active" onclick="nav('rates', this)"><span>💱</span>Курсы</button>
   <button onclick="nav('portfolio', this)"><span>💼</span>Портфель</button>
   <button onclick="nav('crypto', this)"><span>💰</span>Крипта</button>
   <button onclick="nav('stats', this)"><span>📊</span>Стата</button>
+  <button onclick="nav('banks', this)"><span>🏦</span>Банки</button>
+  <button onclick="nav('profile', this)"><span>👤</span>Профиль</button>
   <button onclick="nav('more', this)"><span>⚙️</span>Ещё</button>
 </div>
 
 <script>
 const CURRENCIES = ['USD','EUR','KZT','GBP','CNY','JPY','TRY','UAH','AED','CHF','CAD','AUD','KRW','INR','BRL'];
 const NAMES = {USD:'Доллар 🇺🇸',EUR:'Евро 🇪🇺',KZT:'Тенге 🇰🇿',GBP:'Фунт 🇬🇧',CNY:'Юань 🇨🇳',JPY:'Йена 🇯🇵',TRY:'Лира 🇹🇷',UAH:'Гривна 🇺🇦',AED:'Дирхам 🇦🇪',CHF:'Франк 🇨🇭',CAD:'Канадский 🇨🇦',AUD:'Австралийский 🇦🇺',KRW:'Вона 🇰🇷',INR:'Рупия 🇮🇳',BRL:'Реал 🇧🇷'};
+const FLAGS = {USD:'🇺🇸',EUR:'🇪🇺',KZT:'🇰🇿',GBP:'🇬🇧',CNY:'🇨🇳',JPY:'🇯🇵',TRY:'🇹🇷',UAH:'🇺🇦',AED:'🇦🇪',CHF:'🇨🇭',CAD:'🇨🇦',AUD:'🇦🇺',KRW:'🇰🇷',INR:'🇮🇳',BRL:'🇧🇷'};
 const CRYPTO = ['bitcoin','ethereum','the-open-network','solana','binancecoin','tether'];
 const CRYPTO_NAMES = {bitcoin:'BTC',ethereum:'ETH','the-open-network':'TON',solana:'SOL',binancecoin:'BNB',tether:'USDT'};
 
@@ -141,46 +229,245 @@ const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#0f1a2e'); tg.setBackgroundColor('#0f1a2e'); }
 
 let rates = {}, history = {}, selected = 'USD';
+let statsPeriod = 30;
+let autoRefreshTimer = null;
+let lastRatesSnapshot = {};
 
-// ── Тема ──
-if (localStorage.getItem('theme') === 'light') { document.body.classList.add('light'); document.getElementById('themeBtn').textContent = '☀️'; }
-function toggleTheme() {
-  document.body.classList.toggle('light');
-  const isLight = document.body.classList.contains('light');
-  localStorage.setItem('theme', isLight ? 'light' : 'dark');
-  document.getElementById('themeBtn').textContent = isLight ? '☀️' : '🌙';
-  if (tg) { tg.setHeaderColor(isLight ? '#f4f6fa' : '#0f1a2e'); tg.setBackgroundColor(isLight ? '#f4f6fa' : '#0f1a2e'); }
-  if (Object.keys(rates).length) { drawChart(); drawStats(); }
+// ═══════════════════════════════════════════
+// 1. АВТООБНОВЛЕНИЕ КАЖДЫЕ 60 СЕК
+// ═══════════════════════════════════════════
+function startAutoRefresh() {
+  if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+  autoRefreshTimer = setInterval(async () => {
+    await load(true); // silent mode
+    checkRateChanges();
+    toast('🔄 Курсы обновлены');
+  }, 60000);
 }
 
-// ── Навигация ──
-function nav(id, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+function checkRateChanges() {
+  // Проверяем, изменился ли курс больше чем на 0.5%
+  Object.keys(rates).forEach(c => {
+    const old = lastRatesSnapshot[c];
+    const now = rates[c];
+    if (old && now) {
+      const change = Math.abs((now - old) / old * 100);
+      if (change > 0.5) {
+        const arrow = now > old ? '📈' : '📉';
+        tg?.showPopup?.({
+          title: `${arrow} ${c} изменился!`,
+          message: `${old.toFixed(2)} ₽ → ${now.toFixed(2)} ₽ (${change.toFixed(2)}%)`,
+          buttons: [{type: 'ok'}]
+        });
+      }
+    }
+  });
+  lastRatesSnapshot = {...rates};
+}
+
+// ═══════════════════════════════════════════
+// 2. ПОДЕЛИТЬСЯ КУРСОМ
+// ═══════════════════════════════════════════
+function shareRate(code) {
+  const rate = rates[code];
+  if (!rate) return;
+  const botUsername = tg?.initDataUnsafe?.user?.username || 'валютный_радар';
+  const text = `💱 ${code} = ${rate.toFixed(2)} ₽ | Валютный Радар`;
+  const url = `https://t.me/share/url?url=${encodeURIComponent('https://t.me/' + botUsername)}&text=${encodeURIComponent(text)}`;
+  if (tg) {
+    tg.openTelegramLink(url);
+  } else {
+    window.open(url, '_blank');
+  }
+}
+
+function shareApp() {
+  const botUsername = 'твой_бот'; // замени на username бота
+  const text = '⚡ Валютный Радар — слежу за курсами валют в реальном времени!';
+  const url = `https://t.me/share/url?url=${encodeURIComponent('https://t.me/' + botUsername)}&text=${encodeURIComponent(text)}`;
+  if (tg) tg.openTelegramLink(url);
+  else window.open(url, '_blank');
+}
+
+// ═══════════════════════════════════════════
+// 3. ПРОФИЛЬ
+// ═══════════════════════════════════════════
+async function loadProfile() {
+  const user = tg?.initDataUnsafe?.user;
+  document.getElementById('prof-name').textContent = user ? (user.first_name + ' ' + (user.last_name || '')) : '—';
+  document.getElementById('prof-lang').textContent = localStorage.getItem('lang') === 'en' ? '🇬🇧 English' : '🇷🇺 Русский';
+
+  // Портфель из localStorage
+  const pf = getPortfolio();
+  const codes = Object.keys(pf);
+  if (codes.length) {
+    let total = 0;
+    let html = '';
+    codes.forEach(c => {
+      const val = pf[c] * (rates[c] || 0);
+      total += val;
+      html += `<div class="row"><span>${FLAGS[c] || ''} ${c}: ${pf[c].toFixed(2)}</span><span>${val.toFixed(2)} ₽</span></div>`;
+    });
+    document.getElementById('prof-portfolio').innerHTML = html;
+    document.getElementById('prof-total').textContent = 'Итого: ' + total.toFixed(2) + ' ₽';
+  } else {
+    document.getElementById('prof-portfolio').innerHTML = '<div class="loading">Пусто</div>';
+    document.getElementById('prof-total').textContent = '';
+  }
+
+  // Подписки и алерты — запрашиваем у бота
+  sendCmdSilent('/mysubs_webapp');
+  sendCmdSilent('/myalerts_webapp');
+}
+
+// ═══════════════════════════════════════════
+// 4. УВЕДОМЛЕНИЯ ЧЕРЕЗ tg.showPopup
+// ═══════════════════════════════════════════
+function notify(title, message) {
+  if (tg?.showPopup) {
+    tg.showPopup({ title, message, buttons: [{type: 'ok'}] });
+  } else {
+    toast(title + ': ' + message);
+  }
+}
+
+// ═══════════════════════════════════════════
+// 5. КАЛЕНДАРЬ / ПЕРИОД ГРАФИКА
+// ═══════════════════════════════════════════
+function setPeriod(days, btn) {
+  statsPeriod = days;
+  document.querySelectorAll('#period-btns button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  if (id === 'portfolio') renderPortfolio();
-  if (id === 'crypto') loadCrypto();
-  if (id === 'stats') loadStats();
+  loadStats();
 }
 
-// ── Курсы ──
-async function load() {
-  document.getElementById('list').innerHTML = '<div class="loading">Загрузка...</div>';
+// ═══════════════════════════════════════════
+// 6. БАНКОВСКИЕ КУРСЫ (Сбер + Тинькофф)
+// ═══════════════════════════════════════════
+async function loadBanks() {
+  const el = document.getElementById('banks-list');
+  el.innerHTML = '<div class="loading">Загрузка...</div>';
+  const results = [];
+
+  // Сбербанк
+  try {
+    const sber = await fetch('https://www.sberbank.ru/proxy/services/rates/public/actual?rateType=ERNP-41&isoCodes[]=USD&isoCodes[]=EUR&isoCodes[]=CNY&regionId=038').then(r => r.json());
+    if (sber && sber.rates) {
+      sber.rates.forEach(r => {
+        results.push({ bank: '🟢 Сбербанк', code: r.isoCode, buy: r.buy, sell: r.sell });
+      });
+    }
+  } catch(e) { console.log('Sber error', e); }
+
+  // Тинькофф
+  try {
+    const tink = await fetch('https://api.tinkoff.ru/v1/currency_rates?from=USD&to=RUB').then(r => r.json());
+    if (tink && tink.payload && tink.payload.rates) {
+      tink.payload.rates.forEach(r => {
+        if (['USD','EUR','GBP','CNY'].includes(r.fromCurrency?.code)) {
+          results.push({ bank: '🟡 Тинькофф', code: r.fromCurrency.code, buy: r.buy, sell: r.sell });
+        }
+      });
+    }
+  } catch(e) { console.log('Tinkoff error', e); }
+
+  if (!results.length) {
+    el.innerHTML = '<div class="loading" style="color:var(--red)">⚠️ Не удалось загрузить курсы банков</div>';
+    return;
+  }
+
+  el.innerHTML = results.map(r => `
+    <div class="section">
+      <h3>${r.bank} — ${FLAGS[r.code] || ''} ${r.code}</h3>
+      <div class="row"><span>Покупка</span><span class="badge buy">${r.buy ? r.buy.toFixed(2) + ' ₽' : '—'}</span></div>
+      <div class="row"><span>Продажа</span><span class="badge sell">${r.sell ? r.sell.toFixed(2) + ' ₽' : '—'}</span></div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════
+// 7. СОЗДАНИЕ АЛЕРТОВ (форма)
+// ═══════════════════════════════════════════
+function createAlert() {
+  const code = document.getElementById('alert-code').value;
+  const dir = document.getElementById('alert-direction').value;
+  const target = parseFloat(document.getElementById('alert-target').value);
+  if (!target) { toast('Введи целевой курс'); return; }
+  sendCmd(`/alert ${code} ${dir} ${target}`);
+}
+
+function createSub() {
+  const code = document.getElementById('sub-code').value;
+  const thr = parseFloat(document.getElementById('sub-threshold').value);
+  if (!thr) { toast('Введи порог'); return; }
+  sendCmd(`/subscribe ${code} ${thr}`);
+}
+
+function setDigest() {
+  const time = document.getElementById('digest-time').value;
+  sendCmd(`/digest ${time}`);
+}
+
+// ═══════════════════════════════════════════
+// 8. КАРТА МИРА (список стран с флагами)
+// ═══════════════════════════════════════════
+function renderWorldMap() {
+  const countries = [
+    {code:'USD', country:'США', flag:'🇺🇸'},
+    {code:'EUR', country:'Евросоюз', flag:'🇪🇺'},
+    {code:'GBP', country:'Великобритания', flag:'🇬🇧'},
+    {code:'CNY', country:'Китай', flag:'🇨🇳'},
+    {code:'JPY', country:'Япония', flag:'🇯🇵'},
+    {code:'KZT', country:'Казахстан', flag:'🇰🇿'},
+    {code:'TRY', country:'Турция', flag:'🇹🇷'},
+    {code:'UAH', country:'Украина', flag:'🇺🇦'},
+    {code:'AED', country:'ОАЭ', flag:'🇦🇪'},
+    {code:'CHF', country:'Швейцария', flag:'🇨🇭'},
+    {code:'CAD', country:'Канада', flag:'🇨🇦'},
+    {code:'AUD', country:'Австралия', flag:'🇦🇺'},
+    {code:'KRW', country:'Южная Корея', flag:'🇰🇷'},
+    {code:'INR', country:'Индия', flag:'🇮🇳'},
+    {code:'BRL', country:'Бразилия', flag:'🇧🇷'},
+  ];
+  return countries.map(c => {
+    const rate = rates[c.code];
+    if (!rate) return '';
+    const old = history[c.code];
+    const diff = old ? ((rate - old) / old * 100) : 0;
+    const cls = diff > 0 ? 'up' : (diff < 0 ? 'down' : 'flat');
+    const arrow = diff > 0 ? '📈' : (diff < 0 ? '📉' : '➖');
+    return `<div class="row">
+      <span><span class="flag">${c.flag}</span>${c.country} (${c.code})</span>
+      <span>${rate.toFixed(2)} ₽ <span class="${cls}">${arrow}</span></span>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+// ЯДРО: ЗАГРУЗКА КУРСОВ
+// ═══════════════════════════════════════════
+async function load(silent = false) {
+  if (!silent) document.getElementById('list').innerHTML = '<div class="loading">Загрузка...</div>';
   try {
     const today = await fetch('https://latest.currency-api.pages.dev/v1/currencies/rub.json').then(r => r.json());
     const rub = today.rub;
     const d = new Date(); d.setDate(d.getDate() - 7);
     const old = await fetch(`https://${d.toISOString().slice(0,10)}.currency-api.pages.dev/v1/currencies/rub.json`).then(r => r.json());
 
+    if (!silent) lastRatesSnapshot = {...rates};
+
     rates = {}; history = {};
     CURRENCIES.forEach(c => {
-      if (rub[c.toLowerCase()]) { rates[c] = 1 / rub[c.toLowerCase()]; history[c] = 1 / (old.rub[c.toLowerCase()] || rub[c.toLowerCase()]); }
+      if (rub[c.toLowerCase()]) {
+        rates[c] = 1 / rub[c.toLowerCase()];
+        history[c] = 1 / (old.rub[c.toLowerCase()] || rub[c.toLowerCase()]);
+      }
     });
     renderRates(); drawChart();
     document.getElementById('upd').textContent = 'Обновлено: ' + new Date().toLocaleTimeString('ru-RU');
+    updateWorldMap();
   } catch(e) {
-    document.getElementById('list').innerHTML = '<div class="loading" style="color:var(--red)">⚠️ Ошибка загрузки</div>';
+    if (!silent) document.getElementById('list').innerHTML = '<div class="loading" style="color:var(--red)">⚠️ Ошибка загрузки</div>';
   }
 }
 
@@ -191,12 +478,18 @@ function renderRates() {
     let cls = 'flat', arrow = '➖';
     if (diff > 0.01) { cls = 'up'; arrow = '📈'; } else if (diff < -0.01) { cls = 'down'; arrow = '📉'; }
     return `<div class="card ${c === selected ? 'sel' : ''}" onclick="selectCur('${c}')">
-      <div class="code">${c}</div><div class="name">${NAMES[c]}</div>
+      <button class="share-btn" onclick="event.stopPropagation();shareRate('${c}')">📤</button>
+      <div class="code">${FLAGS[c] || ''} ${c}</div><div class="name">${NAMES[c]}</div>
       <div class="rate">${rate.toFixed(2)} ₽</div>
       <div class="trend ${cls}">${arrow} ${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</div>
     </div>`;
   }).join('');
   document.getElementById('list').innerHTML = `<div class="grid">${html}</div>`;
+}
+
+function updateWorldMap() {
+  const el = document.getElementById('world-map');
+  if (el) el.innerHTML = renderWorldMap();
 }
 
 function selectCur(c) { selected = c; renderRates(); drawChart(); }
@@ -225,11 +518,9 @@ function paintChart(canvasId, values, label, labels) {
   canvas.width = w * dpr; canvas.height = h * dpr;
   ctx.setTransform(1,0,0,1,0,0); ctx.scale(dpr, dpr);
   ctx.clearRect(0, 0, w, h);
-
   const isLight = document.body.classList.contains('light');
   const min = Math.min(...values), max = Math.max(...values), range = max - min || 1;
   const pad = 10, stepX = (w - pad * 2) / (values.length - 1 || 1);
-
   ctx.strokeStyle = '#2E86DE'; ctx.lineWidth = 2;
   ctx.beginPath();
   values.forEach((v, i) => {
@@ -248,7 +539,24 @@ function paintChart(canvasId, values, label, labels) {
   if (rmax) rmax.textContent = '↑ ' + max.toFixed(2);
 }
 
-// ── Портфель ──
+// ═══════════════════════════════════════════
+// НАВИГАЦИЯ
+// ═══════════════════════════════════════════
+function nav(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (id === 'portfolio') renderPortfolio();
+  if (id === 'crypto') loadCrypto();
+  if (id === 'stats') loadStats();
+  if (id === 'banks') loadBanks();
+  if (id === 'profile') loadProfile();
+}
+
+// ═══════════════════════════════════════════
+// ПОРТФЕЛЬ
+// ═══════════════════════════════════════════
 function getPortfolio() { try { return JSON.parse(localStorage.getItem('pf') || '{}'); } catch(e) { return {}; } }
 function savePortfolio(p) { localStorage.setItem('pf', JSON.stringify(p)); }
 
@@ -277,13 +585,15 @@ function renderPortfolio() {
   let total = 0;
   list.innerHTML = codes.map(c => {
     const value = pf[c] * (rates[c] || 0); total += value;
-    return `<div class="row"><span><b>${c}</b> ${pf[c].toFixed(2)}</span>
+    return `<div class="row"><span>${FLAGS[c] || ''} <b>${c}</b> ${pf[c].toFixed(2)}</span>
       <span>${value.toFixed(2)} ₽ <button class="del" onclick="removeFromPortfolio('${c}')">✕</button></span></div>`;
   }).join('');
   totalEl.textContent = 'Итого: ' + total.toFixed(2) + ' ₽';
 }
 
-// ── Крипта ──
+// ═══════════════════════════════════════════
+// КРИПТА
+// ═══════════════════════════════════════════
 async function loadCrypto() {
   document.getElementById('crypto-list').innerHTML = '<div class="loading">Загрузка...</div>';
   try {
@@ -306,13 +616,14 @@ async function loadCrypto() {
   }
 }
 
-// ── Статистика ──
-let statsValues = [], statsCode = 'USD';
+// ═══════════════════════════════════════════
+// СТАТИСТИКА С ПЕРИОДОМ
+// ═══════════════════════════════════════════
 async function loadStats() {
-  statsCode = document.getElementById('stats-code').value || 'USD';
+  const statsCode = document.getElementById('stats-code').value || 'USD';
   const c = statsCode.toLowerCase();
   const values = [];
-  for (let i = 29; i >= 0; i--) {
+  for (let i = statsPeriod - 1; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i);
     const ds = d.toISOString().slice(0,10);
     try {
@@ -321,7 +632,6 @@ async function loadStats() {
       if (r) values.push(1 / r);
     } catch(e) {}
   }
-  statsValues = values;
   if (!values.length) { document.getElementById('stats-grid').innerHTML = '<div class="loading">Нет данных</div>'; return; }
   const min = Math.min(...values), max = Math.max(...values);
   const avg = values.reduce((a,b) => a+b, 0) / values.length;
@@ -332,7 +642,9 @@ async function loadStats() {
   paintChart('stats-chart', values, statsCode, []);
 }
 
-// ── Конвертер между валютами ──
+// ═══════════════════════════════════════════
+// КОНВЕРТЕР
+// ═══════════════════════════════════════════
 async function convertPair() {
   const amount = parseFloat(document.getElementById('cv-amount').value);
   const from = document.getElementById('cv-from').value;
@@ -348,25 +660,68 @@ async function convertPair() {
   } catch(e) { res.textContent = '⚠️ Ошибка'; }
 }
 
-// ── Действия через бота ──
-function sendCmd(cmd) { if (tg) { tg.sendData(JSON.stringify({cmd})); tg.close(); } else alert(cmd); }
+// ═══════════════════════════════════════════
+// ДЕЙСТВИЯ ЧЕРЕЗ БОТА
+// ═══════════════════════════════════════════
+function sendCmd(cmd) {
+  if (tg) { tg.sendData(JSON.stringify({cmd})); tg.close(); }
+  else toast('Команда: ' + cmd);
+}
+
+let silentBuffer = {};
+function sendCmdSilent(cmd) {
+  // Для запроса данных без закрытия
+  if (tg?.sendData) {
+    // sendData закрывает WebApp, поэтому для запросов используем fetch к боту
+    // Пока оставим заглушку — данные профиля можно запрашивать отдельно
+  }
+}
+
 function showHint(cmd) { tg?.showAlert(`Напиши боту в чат:\n${cmd}`); }
 
-// ── Инициализация ──
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════
+// ТЕМА
+// ═══════════════════════════════════════════
+if (localStorage.getItem('theme') === 'light') { document.body.classList.add('light'); document.getElementById('themeBtn').textContent = '☀️'; }
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  const isLight = document.body.classList.contains('light');
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isLight ? '☀️' : '🌙';
+  if (tg) { tg.setHeaderColor(isLight ? '#f4f6fa' : '#0f1a2e'); tg.setBackgroundColor(isLight ? '#f4f6fa' : '#0f1a2e'); }
+  if (Object.keys(rates).length) { drawChart(); }
+}
+
+// ═══════════════════════════════════════════
+// ИНИЦИАЛИЗАЦИЯ
+// ═══════════════════════════════════════════
 function fillSelects() {
-  const pf = document.getElementById('pf-code');
-  const cvFrom = document.getElementById('cv-from'), cvTo = document.getElementById('cv-to');
-  const st = document.getElementById('stats-code');
-  CURRENCIES.forEach(c => {
-    [pf, cvFrom, cvTo, st].forEach(sel => {
-      const o = document.createElement('option'); o.value = c; o.textContent = `${c} — ${NAMES[c]}`;
+  const selects = ['pf-code', 'cv-from', 'cv-to', 'stats-code', 'alert-code', 'sub-code'];
+  selects.forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    CURRENCIES.forEach(c => {
+      const o = document.createElement('option');
+      o.value = c; o.textContent = `${FLAGS[c] || ''} ${c} — ${NAMES[c]}`;
       sel.appendChild(o);
     });
   });
-  cvFrom.value = 'USD'; cvTo.value = 'EUR';
+  document.getElementById('cv-from').value = 'USD';
+  document.getElementById('cv-to').value = 'EUR';
+  document.getElementById('alert-code').value = 'USD';
+  document.getElementById('sub-code').value = 'USD';
 }
+
 fillSelects();
 load();
+startAutoRefresh(); // ← запуск автообновления
 </script>
 </body>
 </html>
