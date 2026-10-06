@@ -24,7 +24,7 @@
   .card { background:var(--card); border-radius:13px; padding:12px; cursor:pointer; transition:transform .15s, box-shadow .4s; position:relative; animation:fadeIn .35s ease both; overflow:hidden; }
   .card.trend-up { box-shadow: inset 0 0 0 1px rgba(0,217,163,.25), inset 0 -40px 60px -30px rgba(0,217,163,.25); }
   .card.trend-down { box-shadow: inset 0 0 0 1px rgba(255,84,112,.25), inset 0 -40px 60px -30px rgba(255,84,112,.25); }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
   .card:active { transform:scale(.97); }
   .card.sel { outline:2px solid var(--accent); }
   .card .code { font-weight:700; font-size:15px; display:flex; align-items:center; gap:4px; }
@@ -34,7 +34,7 @@
   .card .trend { font-size:12px; margin-top:4px; font-weight:600; }
   .card .spark { display:block; margin-top:4px; opacity:.85; }
   .up { color:var(--green); } .down { color:var(--red); } .flat { color:var(--muted); }
-  .btn { width:100%; padding:13px; background:var(--accent); color:white; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; margin-top:6px; transition:transform .12s; }
+  .btn { width:100%; padding:13px; background:var(--accent); color:white; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; margin-top:6px; transition:transform .12s; position:relative; overflow:hidden; }
   .btn.sec { background:var(--card); color:var(--text); border:1px solid var(--border); font-weight:600; }
   .btn:active { opacity:.85; transform:scale(.98); }
   .updated { text-align:center; font-size:11px; color:var(--muted); margin-top:10px; }
@@ -44,8 +44,11 @@
   .loading { text-align:center; color:var(--muted); padding:30px 0; font-size:13px; }
   .chart-wrap { position:relative; height:200px; background:var(--card); border-radius:13px; padding:8px; margin-bottom:6px; }
   .chart-wrap canvas { width:100% !important; height:100% !important; display:block; }
+  .chart-wrap.updating { animation: chartPulse .8s ease; }
+  @keyframes chartPulse { 0%{box-shadow:0 0 0 0 var(--accent)} 50%{box-shadow:0 0 0 8px rgba(46,134,222,0)} 100%{box-shadow:0 0 0 0 transparent} }
+  .chart-skel { position:absolute; inset:8px; background:linear-gradient(90deg,var(--skeleton) 0%, var(--border) 50%, var(--skeleton) 100%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:10px; }
   .zoom-btns { display:flex; gap:6px; justify-content:center; margin-bottom:10px; }
-  .zoom-btns button { padding:8px 16px; background:var(--card); border:1px solid var(--border); border-radius:9px; color:var(--text); font-size:14px; font-weight:700; cursor:pointer; }
+  .zoom-btns button { padding:8px 16px; background:var(--card); border:1px solid var(--border); border-radius:9px; color:var(--text); font-size:14px; font-weight:700; cursor:pointer; position:relative; overflow:hidden; }
   .zoom-btns button:active { background:var(--accent); color:white; }
   .section { background:var(--card); border-radius:13px; padding:12px; margin-bottom:8px; }
   .section h3 { font-size:13px; margin-bottom:8px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
@@ -54,8 +57,9 @@
   .total { font-size:16px; font-weight:800; color:var(--green); text-align:right; margin-top:8px; }
   input, select { width:100%; padding:11px; background:var(--bg); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:14px; margin-bottom:6px; }
   .nav { position:fixed; bottom:0; left:0; right:0; background:var(--card); display:flex; padding:4px 0; border-top:1px solid var(--border); z-index:10; overflow-x:auto; }
-  .nav button { flex:0 0 auto; min-width:52px; background:none; border:none; color:var(--muted); font-size:8px; padding:5px 4px; cursor:pointer; font-weight:600; }
-  .nav button.active { color:var(--accent); }
+  .nav button { flex:0 0 auto; min-width:52px; background:none; border:none; color:var(--muted); font-size:8px; padding:5px 4px; cursor:pointer; font-weight:600; position:relative; overflow:hidden; }
+  .nav button.active { color:var(--accent); text-shadow: 0 0 12px var(--accent); }
+  .nav button.active span:first-child { filter: drop-shadow(0 0 6px var(--accent)); }
   .nav button span:first-child { display:block; font-size:16px; margin-bottom:1px; }
   .page { display:none; }
   .page.active { display:block; animation:slideParallax .35s ease; }
@@ -71,8 +75,11 @@
   .range { display:flex; justify-content:space-between; font-size:10px; color:var(--muted); margin-bottom:3px; padding:0 4px; }
   .card-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:2px; }
   .card-actions { display:flex; gap:2px; }
-  .icon-btn { background:none; border:none; font-size:14px; cursor:pointer; padding:2px; opacity:.6; line-height:1; }
+  .icon-btn { background:none; border:none; font-size:14px; cursor:pointer; padding:2px; opacity:.6; line-height:1; position:relative; overflow:hidden; }
   .icon-btn:active { opacity:1; }
+  .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .page-share { background:var(--card); border:1px solid var(--border); border-radius:9px; padding:6px 10px; color:var(--text); cursor:pointer; font-size:14px; position:relative; overflow:hidden; }
+  .page-share:active { background:var(--accent); color:white; }
   .badge { display:inline-block; padding:2px 8px; border-radius:7px; font-size:11px; font-weight:700; }
   .badge.buy { background:rgba(0,217,163,.15); color:var(--green); }
   .badge.sell { background:rgba(255,84,112,.15); color:var(--red); }
@@ -107,6 +114,30 @@
   .ptr.pulled { top:20px; }
   .ptr.spin { animation:spin 1s linear infinite; }
   @keyframes spin { to{transform:translateX(-50%) rotate(360deg)} }
+  /* Ripple */
+  .ripple { position:absolute; border-radius:50%; background:rgba(255,255,255,.45); transform:scale(0); animation:rippleAnim .6s ease-out; pointer-events:none; }
+  @keyframes rippleAnim { to{transform:scale(4);opacity:0} }
+  /* Modal slide-up */
+  .modal-inner { animation: slideUp .35s cubic-bezier(.2,.8,.2,1); }
+  @keyframes slideUp { from{transform:translateY(60px);opacity:0} to{transform:translateY(0);opacity:1} }
+  /* Banner stack */
+  .banner-stack { position:fixed; top:60px; left:14px; right:14px; z-index:998; display:flex; flex-direction:column; gap:6px; pointer-events:none; }
+  .banner { background:var(--card); border-left:4px solid var(--accent); border-radius:12px; padding:12px 14px; box-shadow:0 8px 24px rgba(0,0,0,.4); display:flex; gap:10px; align-items:center; animation: bannerIn .4s cubic-bezier(.2,.8,.2,1); pointer-events:auto; cursor:pointer; }
+  .banner.up { border-color: var(--green); }
+  .banner.down { border-color: var(--red); }
+  .banner.out { animation: bannerOut .3s ease forwards; }
+  @keyframes bannerIn { from{transform:translateY(-80px);opacity:0} to{transform:translateY(0);opacity:1} }
+  @keyframes bannerOut { to{transform:translateY(-80px);opacity:0} }
+  .banner-icon { font-size:20px; }
+  .banner-text { flex:1; font-size:13px; line-height:1.35; }
+  /* Empty state */
+  .empty-state { text-align:center; padding:40px 20px; color:var(--muted); }
+  .empty-state .emoji { font-size:48px; margin-bottom:12px; opacity:.7; }
+  .empty-state .txt { font-size:13px; }
+  /* Notifications history */
+  .notif-item { padding:10px 12px; background:var(--bg); border-radius:11px; margin-bottom:6px; font-size:12px; display:flex; gap:10px; align-items:flex-start; }
+  .notif-item .ico { font-size:16px; }
+  .notif-item .time { color:var(--muted); font-size:10px; margin-top:2px; }
 </style>
 </head>
 <body>
@@ -115,9 +146,14 @@
 <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
 <div class="ptr" id="ptr">↓</div>
 <div class="toast" id="toast"></div>
+<div class="banner-stack" id="bannerStack"></div>
 
+<!-- КУРСЫ -->
 <div class="page active" id="page-rates">
-  <h1 id="t-title">Валютный Радар</h1>
+  <div class="page-header">
+    <h1 id="t-title">Валютный Радар</h1>
+    <button class="page-share" onclick="sharePage('rates')">📤</button>
+  </div>
   <div class="live" id="t-live">Live · автообновление</div>
   <div class="chart-wrap"><canvas id="chart"></canvas></div>
   <div class="range"><span id="rmin">—</span><span id="rmax">—</span></div>
@@ -130,8 +166,12 @@
   <div class="updated" id="upd"></div>
 </div>
 
+<!-- ОБМЕН -->
 <div class="page" id="page-convert">
-  <h1 id="t-conv-title">Конвертер</h1>
+  <div class="page-header">
+    <h1 id="t-conv-title">Конвертер</h1>
+    <button class="page-share" onclick="sharePage('convert')">📤</button>
+  </div>
   <div class="sub" id="t-conv-sub">Мгновенный обмен</div>
   <div class="section">
     <input type="number" id="cv-amount" value="100" step="0.01">
@@ -145,32 +185,52 @@
   </div>
 </div>
 
+<!-- КРИПТА -->
 <div class="page" id="page-crypto">
-  <h1 id="t-cr-title">Крипта</h1>
+  <div class="page-header">
+    <h1 id="t-cr-title">Крипта</h1>
+    <button class="page-share" onclick="sharePage('crypto')">📤</button>
+  </div>
   <div class="sub" id="t-cr-sub">₽ и $ · 24ч</div>
   <div id="crypto-list"><div class="skeleton"></div><div class="skeleton"></div></div>
 </div>
 
+<!-- НЕФТЬ -->
 <div class="page" id="page-oil">
-  <h1 id="t-oil-title">Нефть</h1>
+  <div class="page-header">
+    <h1 id="t-oil-title">Нефть</h1>
+    <button class="page-share" onclick="sharePage('oil')">📤</button>
+  </div>
   <div class="sub" id="t-oil-sub">Brent · WTI</div>
   <div id="oil-list"><div class="skeleton"></div></div>
 </div>
 
+<!-- МЕТАЛЛЫ -->
 <div class="page" id="page-metals">
-  <h1 id="t-mt-title">Металлы</h1>
+  <div class="page-header">
+    <h1 id="t-mt-title">Металлы</h1>
+    <button class="page-share" onclick="sharePage('metals')">📤</button>
+  </div>
   <div class="sub" id="t-mt-sub">₽/грамм · live</div>
   <div id="metals-list"><div class="skeleton"></div></div>
 </div>
 
+<!-- АКЦИИ -->
 <div class="page" id="page-stocks">
-  <h1 id="t-sk-title">Акции</h1>
+  <div class="page-header">
+    <h1 id="t-sk-title">Акции</h1>
+    <button class="page-share" onclick="sharePage('stocks')">📤</button>
+  </div>
   <div class="sub" id="t-sk-sub">Индексы и акции</div>
   <div id="stocks-list"><div class="skeleton"></div></div>
 </div>
 
+<!-- СТАТИСТИКА -->
 <div class="page" id="page-stats">
-  <h1 id="t-st-title">Статистика</h1>
+  <div class="page-header">
+    <h1 id="t-st-title">Статистика</h1>
+    <button class="page-share" onclick="sharePage('stats')">📤</button>
+  </div>
   <div class="sub" id="t-st-sub">Мин · среднее · макс</div>
   <div class="section"><select id="stats-code"></select></div>
   <div class="period-btns" id="period-btns">
@@ -189,15 +249,23 @@
   <div class="zoom-hint">🔍 2 пальца — зум · 1 палец — сдвиг</div>
 </div>
 
+<!-- БАНКИ -->
 <div class="page" id="page-banks">
-  <h1 id="t-b-title">Банки</h1>
+  <div class="page-header">
+    <h1 id="t-b-title">Банки</h1>
+    <button class="page-share" onclick="sharePage('banks')">📤</button>
+  </div>
   <div class="sub" id="t-b-sub">ЦБ РФ · Тинькофф</div>
   <div id="banks-list"><div class="skeleton"></div><div class="skeleton"></div></div>
   <button class="btn" onclick="loadBanks()" id="t-b-btn">Обновить</button>
 </div>
 
+<!-- КАЛЬКУЛЯТОР -->
 <div class="page" id="page-calc">
-  <h1 id="t-cl-title">Калькулятор</h1>
+  <div class="page-header">
+    <h1 id="t-cl-title">Калькулятор</h1>
+    <button class="page-share" onclick="sharePage('calc')">📤</button>
+  </div>
   <div class="sub" id="t-cl-sub">Ипотека и вклад</div>
   <div class="tabs-mini" id="calc-tabs">
     <button class="active" onclick="switchCalc('mortgage', this)" id="t-cl-m">🏠 Ипотека</button>
@@ -226,8 +294,12 @@
   </div>
 </div>
 
+<!-- ПРОФИЛЬ -->
 <div class="page" id="page-profile">
-  <h1 id="t-pr-title">Профиль</h1>
+  <div class="page-header">
+    <h1 id="t-pr-title">Профиль</h1>
+    <button class="page-share" onclick="sharePage('profile')">📤</button>
+  </div>
   <div class="sub" id="t-pr-sub">Твои данные</div>
   <div class="section">
     <h3 id="t-pr-user">Пользователь</h3>
@@ -242,11 +314,22 @@
     <div id="prof-portfolio" style="margin-top:10px"><div class="loading">Пусто</div></div>
     <div class="total" id="prof-total"></div>
   </div>
+  <div class="section">
+    <h3 id="t-pr-target">🎯 Цель портфеля</h3>
+    <input type="number" id="target-value" placeholder="100000 ₽" step="1000">
+    <button class="btn" onclick="setTarget()">Установить цель</button>
+    <div id="target-progress" style="margin-top:10px"></div>
+  </div>
   <button class="btn" onclick="shareApp()" id="t-pr-share">Поделиться ботом</button>
 </div>
 
+<!-- НАСТРОЙКИ -->
 <div class="page" id="page-more">
-  <h1 id="t-m-title">Настройки</h1>
+  <div class="page-header">
+    <h1 id="t-m-title">Настройки</h1>
+    <button class="page-share" onclick="sharePage('more')">📤</button>
+  </div>
+
   <div class="section">
     <h3 id="t-m-auto">Автоуведомления</h3>
     <div class="toggle-row">
@@ -254,6 +337,32 @@
       <div class="toggle" id="autoToggle" onclick="toggleAuto()"></div>
     </div>
   </div>
+
+  <div class="section">
+    <h3>🔔 Push в приложении</h3>
+    <div class="toggle-row">
+      <span>Попап при изменении</span>
+      <div class="toggle" id="pushToggle" onclick="togglePush()"></div>
+    </div>
+    <input type="number" id="push-threshold" value="0.5" step="0.1" placeholder="Порог %">
+    <button class="btn sec" onclick="savePushThreshold()">Сохранить порог</button>
+  </div>
+
+  <div class="section">
+    <h3>🌙 Тихие часы</h3>
+    <div class="toggle-row">
+      <span>Не уведомлять ночью</span>
+      <div class="toggle" id="quietToggle" onclick="toggleQuiet()"></div>
+    </div>
+    <div class="sub" style="text-align:left;font-size:10px">С 23:00 до 08:00</div>
+  </div>
+
+  <div class="section">
+    <h3 id="t-m-notif">🔔 История уведомлений</h3>
+    <div id="notif-history"></div>
+    <button class="btn sec" onclick="clearNotifHistory()" id="t-m-notif-clear">Очистить</button>
+  </div>
+
   <div class="section">
     <h3 id="t-m-alert">Алерт по курсу</h3>
     <select id="alert-code"></select>
@@ -264,18 +373,19 @@
     <input type="number" id="alert-target" placeholder="Курс в ₽" step="0.01">
     <button class="btn" onclick="createAlert()" id="t-m-alert-btn">Создать</button>
   </div>
+
   <div class="section">
     <h3 id="t-m-digest">Сводка раз в день</h3>
     <input type="time" id="digest-time" value="09:00">
     <button class="btn sec" onclick="setDigest()" id="t-m-digest-btn">Включить</button>
     <button class="btn sec" onclick="sendCmd('/digest off')" id="t-m-digest-off">Выключить</button>
   </div>
+
   <div class="section">
     <h3 id="t-m-chat">В чат бота</h3>
     <button class="btn sec" onclick="sendCmd('/rate')" id="t-m-rate">Курсы</button>
     <button class="btn sec" onclick="sendCmd('/metals')" id="t-m-mt">Металлы</button>
-    <button class="btn sec" onclick="sendCmd('/oil')" id="t-m-oil">Нефть</button>
-    <button class="btn sec" onclick="sendCmd('/stocks')" id="t-m-sk">Акции</button>
+    <button class="btn sec" onclick="sendCmd('/target')" id="t-m-target">Цель</button>
   </div>
 </div>
 
@@ -319,11 +429,11 @@ const T = {
     bTitle:'Банки',bSub:'ЦБ РФ · Тинькофф',bBtn:'Обновить',
     clTitle:'Калькулятор',clSub:'Ипотека и вклад',
     prTitle:'Профиль',prSub:'Твои данные',prUser:'Пользователь',prName:'Имя',prLang:'Язык',
-    prPf:'Портфель',prPfAdd:'Добавить актив',prShare:'Поделиться ботом',
+    prPf:'Портфель',prPfAdd:'Добавить актив',prShare:'Поделиться ботом',prTarget:'🎯 Цель портфеля',
     mTitle:'Настройки',mAuto:'Автоуведомления',mAutoLabel:'USD · EUR · KZT',
     mAlert:'Алерт по курсу',mAlertBtn:'Создать',mDigest:'Сводка раз в день',
     mDigestBtn:'Включить',mDigestOff:'Выключить',mChat:'В чат бота',
-    mRate:'Курсы',mMt:'Металлы',mOil:'Нефть',mSk:'Акции',
+    mRate:'Курсы',mMt:'Металлы',mTarget:'Цель',
     navRates:'Курсы',navConv:'Обмен',navCr:'Крипта',navOil:'Нефть',navMt:'Металлы',navSk:'Акции',
     navSt:'Стата',navB:'Банки',navCl:'Кальк',navPr:'Профиль',navM:'Настройки',
     min:'мин',avg:'сред',max:'макс',buy:'Пок',sell:'Прод',
@@ -345,11 +455,11 @@ const T = {
     bTitle:'Banks',bSub:'CBR · Tinkoff',bBtn:'Refresh',
     clTitle:'Calculator',clSub:'Mortgage & deposit',
     prTitle:'Profile',prSub:'Your data',prUser:'User',prName:'Name',prLang:'Language',
-    prPf:'Portfolio',prPfAdd:'Add asset',prShare:'Share bot',
+    prPf:'Portfolio',prPfAdd:'Add asset',prShare:'Share bot',prTarget:'🎯 Portfolio target',
     mTitle:'Settings',mAuto:'Auto-notifications',mAutoLabel:'USD · EUR · KZT',
     mAlert:'Price alert',mAlertBtn:'Create',mDigest:'Daily digest',
     mDigestBtn:'Enable',mDigestOff:'Disable',mChat:'To bot chat',
-    mRate:'Rates',mMt:'Metals',mOil:'Oil',mSk:'Stocks',
+    mRate:'Rates',mMt:'Metals',mTarget:'Target',
     navRates:'Rates',navConv:'Convert',navCr:'Crypto',navOil:'Oil',navMt:'Metals',navSk:'Stocks',
     navSt:'Stats',navB:'Banks',navCl:'Calc',navPr:'Profile',navM:'Settings',
     min:'min',avg:'avg',max:'max',buy:'Buy',sell:'Sell',
@@ -371,11 +481,11 @@ const T = {
     bTitle:'Banken',bSub:'ZBR · Tinkoff',bBtn:'Aktualisieren',
     clTitle:'Rechner',clSub:'Hypothek & Einlage',
     prTitle:'Profil',prSub:'Deine Daten',prUser:'Benutzer',prName:'Name',prLang:'Sprache',
-    prPf:'Portfolio',prPfAdd:'Hinzufügen',prShare:'Bot teilen',
+    prPf:'Portfolio',prPfAdd:'Hinzufügen',prShare:'Bot teilen',prTarget:'🎯 Ziel',
     mTitle:'Einstellungen',mAuto:'Auto-Benachrichtigungen',mAutoLabel:'USD · EUR · KZT',
     mAlert:'Preisalarm',mAlertBtn:'Erstellen',mDigest:'Tägliche Zusammenfassung',
     mDigestBtn:'Aktivieren',mDigestOff:'Deaktivieren',mChat:'Zum Bot-Chat',
-    mRate:'Kurse',mMt:'Metalle',mOil:'Öl',mSk:'Aktien',
+    mRate:'Kurse',mMt:'Metalle',mTarget:'Ziel',
     navRates:'Kurse',navConv:'Tausch',navCr:'Krypto',navOil:'Öl',navMt:'Metalle',navSk:'Aktien',
     navSt:'Stat',navB:'Banken',navCl:'Rechner',navPr:'Profil',navM:'Einstellungen',
     min:'min',avg:'Ø',max:'max',buy:'Kauf',sell:'Verk',
@@ -397,11 +507,11 @@ const T = {
     bTitle:'Banques',bSub:'BCR · Tinkoff',bBtn:'Actualiser',
     clTitle:'Calculateur',clSub:'Prêt & dépôt',
     prTitle:'Profil',prSub:'Vos données',prUser:'Utilisateur',prName:'Nom',prLang:'Langue',
-    prPf:'Portefeuille',prPfAdd:'Ajouter',prShare:'Partager',
+    prPf:'Portefeuille',prPfAdd:'Ajouter',prShare:'Partager',prTarget:'🎯 Objectif',
     mTitle:'Paramètres',mAuto:'Notifications auto',mAutoLabel:'USD · EUR · KZT',
     mAlert:'Alerte prix',mAlertBtn:'Créer',mDigest:'Résumé quotidien',
     mDigestBtn:'Activer',mDigestOff:'Désactiver',mChat:'Vers le chat',
-    mRate:'Taux',mMt:'Métaux',mOil:'Pétrole',mSk:'Actions',
+    mRate:'Taux',mMt:'Métaux',mTarget:'Objectif',
     navRates:'Taux',navConv:'Échange',navCr:'Crypto',navOil:'Pétrole',navMt:'Métaux',navSk:'Actions',
     navSt:'Stats',navB:'Banques',navCl:'Calc',navPr:'Profil',navM:'Paramètres',
     min:'min',avg:'moy',max:'max',buy:'Achat',sell:'Vente',
@@ -423,11 +533,11 @@ const T = {
     bTitle:'Bancos',bSub:'BCR · Tinkoff',bBtn:'Actualizar',
     clTitle:'Calculadora',clSub:'Hipoteca y depósito',
     prTitle:'Perfil',prSub:'Tus datos',prUser:'Usuario',prName:'Nombre',prLang:'Idioma',
-    prPf:'Portafolio',prPfAdd:'Añadir',prShare:'Compartir',
+    prPf:'Portafolio',prPfAdd:'Añadir',prShare:'Compartir',prTarget:'🎯 Objetivo',
     mTitle:'Ajustes',mAuto:'Notificaciones auto',mAutoLabel:'USD · EUR · KZT',
     mAlert:'Alerta precio',mAlertBtn:'Crear',mDigest:'Resumen diario',
     mDigestBtn:'Activar',mDigestOff:'Desactivar',mChat:'Al chat',
-    mRate:'Tasas',mMt:'Metales',mOil:'Petróleo',mSk:'Acciones',
+    mRate:'Tasas',mMt:'Metales',mTarget:'Objetivo',
     navRates:'Tasas',navConv:'Cambio',navCr:'Cripto',navOil:'Petróleo',navMt:'Metales',navSk:'Acciones',
     navSt:'Stats',navB:'Bancos',navCl:'Calc',navPr:'Perfil',navM:'Ajustes',
     min:'mín',avg:'med',max:'máx',buy:'Compra',sell:'Venta',
@@ -449,11 +559,11 @@ const T = {
     bTitle:'Bankalar',bSub:'MB · Tinkoff',bBtn:'Yenile',
     clTitle:'Hesap',clSub:'Kredi & mevduat',
     prTitle:'Profil',prSub:'Verilerin',prUser:'Kullanıcı',prName:'Ad',prLang:'Dil',
-    prPf:'Portföy',prPfAdd:'Ekle',prShare:'Paylaş',
+    prPf:'Portföy',prPfAdd:'Ekle',prShare:'Paylaş',prTarget:'🎯 Hedef',
     mTitle:'Ayarlar',mAuto:'Otomatik bildirim',mAutoLabel:'USD · EUR · KZT',
     mAlert:'Fiyat alarmı',mAlertBtn:'Oluştur',mDigest:'Günlük özet',
     mDigestBtn:'Aç',mDigestOff:'Kapat',mChat:'Sohbete',
-    mRate:'Kurlar',mMt:'Metaller',mOil:'Petrol',mSk:'Hisseler',
+    mRate:'Kurlar',mMt:'Metaller',mTarget:'Hedef',
     navRates:'Kurlar',navConv:'Çevir',navCr:'Kripto',navOil:'Petrol',navMt:'Metaller',navSk:'Hisseler',
     navSt:'İstat',navB:'Bankalar',navCl:'Hesap',navPr:'Profil',navM:'Ayarlar',
     min:'min',avg:'ort',max:'maks',buy:'Alış',sell:'Satış',
@@ -479,6 +589,9 @@ if (!localStorage.getItem('theme')) localStorage.setItem('theme', sysTheme);
 let LANG = localStorage.getItem('lang') || 'ru';
 let rates = {}, history = {}, selected = 'USD';
 let statsPeriod = 30, autoOn = localStorage.getItem('autoOn') === 'true';
+let pushOn = localStorage.getItem('pushOn') !== 'false';
+let pushThreshold = parseFloat(localStorage.getItem('pushThreshold') || '0.5');
+let quietOn = localStorage.getItem('quietOn') === 'true';
 let ratesChart = null, statsChart = null;
 let lastRatesSnapshot = {};
 let cryptoCache = {};
@@ -491,7 +604,244 @@ function t(key) { return T[LANG]?.[key] ?? T.ru[key] ?? key; }
 
 function haptic(type = 'light') { try { tg?.HapticFeedback?.impactOccurred(type); } catch(e) {} }
 function hapticSuccess() { try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {} }
+function hapticForTrend(trend) {
+  try {
+    if (trend === 'up') tg?.HapticFeedback?.notificationOccurred('success');
+    else if (trend === 'down') tg?.HapticFeedback?.notificationOccurred('warning');
+  } catch(e) {}
+}
 
+// ═══ RIPPLE ═══
+document.addEventListener('click', e => {
+  const t = e.target.closest('.btn, .icon-btn, .nav button, .zoom-btns button, .page-share');
+  if (!t) return;
+  const rect = t.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  ripple.style.width = ripple.style.height = size + 'px';
+  ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+  ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+  t.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 600);
+});
+
+// ═══ КАСКАД ═══
+function applyCascade(container) {
+  const cards = container.querySelectorAll('.card');
+  cards.forEach((c, i) => { c.style.animationDelay = (i * 30) + 'ms'; });
+}
+
+// ═══ УТИЛИТЫ ═══
+function emptyState(emoji, text) {
+  return `<div class="empty-state"><div class="emoji">${emoji}</div><div class="txt">${text}</div></div>`;
+}
+
+function showChartSkeleton(wrapSelector) {
+  const wrap = document.querySelector(wrapSelector);
+  if (!wrap) return;
+  wrap.querySelectorAll('.chart-skel').forEach(s => s.remove());
+  const skel = document.createElement('div');
+  skel.className = 'chart-skel';
+  wrap.appendChild(skel);
+}
+function hideChartSkeleton(wrapSelector) {
+  const wrap = document.querySelector(wrapSelector);
+  if (!wrap) return;
+  wrap.querySelectorAll('.chart-skel').forEach(s => s.remove());
+}
+
+function pulseChart() {
+  const el = document.querySelector('.chart-wrap');
+  if (!el) return;
+  el.classList.remove('updating');
+  void el.offsetWidth;
+  el.classList.add('updating');
+  setTimeout(() => el.classList.remove('updating'), 800);
+}
+
+// ═══ АНИМАЦИЯ ЧИСЕЛ ═══
+function animateValue(el, from, to, duration = 700, decimals = 2) {
+  if (!el) return;
+  const start = performance.now();
+  const diff = to - from;
+  function step(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = (from + diff * eased).toFixed(decimals) + ' ₽';
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function animateStatValues(min, avg, max) {
+  const elMin = document.querySelector('[data-stat="min"]');
+  const elAvg = document.querySelector('[data-stat="avg"]');
+  const elMax = document.querySelector('[data-stat="max"]');
+  const prev = window._prevStats || {};
+  if (elMin) animateValue(elMin, prev.min ?? min, min, 700, 2);
+  if (elAvg) animateValue(elAvg, prev.avg ?? avg, avg, 700, 2);
+  if (elMax) animateValue(elMax, prev.max ?? max, max, 700, 2);
+  window._prevStats = { min, avg, max };
+}
+
+// ═══ БАННЕРЫ + ГРУППИРОВКА ═══
+let notifQueue = [];
+let notifTimer = null;
+function queueNotification(text, type = 'flat') {
+  notifQueue.push({ text, type });
+  clearTimeout(notifTimer);
+  notifTimer = setTimeout(flushNotifications, 3000);
+}
+function flushNotifications() {
+  if (!notifQueue.length) return;
+  if (notifQueue.length === 1) {
+    showBanner(notifQueue[0].text, notifQueue[0].type);
+  } else {
+    const upCount = notifQueue.filter(n => n.type === 'up').length;
+    const downCount = notifQueue.filter(n => n.type === 'down').length;
+    showBanner(`📊 Изменения: 📈 ${upCount} вырос · 📉 ${downCount} упал`, 'flat');
+  }
+  notifQueue = [];
+}
+
+function isQuietTime() {
+  if (!quietOn) return false;
+  const h = new Date().getHours();
+  return h >= 23 || h < 8;
+}
+
+function showBanner(text, type = 'flat', duration = 4000) {
+  if (isQuietTime()) return;
+  const stack = document.getElementById('bannerStack');
+  if (!stack) return;
+  const icon = type === 'up' ? '📈' : type === 'down' ? '📉' : '🔔';
+  const banner = document.createElement('div');
+  banner.className = 'banner ' + type;
+  banner.innerHTML = `<span class="banner-icon">${icon}</span><div class="banner-text">${text}</div>`;
+  banner.onclick = () => removeBanner(banner);
+  stack.appendChild(banner);
+  hapticForTrend(type);
+  addNotifHistory(text, icon);
+  setTimeout(() => removeBanner(banner), duration);
+}
+function removeBanner(b) {
+  if (!b.parentNode) return;
+  b.classList.add('out');
+  setTimeout(() => b.remove(), 300);
+}
+
+// ═══ ИСТОРИЯ УВЕДОМЛЕНИЙ ═══
+function addNotifHistory(text, icon = '🔔') {
+  const history = JSON.parse(localStorage.getItem('notifHistory') || '[]');
+  history.unshift({
+    text: text.replace(/<[^>]+>/g, '').slice(0, 200),
+    icon,
+    time: Date.now()
+  });
+  if (history.length > 30) history.length = 30;
+  localStorage.setItem('notifHistory', JSON.stringify(history));
+  renderNotifHistory();
+}
+function renderNotifHistory() {
+  const el = document.getElementById('notif-history');
+  if (!el) return;
+  const history = JSON.parse(localStorage.getItem('notifHistory') || '[]');
+  if (!history.length) {
+    el.innerHTML = emptyState('🔕', LANG === 'ru' ? 'Пока пусто' : 'Empty');
+    return;
+  }
+  const now = Date.now();
+  const fmt = ts => {
+    const diff = (now - ts) / 1000;
+    if (diff < 60) return LANG === 'ru' ? 'только что' : 'just now';
+    if (diff < 3600) return Math.floor(diff / 60) + (LANG === 'ru' ? ' мин' : ' min');
+    if (diff < 86400) return Math.floor(diff / 3600) + (LANG === 'ru' ? ' ч' : ' h');
+    return Math.floor(diff / 86400) + (LANG === 'ru' ? ' дн' : ' d');
+  };
+  el.innerHTML = history.slice(0, 10).map(n =>
+    `<div class="notif-item"><span class="ico">${n.icon}</span><div><div>${n.text}</div><div class="time">${fmt(n.time)}</div></div></div>`
+  ).join('');
+}
+function clearNotifHistory() {
+  localStorage.removeItem('notifHistory');
+  renderNotifHistory();
+  toast('🗑');
+  haptic('medium');
+}
+
+// ═══ TOGGLES ═══
+function togglePush() {
+  pushOn = !pushOn;
+  localStorage.setItem('pushOn', pushOn);
+  document.getElementById('pushToggle')?.classList.toggle('on', pushOn);
+  haptic('light');
+}
+function savePushThreshold() {
+  pushThreshold = parseFloat(document.getElementById('push-threshold').value) || 0.5;
+  localStorage.setItem('pushThreshold', pushThreshold);
+  toast('✅ ' + pushThreshold + '%');
+  hapticSuccess();
+}
+function toggleQuiet() {
+  quietOn = !quietOn;
+  localStorage.setItem('quietOn', quietOn);
+  document.getElementById('quietToggle')?.classList.toggle('on', quietOn);
+  haptic('light');
+}
+
+// ═══ SHARE ═══
+function sharePage(page) {
+  const texts = {
+    rates: '💱 Курсы валют к рублю — Валютный Радар',
+    convert: '💸 Конвертер валют',
+    crypto: '🪙 Крипта к рублю',
+    oil: '🛢 Нефть Brent/WTI',
+    metals: '💎 Металлы (золото, серебро) — ₽/грамм',
+    stocks: '📈 Акции и индексы',
+    stats: '📊 Статистика курсов',
+    banks: '🏦 Банковские курсы',
+    calc: '🧮 Калькулятор ипотеки и вклада',
+    profile: '💼 Мой портфель · Валютный Радар',
+    more: '⚡ Валютный Радар',
+  };
+  const text = texts[page] || t('title');
+  const url = `https://t.me/share/url?url=${encodeURIComponent('https://t.me')}&text=${encodeURIComponent(text)}`;
+  if (tg) tg.openTelegramLink(url); else window.open(url, '_blank');
+  haptic('light');
+}
+
+// ═══ ЦЕЛЬ ПОРТФЕЛЯ ═══
+function setTarget() {
+  const v = parseFloat(document.getElementById('target-value').value);
+  if (!v || v <= 0) { toast('⚠️'); return; }
+  localStorage.setItem('target', v);
+  renderTarget();
+  toast('✅ ' + v.toLocaleString('ru-RU') + ' ₽');
+  sendCmd(`/target ${v}`);
+  hapticSuccess();
+}
+function renderTarget() {
+  const target = parseFloat(localStorage.getItem('target') || '0');
+  const el = document.getElementById('target-progress');
+  if (!el) return;
+  if (!target) { el.innerHTML = `<div class="sub">${LANG === 'ru' ? 'Цель не установлена' : 'No target'}</div>`; return; }
+  const pf = getPortfolio();
+  let total = 0;
+  Object.keys(pf).forEach(c => total += pf[c] * getAssetPrice(c));
+  const pct = Math.min(total / target * 100, 100);
+  const filled = Math.round(pct / 5);
+  const bar = '█'.repeat(filled) + '░'.repeat(20 - filled);
+  el.innerHTML = `
+    <div style="font-size:13px;line-height:1.6">
+      <div>${LANG === 'ru' ? 'Цель' : 'Target'}: <b>${target.toLocaleString('ru-RU')} ₽</b></div>
+      <div>${LANG === 'ru' ? 'Сейчас' : 'Now'}: <b>${total.toFixed(2)} ₽</b></div>
+      <div style="font-family:monospace;font-size:12px;letter-spacing:-1px;margin-top:4px">${bar}</div>
+      <div style="color:var(--accent);font-weight:700">${pct.toFixed(1)}%</div>
+    </div>`;
+}
+
+// ═══ SPARKLINE ═══
 function sparklineSVG(values, color, w = 70, h = 20) {
   if (!values || values.length < 2) return '';
   const min = Math.min(...values), max = Math.max(...values);
@@ -525,19 +875,6 @@ async function loadSparklines() {
   } catch(e) { sparkData = {}; }
 }
 
-function animateValue(el, from, to, duration = 700, decimals = 2) {
-  if (!el) return;
-  const start = performance.now();
-  const diff = to - from;
-  function step(now) {
-    const p = Math.min((now - start) / duration, 1);
-    const eased = 1 - Math.pow(1 - p, 3);
-    el.textContent = (from + diff * eased).toFixed(decimals) + ' ₽';
-    if (p < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-
 function applyLang() {
   document.getElementById('langBtn').textContent = LANG.toUpperCase();
   const map = {title:'title',live:'live',dcNow:'dcNow',dcOld:'dcOld',
@@ -547,11 +884,11 @@ function applyLang() {
     stTitle:'stTitle',stSub:'stSub',bTitle:'bTitle',bSub:'bSub',bBtn:'bBtn',
     clTitle:'clTitle',clSub:'clSub',
     prTitle:'prTitle',prSub:'prSub',prUser:'prUser',prName:'prName',prLang:'prLang',
-    prPf:'prPf',prPfAdd:'prPfAdd',prShare:'prShare',
+    prPf:'prPf',prPfAdd:'prPfAdd',prShare:'prShare',prTarget:'prTarget',
     mTitle:'mTitle',mAuto:'mAuto',mAutoLabel:'mAutoLabel',
     mAlert:'mAlert',mAlertBtn:'mAlertBtn',mDigest:'mDigest',
     mDigestBtn:'mDigestBtn',mDigestOff:'mDigestOff',mChat:'mChat',
-    mRate:'mRate',mMt:'mMt',mOil:'mOil',mSk:'mSk'};
+    mRate:'mRate',mMt:'mMt',mTarget:'mTarget'};
   Object.keys(map).forEach(id => {
     const el = document.getElementById('t-' + id);
     if (el) el.textContent = t(map[id]);
@@ -570,6 +907,8 @@ function applyLang() {
   const dir = document.getElementById('alert-direction');
   if (dir) { dir.options[0].textContent = t('greater'); dir.options[1].textContent = t('less'); }
   document.getElementById('autoToggle')?.classList.toggle('on', autoOn);
+  document.getElementById('pushToggle')?.classList.toggle('on', pushOn);
+  document.getElementById('quietToggle')?.classList.toggle('on', quietOn);
   ['pf-amount','prof-pf-amount'].forEach(id => {
     const el = document.getElementById(id); if (el) el.placeholder = t('placeholder');
   });
@@ -578,6 +917,10 @@ function applyLang() {
   if (cd) cd.textContent = t('mCalc')[1];
   const cbrLbl = document.getElementById('t-cl-cbr-l');
   if (cbrLbl) cbrLbl.textContent = t('cbrLabel');
+  const notifLbl = document.getElementById('t-m-notif');
+  if (notifLbl) notifLbl.textContent = '🔔 ' + (LANG === 'ru' ? 'История уведомлений' : 'Notifications history');
+  const clearBtn = document.getElementById('t-m-notif-clear');
+  if (clearBtn) clearBtn.textContent = LANG === 'ru' ? 'Очистить' : 'Clear';
   fillSelects();
   if (Object.keys(rates).length) { renderRates(); renderPortfolio(); }
   if (document.getElementById('page-profile').classList.contains('active')) loadProfile();
@@ -592,8 +935,8 @@ function openLang() {
   document.getElementById('langPickModal')?.remove();
   const div = document.createElement('div');
   div.id = 'langPickModal';
-  div.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px';
-  div.innerHTML = `<div style="background:var(--card);border-radius:16px;padding:16px;width:100%;max-width:340px">
+  div.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:flex-end;justify-content:center;padding:20px';
+  div.innerHTML = `<div class="modal-inner" style="background:var(--card);border-radius:16px;padding:16px;width:100%;max-width:340px">
     <h3 style="text-align:center;margin-bottom:12px;font-size:15px;color:var(--text)">${t('langPick')}</h3>
     ${html}
     <button class="btn sec" style="margin-top:8px" onclick="document.getElementById('langPickModal').remove()">✕</button>
@@ -709,7 +1052,7 @@ function nav(id, btn) {
   if (id === 'stats') loadStats();
   if (id === 'banks') loadBanks();
   if (id === 'calc') loadCBRRate();
-  if (id === 'profile') loadProfile();
+  if (id === 'profile') { loadProfile(); renderTarget(); }
   if (id === 'convert') convertPair();
 }
 
@@ -734,6 +1077,7 @@ async function load() {
     if (!Object.keys(sparkData).length) loadSparklines().then(() => renderRates());
     renderRates(); drawChart();
     checkRateChanges();
+    pulseChart();
     document.getElementById('upd').textContent = t('updated') + ' ' + new Date().toLocaleTimeString();
   } catch(e) {
     list.innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
@@ -743,18 +1087,21 @@ async function load() {
 }
 
 function checkRateChanges() {
+  if (!pushOn) return;
   Object.keys(rates).forEach(c => {
     const old = lastRatesSnapshot[c], now = rates[c];
-    if (old && now && Math.abs((now - old) / old * 100) > 0.5) {
-      notify(t('notifyTitle'), t('notifyBody').replace('{code}', c).replace('{dir}', now > old ? '📈' : '📉').replace('{diff}', Math.abs(now - old).toFixed(2)));
+    if (old && now && Math.abs((now - old) / old * 100) > pushThreshold) {
+      const dir = now > old ? 'up' : 'down';
+      const pct = ((now - old) / old * 100).toFixed(2);
+      const arrow = dir === 'up' ? '📈' : '📉';
+      queueNotification(`<b>${c}</b> ${dir === 'up' ? 'вырос' : 'упал'} на <b>${pct}%</b> → ${now.toFixed(2)} ₽`, dir);
     }
   });
   lastRatesSnapshot = {...rates};
 }
 
 function notify(title, body) {
-  if (tg?.showPopup) tg.showPopup({title, message: body, buttons: [{type: 'ok'}]});
-  else toast(title + ': ' + body);
+  showBanner(`<b>${title}</b><br>${body}`, 'flat');
 }
 
 function toggleFav(code) {
@@ -801,6 +1148,7 @@ function renderRates() {
       </div>`;
     }).join('');
     list.innerHTML = `<div class="grid">${html}</div>`;
+    applyCascade(list);
     prevRates = {...rates};
     return;
   }
@@ -924,7 +1272,9 @@ async function loadCrypto() {
         <div class="trend ${cls}">${arrow} ${change.toFixed(2)}%</div>
       </div>`;
     }).join('');
-    document.getElementById('crypto-list').innerHTML = `<div class="grid">${html}</div>`;
+    const container = document.getElementById('crypto-list');
+    container.innerHTML = `<div class="grid">${html}</div>`;
+    applyCascade(container);
     CRYPTO.forEach(id => {
       const code = CRYPTO_NAMES[id];
       const el = document.querySelector(`[data-crypto="${code}"]`);
@@ -973,7 +1323,9 @@ async function loadOil() {
         <div class="rate">$${d.price.toFixed(2)}</div>
         <div class="trend ${cls}">${arrow} ${d.change.toFixed(2)}%</div></div>`;
     }).join('');
-    document.getElementById('oil-list').innerHTML = htmls ? `<div class="grid">${htmls}</div>` : `<div class="loading">${t('error')}</div>`;
+    const container = document.getElementById('oil-list');
+    container.innerHTML = htmls ? `<div class="grid">${htmls}</div>` : emptyState('🛢', t('error'));
+    applyCascade(container);
   } catch(e) {
     document.getElementById('oil-list').innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
   }
@@ -1004,8 +1356,8 @@ async function loadMetals() {
         <div class="usd">${t('perGram')}</div>
       </div>`);
     }
-    if (htmls.length) el.innerHTML = `<div class="grid">${htmls.join('')}</div>`;
-    else el.innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
+    if (htmls.length) { el.innerHTML = `<div class="grid">${htmls.join('')}</div>`; applyCascade(el); }
+    else el.innerHTML = emptyState('💎', t('error'));
   } catch(e) {
     el.innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
   }
@@ -1043,7 +1395,9 @@ async function loadStocks() {
       <div class="rate">${r.price.toFixed(2)}</div>
       <div class="trend ${r.cls}">${r.arrow} ${r.change.toFixed(2)}%</div></div>`
   ).join('');
-  document.getElementById('stocks-list').innerHTML = `<div class="grid">${html}</div>`;
+  const container = document.getElementById('stocks-list');
+  container.innerHTML = `<div class="grid">${html}</div>`;
+  applyCascade(container);
 }
 
 function setPeriod(days, btn) {
@@ -1054,23 +1408,17 @@ function setPeriod(days, btn) {
 }
 
 function zoomStats(factor) {
-  if (statsChart && typeof statsChart.zoom === 'function') {
-    statsChart.zoom(factor);
-  } else {
-    toast('⚠️ Zoom не готов');
-  }
+  if (statsChart && typeof statsChart.zoom === 'function') statsChart.zoom(factor);
   haptic('light');
 }
-
 function resetZoomStats() {
-  if (statsChart && typeof statsChart.resetZoom === 'function') {
-    statsChart.resetZoom();
-  }
+  if (statsChart && typeof statsChart.resetZoom === 'function') statsChart.resetZoom();
   haptic('light');
 }
 
 async function loadStats() {
   document.getElementById('stats-grid').innerHTML = '<div class="skeleton short"></div>';
+  showChartSkeleton('#page-stats .chart-wrap');
   const code = document.getElementById('stats-code').value || 'USD';
   const c = code.toLowerCase();
   const labels = [], values = [];
@@ -1083,13 +1431,19 @@ async function loadStats() {
       if (r) { labels.push(ds); values.push(1 / r); }
     } catch(e) {}
   }
-  if (!values.length) { document.getElementById('stats-grid').innerHTML = `<div class="loading">${t('empty')}</div>`; return; }
+  if (!values.length) {
+    hideChartSkeleton('#page-stats .chart-wrap');
+    document.getElementById('stats-grid').innerHTML = emptyState('📊', t('empty'));
+    return;
+  }
   const min = Math.min(...values), max = Math.max(...values);
   const avg = values.reduce((a,b) => a+b, 0) / values.length;
   document.getElementById('stats-grid').innerHTML = `
-    <div class="stat-item"><div class="lbl">${t('min')}</div><div class="val down">${min.toFixed(2)}</div><div class="stat-spark">${sparklineSVG(values.slice(-14), '#ff5470', 60, 12)}</div></div>
-    <div class="stat-item"><div class="lbl">${t('avg')}</div><div class="val">${avg.toFixed(2)}</div><div class="stat-spark">${sparklineSVG(values.slice(-14), '#2E86DE', 60, 12)}</div></div>
-    <div class="stat-item"><div class="lbl">${t('max')}</div><div class="val up">${max.toFixed(2)}</div><div class="stat-spark">${sparklineSVG(values.slice(-14), '#00D9A3', 60, 12)}</div></div>`;
+    <div class="stat-item"><div class="lbl">${t('min')}</div><div class="val down" data-stat="min">${min.toFixed(2)}</div><div class="stat-spark">${sparklineSVG(values.slice(-14), '#ff5470', 60, 12)}</div></div>
+    <div class="stat-item"><div class="lbl">${t('avg')}</div><div class="val" data-stat="avg">${avg.toFixed(2)}</div><div class="stat-spark">${sparklineSVG(values.slice(-14), '#2E86DE', 60, 12)}</div></div>
+    <div class="stat-item"><div class="lbl">${t('max')}</div><div class="val up" data-stat="max">${max.toFixed(2)}</div><div class="stat-spark">${sparklineSVG(values.slice(-14), '#00D9A3', 60, 12)}</div></div>`;
+  animateStatValues(min, avg, max);
+
   const ctx = document.getElementById('stats-chart').getContext('2d');
   const isLight = document.body.classList.contains('light');
   if (statsChart) statsChart.destroy();
@@ -1103,12 +1457,7 @@ async function loadStats() {
         legend: { display: false },
         zoom: {
           pan: { enabled: true, mode: 'x' },
-          zoom: {
-            wheel: { enabled: true, speed: 0.1 },
-            pinch: { enabled: true },
-            drag: { enabled: false },
-            mode: 'x'
-          }
+          zoom: { wheel: { enabled: true, speed: 0.1 }, pinch: { enabled: true }, drag: { enabled: false }, mode: 'x' }
         }
       },
       scales: {
@@ -1117,46 +1466,57 @@ async function loadStats() {
       }
     }
   });
+  hideChartSkeleton('#page-stats .chart-wrap');
 }
 
 async function loadBanks() {
   const el = document.getElementById('banks-list');
   el.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+  const fetchTimeout = (url, ms = 3500) => {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), ms);
+    return fetch(url, { signal: ctrl.signal })
+      .then(r => r.ok ? r.json() : null)
+      .catch(() => null)
+      .finally(() => clearTimeout(timer));
+  };
+  const tinkUrl = 'https://api.tinkoff.ru/v1/currency_rates?from=USD&to=RUB';
+  const tinkProxies = [
+    'https://corsproxy.io/?url=' + encodeURIComponent(tinkUrl),
+    'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(tinkUrl),
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent(tinkUrl)
+  ];
+  const [cbrData, ...tinkResults] = await Promise.all([
+    fetchTimeout('https://www.cbr-xml-daily.ru/daily_json.js'),
+    ...tinkProxies.map(u => fetchTimeout(u))
+  ]);
   let html = '';
-  try {
-    const cbr = await fetch('https://www.cbr-xml-daily.ru/daily_json.js').then(r => r.json());
+  if (cbrData && cbrData.Valute) {
     html += `<div class="section"><h3>${t('cbrTitle')}</h3>`;
     ['USD','EUR','CNY','GBP','JPY','CHF','KZT'].forEach(code => {
-      const v = cbr.Valute[code]; if (!v) return;
+      const v = cbrData.Valute[code]; if (!v) return;
       const rate = (v.Value / v.Nominal).toFixed(3);
       html += `<div class="row"><span>${FLAGS[code]} ${code}</span><span class="badge buy">${rate} ₽</span></div>`;
     });
     html += '</div>';
-  } catch(e) {}
-  const tinkUrl = 'https://api.tinkoff.ru/v1/currency_rates?from=USD&to=RUB';
-  const proxies = ['https://corsproxy.io/?url=' + encodeURIComponent(tinkUrl),
-                   'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(tinkUrl)];
-  for (const p of proxies) {
-    try {
-      const tink = await fetch(p).then(r => r.json());
-      if (tink?.payload?.rates?.length) {
-        html += `<div class="section"><h3>${t('tinkTitle')}</h3>`;
-        const seen = new Set();
-        tink.payload.rates.forEach(r => {
-          const code = r.fromCurrency?.code;
-          if (!code || seen.has(code) || !['USD','EUR','GBP','CNY','CHF','JPY'].includes(code)) return;
-          seen.add(code);
-          const buy = r.buy ? r.buy.toFixed(2) + ' ₽' : '—';
-          const sell = r.sell ? r.sell.toFixed(2) + ' ₽' : '—';
-          html += `<div class="row"><span>${FLAGS[code] || ''} ${code}</span>
-            <span><span class="badge buy">${t('buy')} ${buy}</span> <span class="badge sell">${t('sell')} ${sell}</span></span></div>`;
-        });
-        html += '</div>';
-        break;
-      }
-    } catch(e) {}
   }
-  if (!html) html = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
+  const tink = tinkResults.find(r => r?.payload?.rates?.length);
+  if (tink) {
+    html += `<div class="section"><h3>${t('tinkTitle')}</h3>`;
+    const seen = new Set();
+    tink.payload.rates.forEach(r => {
+      const code = r.fromCurrency?.code;
+      if (!code || seen.has(code) || !['USD','EUR','GBP','CNY','CHF','JPY'].includes(code)) return;
+      seen.add(code);
+      const buy = r.buy ? r.buy.toFixed(2) + ' ₽' : '—';
+      const sell = r.sell ? r.sell.toFixed(2) + ' ₽' : '—';
+      html += `<div class="row"><span>${FLAGS[code] || ''} ${code}</span>
+        <span><span class="badge buy">${t('buy')} ${buy}</span> <span class="badge sell">${t('sell')} ${sell}</span></span></div>`;
+    });
+    html += '</div>';
+  }
+  if (!html) html = `<div class="loading" style="color:var(--red)">${t('error')}</div>
+    <button class="btn" onclick="loadBanks()" style="margin-top:8px">🔄 ${t('retry')}</button>`;
   el.innerHTML = html;
 }
 
@@ -1205,9 +1565,7 @@ async function loadCBRRate() {
   try {
     cbrRate = 16.0;
     document.getElementById('cbr-rate').textContent = cbrRate.toFixed(2) + '%';
-  } catch(e) {
-    document.getElementById('cbr-rate').textContent = '—';
-  }
+  } catch(e) { document.getElementById('cbr-rate').textContent = '—'; }
 }
 
 function getPortfolio() { try { return JSON.parse(localStorage.getItem('pf') || '{}'); } catch(e) { return {}; } }
@@ -1220,7 +1578,7 @@ function getAssetPrice(code) {
 }
 
 function addToPortfolio() { addAsset('pf-code', 'pf-amount', null); }
-function addToPortfolioProfile() { addAsset('prof-pf-code', 'prof-pf-amount', loadProfile); }
+function addToPortfolioProfile() { addAsset('prof-pf-code', 'prof-pf-amount', () => { loadProfile(); renderTarget(); }); }
 
 function addAsset(codeId, amountId, cb) {
   const code = document.getElementById(codeId).value;
@@ -1239,7 +1597,7 @@ function addAsset(codeId, amountId, cb) {
 function removeFromPortfolio(code) {
   const pf = getPortfolio(); delete pf[code]; savePortfolio(pf);
   renderPortfolio();
-  if (document.getElementById('page-profile').classList.contains('active')) loadProfile();
+  if (document.getElementById('page-profile').classList.contains('active')) { loadProfile(); renderTarget(); }
   haptic('medium');
 }
 
@@ -1248,7 +1606,7 @@ function renderPortfolio() {
   const list = document.getElementById('pf-list'), totalEl = document.getElementById('pf-total');
   if (!list) return;
   const codes = Object.keys(pf);
-  if (!codes.length) { list.innerHTML = `<div class="loading">${t('empty')}</div>`; totalEl.textContent = ''; return; }
+  if (!codes.length) { list.innerHTML = emptyState('💼', t('empty')); totalEl.textContent = ''; return; }
   let total = 0;
   list.innerHTML = codes.map(c => {
     const price = getAssetPrice(c);
@@ -1275,9 +1633,10 @@ function loadProfile() {
     el.innerHTML = html;
     totalEl.textContent = t('total') + ': ' + total.toFixed(2) + ' ₽';
   } else {
-    el.innerHTML = `<div class="loading">${t('empty')}</div>`;
+    el.innerHTML = emptyState('💼', t('empty'));
     totalEl.textContent = '';
   }
+  renderTarget();
 }
 
 function createAlert() {
@@ -1359,8 +1718,11 @@ function fillSelects() {
   }
 }
 
+// Инициализация
+document.getElementById('push-threshold').value = pushThreshold;
 fillSelects();
 applyLang();
+renderNotifHistory();
 load();
 loadCrypto();
 </script>
