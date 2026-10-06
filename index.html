@@ -11,14 +11,7 @@
   :root { --bg:#0f1a2e; --card:#1b2a4e; --accent:#2E86DE; --green:#00D9A3; --red:#ff5470; --text:#e6ecf5; --muted:#8fa3bf; --border:#253456; --skeleton:#253456; }
   body.light { --bg:#f4f6fa; --card:#ffffff; --accent:#2E86DE; --green:#00a878; --red:#e63946; --text:#1a2332; --muted:#6b7a90; --border:#e1e6ee; --skeleton:#e1e6ee; }
   * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-  body {
-    background: linear-gradient(-45deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 85%, var(--accent)) 50%, var(--bg) 100%);
-    background-size: 400% 400%;
-    animation: bgShift 20s ease infinite;
-    color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-    padding:14px 14px 86px; min-height:100vh; transition:color .3s; overflow-x:hidden;
-  }
-  @keyframes bgShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+  body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; padding:14px 14px 86px; min-height:100vh; transition:color .3s; overflow-x:hidden; }
   h1 { font-size:19px; margin-bottom:2px; text-align:center; font-weight:800; letter-spacing:-.3px; }
   .sub { text-align:center; font-size:11px; color:var(--muted); margin-bottom:4px; }
   .live { text-align:center; font-size:11px; color:var(--green); margin-bottom:14px; display:flex; align-items:center; justify-content:center; gap:5px; font-weight:600; }
@@ -27,14 +20,9 @@
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
   @keyframes pulseBig { 0%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(2.5)} 100%{opacity:1;transform:scale(1)} }
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
-  .card {
-    background:var(--card); border-radius:13px; padding:12px; cursor:pointer;
-    transition:transform .15s, background .4s, box-shadow .4s;
-    position:relative; animation:fadeIn .35s ease both;
-    overflow:hidden;
-  }
-  .card.trend-up { background: linear-gradient(135deg, var(--card) 0%, color-mix(in srgb, var(--card) 88%, var(--green)) 100%); }
-  .card.trend-down { background: linear-gradient(135deg, var(--card) 0%, color-mix(in srgb, var(--card) 88%, var(--red)) 100%); }
+  .card { background:var(--card); border-radius:13px; padding:12px; cursor:pointer; transition:transform .15s, box-shadow .4s; position:relative; animation:fadeIn .35s ease both; overflow:hidden; }
+  .card.trend-up { box-shadow: inset 0 0 0 1px rgba(0,217,163,.25), inset 0 -40px 60px -30px rgba(0,217,163,.25); }
+  .card.trend-down { box-shadow: inset 0 0 0 1px rgba(255,84,112,.25), inset 0 -40px 60px -30px rgba(255,84,112,.25); }
   @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
   .card:active { transform:scale(.97); }
   .card.sel { outline:2px solid var(--accent); }
@@ -55,7 +43,7 @@
   .loading { text-align:center; color:var(--muted); padding:30px 0; font-size:13px; }
   .chart-wrap { position:relative; height:200px; background:var(--card); border-radius:13px; padding:8px; margin-bottom:10px; }
   .chart-wrap canvas { width:100% !important; height:100% !important; display:block; }
-  .section { background:var(--card); border-radius:13px; padding:12px; margin-bottom:8px; animation:fadeIn .3s ease; }
+  .section { background:var(--card); border-radius:13px; padding:12px; margin-bottom:8px; }
   .section h3 { font-size:13px; margin-bottom:8px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
   .row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid var(--border); font-size:13px; }
   .row:last-child { border:none; }
@@ -109,14 +97,12 @@
   .zoom-hint { text-align:center; font-size:10px; color:var(--muted); margin-top:4px; }
   .rate-flash-up { animation: flashUp .7s ease; }
   .rate-flash-down { animation: flashDown .7s ease; }
-  @keyframes flashUp { 0%{box-shadow:0 0 0 2px var(--green) inset;} 100%{box-shadow:0 0 0 2px transparent inset;} }
-  @keyframes flashDown { 0%{box-shadow:0 0 0 2px var(--red) inset;} 100%{box-shadow:0 0 0 2px transparent inset;} }
+  @keyframes flashUp { 0%{box-shadow: inset 0 0 0 2px var(--green)} 100%{box-shadow: inset 0 0 0 0 transparent} }
+  @keyframes flashDown { 0%{box-shadow: inset 0 0 0 2px var(--red)} 100%{box-shadow: inset 0 0 0 0 transparent} }
   .ptr { position:fixed; top:-60px; left:50%; transform:translateX(-50%); width:50px; height:50px; background:var(--card); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; z-index:100; transition:top .2s; box-shadow:0 4px 20px rgba(0,0,0,.3); }
   .ptr.pulled { top:20px; }
   .ptr.spin { animation:spin 1s linear infinite; }
   @keyframes spin { to{transform:translateX(-50%) rotate(360deg)} }
-  .card.shimmer::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent); animation:shimmerMove 1.5s; pointer-events:none; }
-  @keyframes shimmerMove { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
 </style>
 </head>
 <body>
@@ -494,12 +480,8 @@ let cbrRate = null;
 
 function t(key) { return T[LANG]?.[key] ?? T.ru[key] ?? key; }
 
-function haptic(type = 'light') {
-  try { tg?.HapticFeedback?.impactOccurred(type); } catch(e) {}
-}
-function hapticSuccess() {
-  try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {}
-}
+function haptic(type = 'light') { try { tg?.HapticFeedback?.impactOccurred(type); } catch(e) {} }
+function hapticSuccess() { try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {} }
 
 function sparklineSVG(values, color, w = 70, h = 20) {
   if (!values || values.length < 2) return '';
@@ -515,21 +497,26 @@ function sparklineSVG(values, color, w = 70, h = 20) {
 }
 
 async function loadSparklines() {
-  const promises = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i);
-    const ds = d.toISOString().slice(0,10);
-    promises.push(fetch(`https://${ds}.currency-api.pages.dev/v1/currencies/rub.json`).then(r => r.json()).catch(() => null));
-  }
-  const days = await Promise.all(promises);
-  sparkData = {};
-  CURRENCIES.forEach(c => {
-    const vals = [];
-    for (const day of days) {
-      if (day && day.rub && day.rub[c.toLowerCase()]) vals.push(1 / day.rub[c.toLowerCase()]);
+  try {
+    const promises = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const ds = d.toISOString().slice(0,10);
+      promises.push(fetch(`https://${ds}.currency-api.pages.dev/v1/currencies/rub.json`).then(r => r.json()).catch(() => null));
     }
-    if (vals.length >= 2) sparkData[c] = vals;
-  });
+    const days = await Promise.all(promises);
+    sparkData = {};
+    CURRENCIES.forEach(c => {
+      const vals = [];
+      for (const day of days) {
+        if (day && day.rub && day.rub[c.toLowerCase()]) vals.push(1 / day.rub[c.toLowerCase()]);
+      }
+      if (vals.length >= 2) sparkData[c] = vals;
+    });
+  } catch(e) {
+    console.warn('Sparklines failed:', e);
+    sparkData = {};
+  }
 }
 
 function animateValue(el, from, to, duration = 700, decimals = 2) {
@@ -713,7 +700,7 @@ document.addEventListener('touchend', e => {
       haptic('light');
     }, 250);
   } else {
-    if (touchCurPage) { touchCurPage.style.transform = 'translateX(0)'; }
+    if (touchCurPage) touchCurPage.style.transform = 'translateX(0)';
     if (touchNextPage) {
       const hideX = dx < 0 ? '100' : '-100';
       touchNextPage.style.transform = `translateX(${hideX}%)`;
@@ -743,33 +730,20 @@ document.addEventListener('touchmove', e => {
   if (dy > 0 && window.scrollY === 0) {
     pullDistance = Math.min(dy * 0.5, 80);
     ptr.style.top = (pullDistance - 60) + 'px';
-    if (pullDistance > 40) {
-      ptr.textContent = '↻';
-      ptr.classList.add('pulled');
-    } else {
-      ptr.textContent = '↓';
-      ptr.classList.remove('pulled');
-    }
+    if (pullDistance > 40) { ptr.textContent = '↻'; ptr.classList.add('pulled'); }
+    else { ptr.textContent = '↓'; ptr.classList.remove('pulled'); }
   }
 }, {passive: true});
 document.addEventListener('touchend', () => {
   if (!isPulling) return;
   isPulling = false;
   if (pullDistance > 40) {
-    ptr.classList.add('spin');
-    ptr.textContent = '↻';
-    haptic('medium');
+    ptr.classList.add('spin'); ptr.textContent = '↻'; haptic('medium');
     load().then(() => {
-      ptr.classList.remove('spin');
-      ptr.textContent = '↓';
-      ptr.classList.remove('pulled');
-      ptr.style.top = '-60px';
-      hapticSuccess();
+      ptr.classList.remove('spin'); ptr.textContent = '↓'; ptr.classList.remove('pulled');
+      ptr.style.top = '-60px'; hapticSuccess();
     });
-  } else {
-    ptr.classList.remove('pulled');
-    ptr.style.top = '-60px';
-  }
+  } else { ptr.classList.remove('pulled'); ptr.style.top = '-60px'; }
   pullDistance = 0;
 }, {passive: true});
 
@@ -808,9 +782,7 @@ async function load() {
         history[c] = 1 / (old.rub[c.toLowerCase()] || rub[c.toLowerCase()]);
       }
     });
-    if (!Object.keys(sparkData).length) {
-      loadSparklines().then(() => renderRates());
-    }
+    if (!Object.keys(sparkData).length) loadSparklines().then(() => renderRates());
     renderRates(); drawChart();
     checkRateChanges();
     document.getElementById('upd').textContent = t('updated') + ' ' + new Date().toLocaleTimeString();
@@ -863,7 +835,7 @@ function renderRates() {
       else if (diff < -0.01) { cls = 'down'; arrow = '▼'; trendCls = 'trend-down'; }
       const isFav = favorites.includes(c);
       const sparkVals = sparkData[c] || [];
-      const sparkColor = diff > 0.01 ? 'var(--green)' : (diff < -0.01 ? 'var(--red)' : 'var(--muted)');
+      const sparkColor = diff > 0.01 ? '#00D9A3' : (diff < -0.01 ? '#ff5470' : '#8fa3bf');
       const spark = sparklineSVG(sparkVals, sparkColor, 70, 20);
       return `<div class="card ${c === selected ? 'sel' : ''} ${trendCls}" data-code="${c}" onclick="onCardClick('${c}')">
         <div class="card-top">
@@ -881,12 +853,6 @@ function renderRates() {
     }).join('');
     list.innerHTML = `<div class="grid">${html}</div>`;
     prevRates = {...rates};
-    setTimeout(() => {
-      list.querySelectorAll('.card').forEach(card => {
-        card.classList.add('shimmer');
-        setTimeout(() => card.classList.remove('shimmer'), 1500);
-      });
-    }, 50);
     return;
   }
 
@@ -923,11 +889,7 @@ function renderRates() {
   prevRates = {...rates};
 }
 
-function onCardClick(code) {
-  haptic('light');
-  selectCur(code);
-}
-
+function onCardClick(code) { haptic('light'); selectCur(code); }
 function selectCur(c) { selected = c; renderRates(); drawChart(); }
 
 async function drawChart() {
@@ -959,9 +921,9 @@ async function drawChart() {
   if (values.length >= 2) {
     const now = values[values.length - 1], old = values[values.length - 2];
     const diff = now - old, pct = (diff / old) * 100;
-    let arrow = '·', color = 'var(--muted)';
-    if (diff > 0.01) { arrow = '▲'; color = 'var(--green)'; }
-    else if (diff < -0.01) { arrow = '▼'; color = 'var(--red)'; }
+    let arrow = '·', color = '#8fa3bf';
+    if (diff > 0.01) { arrow = '▲'; color = '#00D9A3'; }
+    else if (diff < -0.01) { arrow = '▼'; color = '#ff5470'; }
     document.getElementById('dc-now').textContent = now.toFixed(2) + ' ₽';
     document.getElementById('dc-old').textContent = old.toFixed(2) + ' ₽';
     const dc = document.getElementById('dc-diff');
@@ -973,8 +935,7 @@ async function drawChart() {
 function swapCur() {
   const f = document.getElementById('cv-from'), to = document.getElementById('cv-to');
   const tmp = f.value; f.value = to.value; to.value = tmp;
-  convertPair();
-  haptic('light');
+  convertPair(); haptic('light');
 }
 
 async function convertPair() {
@@ -1003,7 +964,6 @@ async function loadCrypto() {
     const data = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${CRYPTO.join(',')}&vs_currencies=rub,usd&include_24hr_change=true`).then(r => r.json());
     cryptoCache = {};
     CRYPTO.forEach(id => { if (data[id]) cryptoCache[CRYPTO_NAMES[id]] = data[id]; });
-
     const html = CRYPTO.map(id => {
       const d = data[id]; if (!d) return '';
       const change = d.rub_24h_change || 0;
@@ -1019,7 +979,6 @@ async function loadCrypto() {
       </div>`;
     }).join('');
     document.getElementById('crypto-list').innerHTML = `<div class="grid">${html}</div>`;
-
     CRYPTO.forEach(id => {
       const code = CRYPTO_NAMES[id];
       const el = document.querySelector(`[data-crypto="${code}"]`);
@@ -1070,7 +1029,6 @@ async function loadOil() {
   }
 }
 
-// ═══ МЕТАЛЛЫ — улучшенная версия с 7 прокси ═══
 async function loadMetals() {
   const el = document.getElementById('metals-list');
   el.innerHTML = '<div class="skeleton"></div>';
@@ -1092,13 +1050,8 @@ async function loadMetals() {
       const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
       if (!resp.ok) continue;
       const json = await resp.json();
-      if (json && json.Valute && json.Valute.XAU) {
-        data = json;
-        break;
-      }
-    } catch(e) {
-      console.log('Proxy failed:', url, e.message);
-    }
+      if (json && json.Valute && json.Valute.XAU) { data = json; break; }
+    } catch(e) { console.log('Proxy failed:', url, e.message); }
   }
 
   if (!data) {
@@ -1164,8 +1117,7 @@ function setPeriod(days, btn) {
   statsPeriod = days;
   document.querySelectorAll('#period-btns button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  haptic('light');
-  loadStats();
+  haptic('light'); loadStats();
 }
 
 async function loadStats() {
@@ -1186,9 +1138,9 @@ async function loadStats() {
   const min = Math.min(...values), max = Math.max(...values);
   const avg = values.reduce((a,b) => a+b, 0) / values.length;
   document.getElementById('stats-grid').innerHTML = `
-    <div class="stat-item"><div class="lbl">${t('min')}</div><div class="val down" data-stat="min">${min.toFixed(2)}</div><div class="stat-spark">${sparklineSVG(values.slice(-14), 'var(--red)', 60, 12)}</div></div>
-    <div class="stat-item"><div class="lbl">${t('avg')}</div><div class="val" data-stat="avg">${avg.toFixed(2)}</div><div class="stat-spark">${sparklineSVG(values.slice(-14), 'var(--accent)', 60, 12)}</div></div>
-    <div class="stat-item"><div class="lbl">${t('max')}</div><div class="val up" data-stat="max">${max.toFixed(2)}</div><div class="stat-spark">${sparklineSVG(values.slice(-14), 'var(--green)', 60, 12)}</div></div>`;
+    <div class="stat-item"><div class="lbl">${t('min')}</div><div class="val down">${min.toFixed(2)}</div><div class="stat-spark">${sparklineSVG(values.slice(-14), '#ff5470', 60, 12)}</div></div>
+    <div class="stat-item"><div class="lbl">${t('avg')}</div><div class="val">${avg.toFixed(2)}</div><div class="stat-spark">${sparklineSVG(values.slice(-14), '#2E86DE', 60, 12)}</div></div>
+    <div class="stat-item"><div class="lbl">${t('max')}</div><div class="val up">${max.toFixed(2)}</div><div class="stat-spark">${sparklineSVG(values.slice(-14), '#00D9A3', 60, 12)}</div></div>`;
 
   const ctx = document.getElementById('stats-chart').getContext('2d');
   const isLight = document.body.classList.contains('light');
@@ -1275,9 +1227,9 @@ function calcMortgage() {
   const over = total - amount;
   document.getElementById('mo-result').innerHTML = `
     <div class="section">
-      <div class="row"><span>${t('monthlyPay')}</span><span style="font-weight:800;color:var(--accent)">${monthly.toLocaleString('ru-RU', {maximumFractionDigits:0})} ₽</span></div>
+      <div class="row"><span>${t('monthlyPay')}</span><span style="font-weight:800;color:#2E86DE">${monthly.toLocaleString('ru-RU', {maximumFractionDigits:0})} ₽</span></div>
       <div class="row"><span>${t('totalPay')}</span><span>${total.toLocaleString('ru-RU', {maximumFractionDigits:0})} ₽</span></div>
-      <div class="row"><span>${t('overPay')}</span><span style="color:var(--red)">${over.toLocaleString('ru-RU', {maximumFractionDigits:0})} ₽</span></div>
+      <div class="row"><span>${t('overPay')}</span><span style="color:#ff5470">${over.toLocaleString('ru-RU', {maximumFractionDigits:0})} ₽</span></div>
     </div>`;
   hapticSuccess();
 }
@@ -1291,8 +1243,8 @@ function calcDeposit() {
   const profit = final - amount;
   document.getElementById('dp-result').innerHTML = `
     <div class="section">
-      <div class="row"><span>${t('finalAmount')}</span><span style="font-weight:800;color:var(--green)">${final.toLocaleString('ru-RU', {maximumFractionDigits:0})} ₽</span></div>
-      <div class="row"><span>${t('profit')}</span><span style="color:var(--green)">+${profit.toLocaleString('ru-RU', {maximumFractionDigits:0})} ₽</span></div>
+      <div class="row"><span>${t('finalAmount')}</span><span style="font-weight:800;color:#00D9A3">${final.toLocaleString('ru-RU', {maximumFractionDigits:0})} ₽</span></div>
+      <div class="row"><span>${t('profit')}</span><span style="color:#00D9A3">+${profit.toLocaleString('ru-RU', {maximumFractionDigits:0})} ₽</span></div>
     </div>`;
   hapticSuccess();
 }
@@ -1381,8 +1333,7 @@ function createAlert() {
   const dir = document.getElementById('alert-direction').value;
   const target = parseFloat(document.getElementById('alert-target').value);
   if (!target) { toast('⚠️'); return; }
-  sendCmd(`/alert ${code} ${dir} ${target}`);
-  hapticSuccess();
+  sendCmd(`/alert ${code} ${dir} ${target}`); hapticSuccess();
 }
 function setDigest() { sendCmd(`/digest ${document.getElementById('digest-time').value}`); hapticSuccess(); }
 
