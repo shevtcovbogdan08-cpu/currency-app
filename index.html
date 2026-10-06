@@ -11,22 +11,39 @@
   :root { --bg:#0f1a2e; --card:#1b2a4e; --accent:#2E86DE; --green:#00D9A3; --red:#ff5470; --text:#e6ecf5; --muted:#8fa3bf; --border:#253456; --skeleton:#253456; }
   body.light { --bg:#f4f6fa; --card:#ffffff; --accent:#2E86DE; --green:#00a878; --red:#e63946; --text:#1a2332; --muted:#6b7a90; --border:#e1e6ee; --skeleton:#e1e6ee; }
   * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-  body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; padding:14px 14px 86px; min-height:100vh; transition:background .3s,color .3s; overflow-x:hidden; }
+  body {
+    background: linear-gradient(-45deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 85%, var(--accent)) 50%, var(--bg) 100%);
+    background-size: 400% 400%;
+    animation: bgShift 20s ease infinite;
+    color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    padding:14px 14px 86px; min-height:100vh; transition:color .3s; overflow-x:hidden;
+  }
+  @keyframes bgShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
   h1 { font-size:19px; margin-bottom:2px; text-align:center; font-weight:800; letter-spacing:-.3px; }
   .sub { text-align:center; font-size:11px; color:var(--muted); margin-bottom:4px; }
   .live { text-align:center; font-size:11px; color:var(--green); margin-bottom:14px; display:flex; align-items:center; justify-content:center; gap:5px; font-weight:600; }
   .live::before { content:''; width:6px; height:6px; background:var(--green); border-radius:50%; animation:pulse 1.5s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .live.refreshing::before { animation:pulseBig .6s 3; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
+  @keyframes pulseBig { 0%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(2.5)} 100%{opacity:1;transform:scale(1)} }
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
-  .card { background:var(--card); border-radius:13px; padding:12px; cursor:pointer; transition:transform .15s; position:relative; animation:fadeIn .3s ease; }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  .card {
+    background:var(--card); border-radius:13px; padding:12px; cursor:pointer;
+    transition:transform .15s, background .4s, box-shadow .4s;
+    position:relative; animation:fadeIn .35s ease both;
+    overflow:hidden;
+  }
+  .card.trend-up { background: linear-gradient(135deg, var(--card) 0%, color-mix(in srgb, var(--card) 88%, var(--green)) 100%); }
+  .card.trend-down { background: linear-gradient(135deg, var(--card) 0%, color-mix(in srgb, var(--card) 88%, var(--red)) 100%); }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
   .card:active { transform:scale(.97); }
   .card.sel { outline:2px solid var(--accent); }
   .card .code { font-weight:700; font-size:15px; display:flex; align-items:center; gap:4px; }
-  .card .name { font-size:11px; color:var(--muted); margin:1px 0 8px; }
+  .card .name { font-size:11px; color:var(--muted); margin:1px 0 6px; }
   .card .rate { font-size:19px; font-weight:800; letter-spacing:-.3px; transition:color .3s; }
   .card .usd { font-size:12px; font-weight:600; color:var(--muted); margin-top:2px; }
-  .card .trend { font-size:12px; margin-top:5px; font-weight:600; }
+  .card .trend { font-size:12px; margin-top:4px; font-weight:600; }
+  .card .spark { display:block; margin-top:4px; opacity:.85; }
   .up { color:var(--green); } .down { color:var(--red); } .flat { color:var(--muted); }
   .btn { width:100%; padding:13px; background:var(--accent); color:white; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; margin-top:6px; transition:transform .12s; }
   .btn.sec { background:var(--card); color:var(--text); border:1px solid var(--border); font-weight:600; }
@@ -48,14 +65,15 @@
   .nav button { flex:0 0 auto; min-width:52px; background:none; border:none; color:var(--muted); font-size:8px; padding:5px 4px; cursor:pointer; font-weight:600; }
   .nav button.active { color:var(--accent); }
   .nav button span:first-child { display:block; font-size:16px; margin-bottom:1px; }
-  .page { display:none; animation:slideIn .25s ease; }
-  .page.active { display:block; }
-  @keyframes slideIn { from{opacity:0; transform:translateX(10px)} to{opacity:1; transform:translateX(0)} }
+  .page { display:none; }
+  .page.active { display:block; animation:slideParallax .35s ease; }
+  @keyframes slideParallax { from{opacity:0; transform:translateX(20px) scale(.98)} to{opacity:1; transform:translateX(0) scale(1)} }
   .del { background:var(--red); color:white; border:none; border-radius:7px; padding:3px 8px; font-size:11px; cursor:pointer; }
   .stat-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:10px; }
-  .stat-item { background:var(--bg); border-radius:10px; padding:10px 6px; text-align:center; }
+  .stat-item { background:var(--bg); border-radius:10px; padding:10px 6px; text-align:center; position:relative; }
   .stat-item .lbl { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
   .stat-item .val { font-size:14px; font-weight:800; margin-top:3px; }
+  .stat-spark { display:block; margin:6px auto 0; opacity:.8; }
   .theme-btn { position:absolute; top:12px; right:12px; background:var(--card); border:1px solid var(--border); border-radius:9px; padding:6px 10px; color:var(--text); cursor:pointer; font-size:14px; z-index:5; }
   .lang-btn { position:absolute; top:12px; left:12px; background:var(--card); border:1px solid var(--border); border-radius:9px; padding:6px 10px; color:var(--text); cursor:pointer; font-size:11px; font-weight:800; letter-spacing:.5px; z-index:5; }
   .range { display:flex; justify-content:space-between; font-size:10px; color:var(--muted); margin-bottom:3px; padding:0 4px; }
@@ -93,12 +111,20 @@
   .rate-flash-down { animation: flashDown .7s ease; }
   @keyframes flashUp { 0%{box-shadow:0 0 0 2px var(--green) inset;} 100%{box-shadow:0 0 0 2px transparent inset;} }
   @keyframes flashDown { 0%{box-shadow:0 0 0 2px var(--red) inset;} 100%{box-shadow:0 0 0 2px transparent inset;} }
+  /* Pull-to-refresh */
+  .ptr { position:fixed; top:-60px; left:50%; transform:translateX(-50%); width:50px; height:50px; background:var(--card); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; z-index:100; transition:top .2s; box-shadow:0 4px 20px rgba(0,0,0,.3); }
+  .ptr.pulled { top:20px; }
+  .ptr.spin { animation:spin 1s linear infinite; }
+  @keyframes spin { to{transform:translateX(-50%) rotate(360deg)} }
+  .card.shimmer::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent); animation:shimmerMove 1.5s; pointer-events:none; }
+  @keyframes shimmerMove { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
 </style>
 </head>
 <body>
 
 <button class="lang-btn" onclick="openLang()" id="langBtn">RU</button>
 <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+<div class="ptr" id="ptr">↓</div>
 <div class="toast" id="toast"></div>
 
 <div class="page active" id="page-rates">
@@ -456,11 +482,67 @@ let statsPeriod = 30, autoOn = localStorage.getItem('autoOn') === 'true';
 let ratesChart = null, statsChart = null;
 let lastRatesSnapshot = {};
 let cryptoCache = {};
-let prevRates = {}; // для плавной анимации
+let prevRates = {};
+let sparkData = {}; // { USD: [v1,v2,...,v7] }
 let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
 let cbrRate = null;
 
 function t(key) { return T[LANG]?.[key] ?? T.ru[key] ?? key; }
+
+// ═══ HAPTIC ═══
+function haptic(type = 'light') {
+  try { tg?.HapticFeedback?.impactOccurred(type); } catch(e) {}
+}
+function hapticSuccess() {
+  try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e) {}
+}
+
+// ═══ SPARKLINE ═══
+function sparklineSVG(values, color, w = 70, h = 20) {
+  if (!values || values.length < 2) return '';
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = max - min || 1;
+  const stepX = w / (values.length - 1);
+  const points = values.map((v, i) => {
+    const x = i * stepX;
+    const y = h - ((v - min) / range) * (h - 2) - 1;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline fill="none" stroke="${color}" stroke-width="1.5" points="${points}" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+async function loadSparklines() {
+  const promises = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0,10);
+    promises.push(fetch(`https://${ds}.currency-api.pages.dev/v1/currencies/rub.json`).then(r => r.json()).catch(() => null));
+  }
+  const days = await Promise.all(promises);
+  sparkData = {};
+  CURRENCIES.forEach(c => {
+    const vals = [];
+    for (const day of days) {
+      if (day && day.rub && day.rub[c.toLowerCase()]) vals.push(1 / day.rub[c.toLowerCase()]);
+    }
+    if (vals.length >= 2) sparkData[c] = vals;
+  });
+}
+
+// ═══ ПЛАВНАЯ АНИМАЦИЯ ЧИСЕЛ ═══
+function animateValue(el, from, to, duration = 700, decimals = 2) {
+  if (!el) return;
+  const start = performance.now();
+  const diff = to - from;
+  function step(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
+    const current = from + diff * eased;
+    el.textContent = current.toFixed(decimals) + ' ₽';
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
 
 function applyLang() {
   document.getElementById('langBtn').textContent = LANG.toUpperCase();
@@ -526,6 +608,7 @@ function openLang() {
     <button class="btn sec" style="margin-top:8px" onclick="document.getElementById('langPickModal').remove()">✕</button>
   </div>`;
   document.body.appendChild(div);
+  haptic('light');
 }
 
 function setLang(code) {
@@ -543,6 +626,7 @@ function setLang(code) {
   if (active === 'banks') loadBanks();
   if (active === 'profile') loadProfile();
   toast('✅ ' + code.toUpperCase());
+  hapticSuccess();
 }
 
 function toggleAuto() {
@@ -551,6 +635,7 @@ function toggleAuto() {
   document.getElementById('autoToggle').classList.toggle('on', autoOn);
   sendCmdSilent(autoOn ? '/autosub on' : '/autosub off');
   toast(autoOn ? '🔔 ' + t('toastOn') : '🔕 ' + t('toastOff'));
+  haptic('light');
 }
 
 if (localStorage.getItem('theme') === 'light') { document.body.classList.add('light'); document.getElementById('themeBtn').textContent = '☀️'; }
@@ -561,21 +646,131 @@ function toggleTheme() {
   document.getElementById('themeBtn').textContent = isLight ? '☀️' : '🌙';
   if (Object.keys(rates).length) drawChart();
   if (statsChart) loadStats();
+  haptic('light');
 }
 
 const NAV_ORDER = ['rates','convert','crypto','oil','metals','stocks','stats','banks','calc','profile','more'];
-let touchStartX = 0, touchStartY = 0;
-document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; }, {passive: true});
+
+// ═══ СВАЙП С ПАРАЛЛАКСОМ ═══
+let touchStartX = 0, touchStartY = 0, touchCurPage = null, touchNextPage = null, isSwipeHorizontal = false;
+document.addEventListener('touchstart', e => {
+  if (e.target.closest('.chart-wrap')) return; // не мешаем графику
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  isSwipeHorizontal = false;
+  touchCurPage = null;
+}, {passive: true});
+document.addEventListener('touchmove', e => {
+  const dx = e.touches[0].clientX - touchStartX;
+  const dy = e.touches[0].clientY - touchStartY;
+  if (!isSwipeHorizontal && Math.abs(dx) > 15 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    isSwipeHorizontal = true;
+    const cur = NAV_ORDER.findIndex(id => document.getElementById('page-' + id).classList.contains('active'));
+    touchCurPage = document.getElementById('page-' + NAV_ORDER[cur]);
+    let nextIdx = dx < 0 ? cur + 1 : cur - 1;
+    touchNextPage = (nextIdx >= 0 && nextIdx < NAV_ORDER.length) ? document.getElementById('page-' + NAV_ORDER[nextIdx]) : null;
+    if (touchNextPage) {
+      touchNextPage.style.display = 'block';
+      touchNextPage.style.position = 'absolute';
+      touchNextPage.style.top = '0'; touchNextPage.style.left = '0'; touchNextPage.style.right = '0';
+      touchNextPage.style.transform = `translateX(${dx < 0 ? '100%' : '-100%'})`;
+      touchNextPage.style.transition = 'none';
+    }
+  }
+  if (isSwipeHorizontal && touchCurPage) {
+    e.preventDefault();
+    touchCurPage.style.transition = 'none';
+    touchCurPage.style.transform = `translateX(${dx}px)`;
+    if (touchNextPage) {
+      const startX = dx < 0 ? 100 : -100;
+      const progress = Math.min(Math.abs(dx) / window.innerWidth, 1);
+      const nextX = startX + (0 - startX) * progress;
+      touchNextPage.style.transform = `translateX(${nextX}%)`;
+    }
+  }
+}, {passive: false});
 document.addEventListener('touchend', e => {
+  if (!isSwipeHorizontal || !touchCurPage) return;
   const dx = e.changedTouches[0].clientX - touchStartX;
-  const dy = e.changedTouches[0].clientY - touchStartY;
-  if (Math.abs(dx) < 80 || Math.abs(dy) > 60) return;
   const cur = NAV_ORDER.findIndex(id => document.getElementById('page-' + id).classList.contains('active'));
-  if (cur === -1) return;
-  let next = dx < 0 ? cur + 1 : cur - 1;
-  if (next < 0 || next >= NAV_ORDER.length) return;
-  const btns = document.querySelectorAll('.nav button');
-  nav(NAV_ORDER[next], btns[next]);
+  const threshold = window.innerWidth * 0.25;
+  let next = cur;
+  if (dx < -threshold && cur < NAV_ORDER.length - 1) next = cur + 1;
+  else if (dx > threshold && cur > 0) next = cur - 1;
+
+  touchCurPage.style.transition = 'transform .25s ease';
+  if (touchNextPage) touchNextPage.style.transition = 'transform .25s ease';
+
+  if (next !== cur) {
+    touchCurPage.style.transform = `translateX(${dx < 0 ? '-100%' : '100%'}%)`;
+    if (touchNextPage) touchNextPage.style.transform = 'translateX(0)';
+    setTimeout(() => {
+      if (touchCurPage) { touchCurPage.style.transform = ''; touchCurPage.style.transition = ''; }
+      if (touchNextPage) { touchNextPage.style.transform = ''; touchNextPage.style.transition = ''; touchNextPage.style.position = ''; touchNextPage.style.top = ''; touchNextPage.style.left = ''; touchNextPage.style.right = ''; touchNextPage.style.display = ''; }
+      const btns = document.querySelectorAll('.nav button');
+      nav(NAV_ORDER[next], btns[next]);
+      haptic('light');
+    }, 250);
+  } else {
+    if (touchCurPage) { touchCurPage.style.transform = 'translateX(0)'; }
+    if (touchNextPage) {
+      const hideX = dx < 0 ? '100' : '-100';
+      touchNextPage.style.transform = `translateX(${hideX}%)`;
+    }
+    setTimeout(() => {
+      if (touchCurPage) { touchCurPage.style.transform = ''; touchCurPage.style.transition = ''; }
+      if (touchNextPage) { touchNextPage.style.transform = ''; touchNextPage.style.transition = ''; touchNextPage.style.position = ''; touchNextPage.style.top = ''; touchNextPage.style.left = ''; touchNextPage.style.right = ''; touchNextPage.style.display = ''; }
+    }, 250);
+  }
+  isSwipeHorizontal = false;
+  touchCurPage = null;
+  touchNextPage = null;
+}, {passive: true});
+
+// ═══ PULL-TO-REFRESH ═══
+let pullStartY = 0, pullDistance = 0, isPulling = false;
+const ptr = document.getElementById('ptr');
+document.addEventListener('touchstart', e => {
+  if (window.scrollY === 0 && document.getElementById('page-rates').classList.contains('active')) {
+    pullStartY = e.touches[0].clientY;
+    isPulling = true;
+    pullDistance = 0;
+  }
+}, {passive: true});
+document.addEventListener('touchmove', e => {
+  if (!isPulling) return;
+  const dy = e.touches[0].clientY - pullStartY;
+  if (dy > 0 && window.scrollY === 0) {
+    pullDistance = Math.min(dy * 0.5, 80);
+    ptr.style.top = (pullDistance - 60) + 'px';
+    if (pullDistance > 40) {
+      ptr.textContent = '↻';
+      ptr.classList.add('pulled');
+    } else {
+      ptr.textContent = '↓';
+      ptr.classList.remove('pulled');
+    }
+  }
+}, {passive: true});
+document.addEventListener('touchend', () => {
+  if (!isPulling) return;
+  isPulling = false;
+  if (pullDistance > 40) {
+    ptr.classList.add('spin');
+    ptr.textContent = '↻';
+    haptic('medium');
+    load().then(() => {
+      ptr.classList.remove('spin');
+      ptr.textContent = '↓';
+      ptr.classList.remove('pulled');
+      ptr.style.top = '-60px';
+      hapticSuccess();
+    });
+  } else {
+    ptr.classList.remove('pulled');
+    ptr.style.top = '-60px';
+  }
+  pullDistance = 0;
 }, {passive: true});
 
 function nav(id, btn) {
@@ -595,23 +790,10 @@ function nav(id, btn) {
   if (id === 'convert') convertPair();
 }
 
-// ═══ ПЛАВНАЯ АНИМАЦИЯ ЧИСЕЛ ═══
-function animateValue(el, from, to, duration = 700, decimals = 2) {
-  if (!el) return;
-  const start = performance.now();
-  const diff = to - from;
-  function step(now) {
-    const p = Math.min((now - start) / duration, 1);
-    const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
-    const current = from + diff * eased;
-    el.textContent = current.toFixed(decimals) + ' ₽';
-    if (p < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-
 async function load() {
   const list = document.getElementById('list');
+  const liveEl = document.getElementById('t-live');
+  liveEl?.classList.add('refreshing');
   if (!Object.keys(rates).length) list.innerHTML = '<div class="skeleton"></div>'.repeat(4);
   try {
     const today = await fetch('https://latest.currency-api.pages.dev/v1/currencies/rub.json').then(r => r.json());
@@ -626,11 +808,17 @@ async function load() {
         history[c] = 1 / (old.rub[c.toLowerCase()] || rub[c.toLowerCase()]);
       }
     });
+    // Спарклайны (асинхронно, но не блокируя)
+    if (!Object.keys(sparkData).length) {
+      loadSparklines().then(() => renderRates());
+    }
     renderRates(); drawChart();
     checkRateChanges();
     document.getElementById('upd').textContent = t('updated') + ' ' + new Date().toLocaleTimeString();
   } catch(e) {
     list.innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
+  } finally {
+    setTimeout(() => liveEl?.classList.remove('refreshing'), 1500);
   }
 }
 
@@ -653,10 +841,10 @@ function toggleFav(code) {
   const i = favorites.indexOf(code);
   if (i === -1) favorites.push(code); else favorites.splice(i, 1);
   localStorage.setItem('favorites', JSON.stringify(favorites));
+  haptic('light');
   renderRates();
 }
 
-// ═══ РЕНДЕР С ПЛАВНОЙ АНИМАЦИЕЙ ═══
 function renderRates() {
   const sorted = [...CURRENCIES].sort((a, b) => {
     const fa = favorites.includes(a) ? 0 : 1;
@@ -671,10 +859,14 @@ function renderRates() {
       const rate = rates[c]; if (!rate) return '';
       const oldRate = history[c];
       const diff = rate - oldRate, pct = (diff / oldRate) * 100;
-      let cls = 'flat', arrow = '·';
-      if (diff > 0.01) { cls = 'up'; arrow = '▲'; } else if (diff < -0.01) { cls = 'down'; arrow = '▼'; }
+      let cls = 'flat', arrow = '·', trendCls = '';
+      if (diff > 0.01) { cls = 'up'; arrow = '▲'; trendCls = 'trend-up'; }
+      else if (diff < -0.01) { cls = 'down'; arrow = '▼'; trendCls = 'trend-down'; }
       const isFav = favorites.includes(c);
-      return `<div class="card ${c === selected ? 'sel' : ''}" data-code="${c}" onclick="selectCur('${c}')">
+      const sparkVals = sparkData[c] || [];
+      const sparkColor = diff > 0.01 ? 'var(--green)' : (diff < -0.01 ? 'var(--red)' : 'var(--muted)');
+      const spark = sparklineSVG(sparkVals, sparkColor, 70, 20);
+      return `<div class="card ${c === selected ? 'sel' : ''} ${trendCls}" data-code="${c}" onclick="onCardClick('${c}')">
         <div class="card-top">
           <div class="code">${FLAGS[c] || ''} ${c}</div>
           <div class="card-actions">
@@ -685,14 +877,22 @@ function renderRates() {
         <div class="name">${NAMES[LANG]?.[c] || c}</div>
         <div class="rate" data-rate="${c}">${rate.toFixed(2)} ₽</div>
         <div class="trend ${cls}" data-trend="${c}">${arrow} ${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</div>
+        ${spark}
       </div>`;
     }).join('');
     list.innerHTML = `<div class="grid">${html}</div>`;
     prevRates = {...rates};
+    // Shimmer поверх свежих карточек
+    setTimeout(() => {
+      list.querySelectorAll('.card').forEach(card => {
+        card.classList.add('shimmer');
+        setTimeout(() => card.classList.remove('shimmer'), 1500);
+      });
+    }, 50);
     return;
   }
 
-  // Обновление — плавная анимация цифр
+  // Обновление с анимацией
   sorted.forEach(c => {
     const rate = rates[c]; if (!rate) return;
     const rateEl = list.querySelector(`[data-rate="${c}"]`);
@@ -705,9 +905,10 @@ function renderRates() {
       const card = list.querySelector(`[data-code="${c}"]`);
       if (card) {
         const flashClass = rate > oldRate ? 'rate-flash-up' : 'rate-flash-down';
-        card.classList.remove('rate-flash-up', 'rate-flash-down');
+        card.classList.remove('rate-flash-up', 'rate-flash-down', 'trend-up', 'trend-down');
         void card.offsetWidth;
         card.classList.add(flashClass);
+        card.classList.add(rate > oldRate ? 'trend-up' : 'trend-down');
         setTimeout(() => card.classList.remove(flashClass), 700);
       }
     }
@@ -723,6 +924,11 @@ function renderRates() {
   });
 
   prevRates = {...rates};
+}
+
+function onCardClick(code) {
+  haptic('light');
+  selectCur(code);
 }
 
 function selectCur(c) { selected = c; renderRates(); drawChart(); }
@@ -745,7 +951,7 @@ async function drawChart() {
   ratesChart = new Chart(ctx, {
     type: 'line',
     data: { labels, datasets: [{ data: values, borderColor: '#2E86DE', backgroundColor: 'rgba(46,134,222,0.15)', fill: true, tension: 0.35, pointRadius: 0, borderWidth: 2 }] },
-    options: { responsive: true, maintainAspectRatio: false,
+    options: { responsive: true, maintainAspectRatio: false, animation: { duration: 600, easing: 'easeOutCubic' },
       plugins: { legend: { display: false } },
       scales: {
         x: { ticks: { color: isLight ? '#6b7a90' : '#8fa3bf', font: {size: 9}, maxTicksLimit: 5 }, grid: { display: false } },
@@ -771,6 +977,7 @@ function swapCur() {
   const f = document.getElementById('cv-from'), to = document.getElementById('cv-to');
   const tmp = f.value; f.value = to.value; to.value = tmp;
   convertPair();
+  haptic('light');
 }
 
 async function convertPair() {
@@ -791,7 +998,6 @@ async function convertPair() {
   } catch(e) { res.textContent = t('error'); }
 }
 
-// ═══ КРИПТА С ПЛАВНОЙ АНИМАЦИЕЙ ═══
 let prevCrypto = {};
 
 async function loadCrypto() {
@@ -806,7 +1012,8 @@ async function loadCrypto() {
       const change = d.rub_24h_change || 0;
       const cls = change > 0 ? 'up' : (change < 0 ? 'down' : 'flat');
       const arrow = change > 0 ? '▲' : (change < 0 ? '▼' : '·');
-      return `<div class="card">
+      const trendCls = change > 0 ? 'trend-up' : (change < 0 ? 'trend-down' : '');
+      return `<div class="card ${trendCls}">
         <div class="code">${CRYPTO_NAMES[id]}</div>
         <div class="name">${NAMES[LANG]?.[CRYPTO_NAMES[id]] || id}</div>
         <div class="rate" data-crypto="${CRYPTO_NAMES[id]}">${d.rub.toLocaleString(LANG)} ₽</div>
@@ -816,7 +1023,6 @@ async function loadCrypto() {
     }).join('');
     document.getElementById('crypto-list').innerHTML = `<div class="grid">${html}</div>`;
 
-    // Плавная анимация от старых значений
     CRYPTO.forEach(id => {
       const code = CRYPTO_NAMES[id];
       const el = document.querySelector(`[data-crypto="${code}"]`);
@@ -855,7 +1061,8 @@ async function loadOil() {
     const htmls = Object.entries(result).map(([name, d]) => {
       const arrow = d.change > 0 ? '▲' : (d.change < 0 ? '▼' : '·');
       const cls = d.change > 0 ? 'up' : (d.change < 0 ? 'down' : 'flat');
-      return `<div class="card"><div class="code">🛢 ${name}</div>
+      const trendCls = d.change > 0 ? 'trend-up' : (d.change < 0 ? 'trend-down' : '');
+      return `<div class="card ${trendCls}"><div class="code">🛢 ${name}</div>
         <div class="name">${name === 'BRENT' ? 'Brent Crude' : 'West Texas'}</div>
         <div class="rate">$${d.price.toFixed(2)}</div>
         <div class="trend ${cls}">${arrow} ${d.change.toFixed(2)}%</div></div>`;
@@ -874,18 +1081,15 @@ async function loadMetals() {
     const proxied = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
     const data = await fetch(proxied).then(r => r.json());
     const vals = data.Valute || {};
-
     const meta = {
       'XAU': { icon: '🥇', nameKey: 'metalGold' },
       'XAG': { icon: '🥈', nameKey: 'metalSilver' },
       'XPT': { icon: '⚪', nameKey: 'metalPlatinum' },
       'XPD': { icon: '⚫', nameKey: 'metalPalladium' }
     };
-
     const htmls = [];
     for (const [code, m] of Object.entries(meta)) {
-      const v = vals[code];
-      if (!v) continue;
+      const v = vals[code]; if (!v) continue;
       const nominal = parseFloat(v.Nominal) || 1;
       const value = parseFloat(String(v.Value).replace(',', '.'));
       const pricePerGram = value / nominal;
@@ -896,14 +1100,9 @@ async function loadMetals() {
         <div class="usd">${t('perGram')}</div>
       </div>`);
     }
-
-    if (htmls.length) {
-      el.innerHTML = `<div class="grid">${htmls.join('')}</div>`;
-    } else {
-      el.innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
-    }
+    if (htmls.length) el.innerHTML = `<div class="grid">${htmls.join('')}</div>`;
+    else el.innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
   } catch(e) {
-    console.error('Metals error:', e);
     el.innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
   }
 }
@@ -922,7 +1121,8 @@ async function loadStocks() {
       const change = ((price - prev) / prev * 100);
       const arrow = change > 0 ? '▲' : (change < 0 ? '▼' : '·');
       const cls = change > 0 ? 'up' : (change < 0 ? 'down' : 'flat');
-      htmls.push(`<div class="card"><div class="code">📈 ${name}</div>
+      const trendCls = change > 0 ? 'trend-up' : (change < 0 ? 'trend-down' : '');
+      htmls.push(`<div class="card ${trendCls}"><div class="code">📈 ${name}</div>
         <div class="rate">${price.toFixed(2)}</div>
         <div class="trend ${cls}">${arrow} ${change.toFixed(2)}%</div></div>`);
     } catch(e) {}
@@ -934,6 +1134,7 @@ function setPeriod(days, btn) {
   statsPeriod = days;
   document.querySelectorAll('#period-btns button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  haptic('light');
   loadStats();
 }
 
@@ -955,9 +1156,9 @@ async function loadStats() {
   const min = Math.min(...values), max = Math.max(...values);
   const avg = values.reduce((a,b) => a+b, 0) / values.length;
   document.getElementById('stats-grid').innerHTML = `
-    <div class="stat-item"><div class="lbl">${t('min')}</div><div class="val down">${min.toFixed(2)}</div></div>
-    <div class="stat-item"><div class="lbl">${t('avg')}</div><div class="val">${avg.toFixed(2)}</div></div>
-    <div class="stat-item"><div class="lbl">${t('max')}</div><div class="val up">${max.toFixed(2)}</div></div>`;
+    <div class="stat-item"><div class="lbl">${t('min')}</div><div class="val down" data-stat="min">${min.toFixed(2)}</div><div class="stat-spark">${sparklineSVG(values.slice(-14), 'var(--red)', 60, 12)}</div></div>
+    <div class="stat-item"><div class="lbl">${t('avg')}</div><div class="val" data-stat="avg">${avg.toFixed(2)}</div><div class="stat-spark">${sparklineSVG(values.slice(-14), 'var(--accent)', 60, 12)}</div></div>
+    <div class="stat-item"><div class="lbl">${t('max')}</div><div class="val up" data-stat="max">${max.toFixed(2)}</div><div class="stat-spark">${sparklineSVG(values.slice(-14), 'var(--green)', 60, 12)}</div></div>`;
 
   const ctx = document.getElementById('stats-chart').getContext('2d');
   const isLight = document.body.classList.contains('light');
@@ -967,6 +1168,7 @@ async function loadStats() {
     data: { labels, datasets: [{ label: code, data: values, borderColor: '#2E86DE', backgroundColor: 'rgba(46,134,222,0.15)', fill: true, tension: 0.35, pointRadius: 0, borderWidth: 2 }] },
     options: {
       responsive: true, maintainAspectRatio: false,
+      animation: { duration: 600, easing: 'easeOutCubic' },
       plugins: {
         legend: { display: false },
         zoom: {
@@ -1029,6 +1231,7 @@ function switchCalc(type, btn) {
   btn.classList.add('active');
   document.getElementById('calc-mortgage').style.display = type === 'mortgage' ? 'block' : 'none';
   document.getElementById('calc-deposit').style.display = type === 'deposit' ? 'block' : 'none';
+  haptic('light');
 }
 
 function calcMortgage() {
@@ -1046,6 +1249,7 @@ function calcMortgage() {
       <div class="row"><span>${t('totalPay')}</span><span>${total.toLocaleString('ru-RU', {maximumFractionDigits:0})} ₽</span></div>
       <div class="row"><span>${t('overPay')}</span><span style="color:var(--red)">${over.toLocaleString('ru-RU', {maximumFractionDigits:0})} ₽</span></div>
     </div>`;
+  hapticSuccess();
 }
 
 function calcDeposit() {
@@ -1060,6 +1264,7 @@ function calcDeposit() {
       <div class="row"><span>${t('finalAmount')}</span><span style="font-weight:800;color:var(--green)">${final.toLocaleString('ru-RU', {maximumFractionDigits:0})} ₽</span></div>
       <div class="row"><span>${t('profit')}</span><span style="color:var(--green)">+${profit.toLocaleString('ru-RU', {maximumFractionDigits:0})} ₽</span></div>
     </div>`;
+  hapticSuccess();
 }
 
 async function loadCBRRate() {
@@ -1093,7 +1298,7 @@ function addAsset(codeId, amountId, cb) {
   document.getElementById(amountId).value = '';
   renderPortfolio();
   if (cb) cb();
-  tg?.HapticFeedback?.notificationOccurred('success');
+  hapticSuccess();
   toast('✅ ' + code + ' +' + amount);
 }
 
@@ -1101,6 +1306,7 @@ function removeFromPortfolio(code) {
   const pf = getPortfolio(); delete pf[code]; savePortfolio(pf);
   renderPortfolio();
   if (document.getElementById('page-profile').classList.contains('active')) loadProfile();
+  haptic('medium');
 }
 
 function renderPortfolio() {
@@ -1146,18 +1352,21 @@ function createAlert() {
   const target = parseFloat(document.getElementById('alert-target').value);
   if (!target) { toast('⚠️'); return; }
   sendCmd(`/alert ${code} ${dir} ${target}`);
+  hapticSuccess();
 }
-function setDigest() { sendCmd(`/digest ${document.getElementById('digest-time').value}`); }
+function setDigest() { sendCmd(`/digest ${document.getElementById('digest-time').value}`); hapticSuccess(); }
 
 function shareRate(code) {
   const rate = rates[code]; if (!rate) return;
   const text = `💱 ${code} = ${rate.toFixed(2)} ₽ · ${t('title')}`;
   const url = `https://t.me/share/url?url=${encodeURIComponent('https://t.me')}&text=${encodeURIComponent(text)}`;
   if (tg) tg.openTelegramLink(url); else window.open(url, '_blank');
+  haptic('light');
 }
 function shareApp() {
   const url = `https://t.me/share/url?url=${encodeURIComponent('https://t.me')}&text=${encodeURIComponent('⚡ ' + t('title'))}`;
   if (tg) tg.openTelegramLink(url); else window.open(url, '_blank');
+  haptic('light');
 }
 
 function sendCmd(cmd) { if (tg) { tg.sendData(JSON.stringify({cmd})); tg.close(); } else toast(cmd); }
