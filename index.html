@@ -90,7 +90,6 @@
 <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
 <div class="toast" id="toast"></div>
 
-<!-- КУРСЫ -->
 <div class="page active" id="page-rates">
   <h1 id="t-title">Валютный Радар</h1>
   <div class="live" id="t-live">Live · автообновление</div>
@@ -108,7 +107,6 @@
   <div class="updated" id="upd"></div>
 </div>
 
-<!-- КОНВЕРТЕР -->
 <div class="page" id="page-convert">
   <h1 id="t-conv-title">Конвертер</h1>
   <div class="sub" id="t-conv-sub">Мгновенный обмен</div>
@@ -124,7 +122,6 @@
   </div>
 </div>
 
-<!-- ПОРТФЕЛЬ -->
 <div class="page" id="page-portfolio">
   <h1 id="t-pf-title">Портфель</h1>
   <div class="sub" id="t-pf-sub">Валюты и крипта</div>
@@ -141,29 +138,26 @@
   </div>
 </div>
 
-<!-- КРИПТА -->
 <div class="page" id="page-crypto">
   <h1 id="t-cr-title">Крипта</h1>
   <div class="sub" id="t-cr-sub">₽ и $ · 24ч</div>
   <div id="crypto-list"><div class="skeleton"></div><div class="skeleton"></div></div>
 </div>
 
-<!-- СТАТИСТИКА -->
 <div class="page" id="page-stats">
   <h1 id="t-st-title">Статистика</h1>
   <div class="sub" id="t-st-sub">Мин · среднее · макс</div>
   <div class="section"><select id="stats-code"></select></div>
   <div class="period-btns" id="period-btns">
-    <button onclick="setPeriod(7, this)">7д</button>
-    <button class="active" onclick="setPeriod(30, this)">30д</button>
-    <button onclick="setPeriod(60, this)">60д</button>
-    <button onclick="setPeriod(90, this)">90д</button>
+    <button id="t-p7" onclick="setPeriod(7, this)">7д</button>
+    <button id="t-p30" class="active" onclick="setPeriod(30, this)">30д</button>
+    <button id="t-p60" onclick="setPeriod(60, this)">60д</button>
+    <button id="t-p90" onclick="setPeriod(90, this)">90д</button>
   </div>
   <div class="stat-grid" id="stats-grid"></div>
   <div class="chart-wrap"><canvas id="stats-chart"></canvas></div>
 </div>
 
-<!-- БАНКИ -->
 <div class="page" id="page-banks">
   <h1 id="t-b-title">Банки</h1>
   <div class="sub" id="t-b-sub">ЦБ РФ · Тинькофф</div>
@@ -171,7 +165,6 @@
   <button class="btn" onclick="loadBanks()" id="t-b-btn">Обновить</button>
 </div>
 
-<!-- ПРОФИЛЬ -->
 <div class="page" id="page-profile">
   <h1 id="t-pr-title">Профиль</h1>
   <div class="sub" id="t-pr-sub">Твои данные</div>
@@ -191,7 +184,6 @@
   <button class="btn" onclick="shareApp()" id="t-pr-share">Поделиться ботом</button>
 </div>
 
-<!-- НАСТРОЙКИ -->
 <div class="page" id="page-more">
   <h1 id="t-m-title">Настройки</h1>
   <div class="section">
@@ -272,7 +264,8 @@ const T = {
     greater:'Больше (>)',less:'Меньше (<)',langPick:'Язык',
     langRu:'Русский',langEn:'Английский',langDe:'Немецкий',langFr:'Французский',langEs:'Испанский',langTr:'Турецкий',
     toastOn:'Включено',toastOff:'Выключено',toastLang:'Язык',
-    placeholder:'Количество',
+    placeholder:'Количество',currenciesLabel:'Валюты',cryptoLabel:'Крипта',
+    days:'д',cbrTitle:'🇷🇺 ЦБ РФ',tinkTitle:'🟡 Тинькофф',
     notifyTitle:'Курс изменился',notifyBody:'{code} {dir} на {diff} ₽'},
   en:{
     title:'Currency Radar',live:'Live · auto-refresh',dcNow:'Now',dcOld:'24h ago',
@@ -292,7 +285,8 @@ const T = {
     greater:'Greater (>)',less:'Less (<)',langPick:'Language',
     langRu:'Russian',langEn:'English',langDe:'German',langFr:'French',langEs:'Spanish',langTr:'Turkish',
     toastOn:'ON',toastOff:'OFF',toastLang:'Language',
-    placeholder:'Amount',
+    placeholder:'Amount',currenciesLabel:'Currencies',cryptoLabel:'Crypto',
+    days:'d',cbrTitle:'🇷🇺 CBR',tinkTitle:'🟡 Tinkoff',
     notifyTitle:'Rate changed',notifyBody:'{code} {dir} by {diff} ₽'},
   de:{
     title:'Währungsradar',live:'Live · Auto-Aktualisierung',dcNow:'Jetzt',dcOld:'vor 24h',
@@ -312,7 +306,8 @@ const T = {
     greater:'Größer (>)',less:'Kleiner (<)',langPick:'Sprache',
     langRu:'Russisch',langEn:'Englisch',langDe:'Deutsch',langFr:'Französisch',langEs:'Spanisch',langTr:'Türkisch',
     toastOn:'AN',toastOff:'AUS',toastLang:'Sprache',
-    placeholder:'Menge',
+    placeholder:'Menge',currenciesLabel:'Währungen',cryptoLabel:'Krypto',
+    days:'T',cbrTitle:'🇷🇺 ZBR',tinkTitle:'🟡 Tinkoff',
     notifyTitle:'Kurs geändert',notifyBody:'{code} {dir} um {diff} ₽'},
   fr:{
     title:'Radar Devises',live:'Live · auto-actualisation',dcNow:'Maintenant',dcOld:'il y a 24h',
@@ -332,7 +327,8 @@ const T = {
     greater:'Supérieur (>)',less:'Inférieur (<)',langPick:'Langue',
     langRu:'Russe',langEn:'Anglais',langDe:'Allemand',langFr:'Français',langEs:'Espagnol',langTr:'Turc',
     toastOn:'ON',toastOff:'OFF',toastLang:'Langue',
-    placeholder:'Montant',
+    placeholder:'Montant',currenciesLabel:'Devises',cryptoLabel:'Crypto',
+    days:'j',cbrTitle:'🇷🇺 BCR',tinkTitle:'🟡 Tinkoff',
     notifyTitle:'Taux modifié',notifyBody:'{code} {dir} de {diff} ₽'},
   es:{
     title:'Radar de Divisas',live:'Live · auto-actualizado',dcNow:'Ahora',dcOld:'hace 24h',
@@ -352,7 +348,8 @@ const T = {
     greater:'Mayor (>)',less:'Menor (<)',langPick:'Idioma',
     langRu:'Ruso',langEn:'Inglés',langDe:'Alemán',langFr:'Francés',langEs:'Español',langTr:'Turco',
     toastOn:'ON',toastOff:'OFF',toastLang:'Idioma',
-    placeholder:'Cantidad',
+    placeholder:'Cantidad',currenciesLabel:'Divisas',cryptoLabel:'Cripto',
+    days:'d',cbrTitle:'🇷🇺 BCR',tinkTitle:'🟡 Tinkoff',
     notifyTitle:'Tasa cambiada',notifyBody:'{code} {dir} en {diff} ₽'},
   tr:{
     title:'Döviz Radarı',live:'Canlı · otomatik',dcNow:'Şimdi',dcOld:'24s önce',
@@ -372,7 +369,8 @@ const T = {
     greater:'Büyük (>)',less:'Küçük (<)',langPick:'Dil',
     langRu:'Rusça',langEn:'İngilizce',langDe:'Almanca',langFr:'Fransızca',langEs:'İspanyolca',langTr:'Türkçe',
     toastOn:'AÇIK',toastOff:'KAPALI',toastLang:'Dil',
-    placeholder:'Miktar',
+    placeholder:'Miktar',currenciesLabel:'Döviz',cryptoLabel:'Kripto',
+    days:'g',cbrTitle:'🇷🇺 MB',tinkTitle:'🟡 Tinkoff',
     notifyTitle:'Kur değişti',notifyBody:'{code} {dir} {diff} ₽'}
 };
 
@@ -410,14 +408,22 @@ function applyLang() {
     const el = document.getElementById('t-nav-' + k);
     if (el) el.textContent = t('nav' + k.charAt(0).toUpperCase() + k.slice(1));
   });
+  // Периоды статистики
+  ['p7','p30','p60','p90'].forEach(id => {
+    const el = document.getElementById('t-' + id);
+    if (el) {
+      const n = el.textContent.replace(/[^0-9]/g, '') || id.slice(1);
+      el.textContent = n + t('days');
+    }
+  });
   document.getElementById('alert-direction').options[0].textContent = t('greater');
   document.getElementById('alert-direction').options[1].textContent = t('less');
   document.getElementById('autoToggle').classList.toggle('on', autoOn);
-  // Плейсхолдеры
   const pfAmt = document.getElementById('pf-amount');
   const profAmt = document.getElementById('prof-pf-amount');
   if (pfAmt) pfAmt.placeholder = t('placeholder');
   if (profAmt) profAmt.placeholder = t('placeholder');
+  fillSelects();
   if (Object.keys(rates).length) { renderRates(); renderPortfolio(); }
   if (document.getElementById('page-profile').classList.contains('active')) loadProfile();
 }
@@ -447,8 +453,14 @@ function setLang(code) {
   localStorage.setItem('lang', LANG);
   const m = document.getElementById('langPickModal'); if (m) m.remove();
   applyLang();
-  renderRates(); loadCrypto(); renderPortfolio();
-  fillSelects();
+  renderRates();
+  renderPortfolio();
+  const active = ['rates','convert','crypto','stats','banks','profile','more']
+    .find(id => document.getElementById('page-' + id).classList.contains('active'));
+  if (active === 'crypto') loadCrypto();
+  if (active === 'stats') loadStats();
+  if (active === 'banks') loadBanks();
+  if (active === 'profile') loadProfile();
   toast('✅ ' + code.toUpperCase());
   sendCmdSilent(`/lang ${code}`);
 }
@@ -771,7 +783,7 @@ async function loadBanks() {
 
   try {
     const cbr = await fetch('https://www.cbr-xml-daily.ru/daily_json.js').then(r => r.json());
-    html += '<div class="section"><h3>🇷🇺 ЦБ РФ</h3>';
+    html += `<div class="section"><h3>${t('cbrTitle')}</h3>`;
     ['USD','EUR','CNY','GBP','JPY','CHF','KZT'].forEach(code => {
       const v = cbr.Valute[code];
       if (!v) return;
@@ -791,7 +803,7 @@ async function loadBanks() {
     try {
       const tink = await fetch(p).then(r => r.json());
       if (tink?.payload?.rates?.length) {
-        html += '<div class="section"><h3>🟡 Тинькофф</h3>';
+        html += `<div class="section"><h3>${t('tinkTitle')}</h3>`;
         const seen = new Set();
         tink.payload.rates.forEach(r => {
           const code = r.fromCurrency?.code;
@@ -844,12 +856,12 @@ function setDigest() { sendCmd(`/digest ${document.getElementById('digest-time')
 
 function shareRate(code) {
   const rate = rates[code]; if (!rate) return;
-  const text = `💱 ${code} = ${rate.toFixed(2)} ₽ · Валютный Радар`;
+  const text = `💱 ${code} = ${rate.toFixed(2)} ₽ · ${t('title')}`;
   const url = `https://t.me/share/url?url=${encodeURIComponent('https://t.me')}&text=${encodeURIComponent(text)}`;
   if (tg) tg.openTelegramLink(url); else window.open(url, '_blank');
 }
 function shareApp() {
-  const text = '⚡ Валютный Радар — курсы валют в реальном времени';
+  const text = '⚡ ' + t('title');
   const url = `https://t.me/share/url?url=${encodeURIComponent('https://t.me')}&text=${encodeURIComponent(text)}`;
   if (tg) tg.openTelegramLink(url); else window.open(url, '_blank');
 }
@@ -875,7 +887,7 @@ function fillSelects() {
     const current = sel.value;
     sel.innerHTML = '';
     const g1 = document.createElement('optgroup');
-    g1.label = '💱 ' + (LANG === 'ru' ? 'Валюты' : 'Currencies');
+    g1.label = '💱 ' + t('currenciesLabel');
     CURRENCIES.forEach(c => {
       const o = document.createElement('option');
       o.value = c; o.textContent = `${FLAGS[c] || ''} ${c} — ${NAMES[LANG]?.[c] || c}`;
@@ -883,7 +895,7 @@ function fillSelects() {
     });
     sel.appendChild(g1);
     const g2 = document.createElement('optgroup');
-    g2.label = '💰 ' + (LANG === 'ru' ? 'Крипта' : 'Crypto');
+    g2.label = '💰 ' + t('cryptoLabel');
     CRYPTO.forEach(id => {
       const code = CRYPTO_NAMES[id];
       const o = document.createElement('option');
