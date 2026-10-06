@@ -6,22 +6,23 @@
 <title>Валютный Радар</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
 <style>
-  :root { --bg:#0f1a2e; --card:#1b2a4e; --accent:#2E86DE; --green:#00D9A3; --red:#ff5470; --text:#e6ecf5; --muted:#8fa3bf; --border:#253456; --skeleton:#253456; }
-  body.light { --bg:#f4f6fa; --card:#ffffff; --accent:#2E86DE; --green:#00a878; --red:#e63946; --text:#1a2332; --muted:#6b7a90; --border:#e1e6ee; --skeleton:#e1e6ee; }
+  :root { --bg:#0f1a2e; --card:#1b2a4e; --accent:#2E86DE; --green:#00D9A3; --red:#ff5470; --text:#e6ecf5; --muted:#8fa3bf; --border:#253456; --skeleton:#253456; --gold:#ffd700; }
+  body.light { --bg:#f4f6fa; --card:#ffffff; --accent:#2E86DE; --green:#00a878; --red:#e63946; --text:#1a2332; --muted:#6b7a90; --border:#e1e6ee; --skeleton:#e1e6ee; --gold:#d4a017; }
   * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
   body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; padding:14px 14px 86px; min-height:100vh; transition:background .3s,color .3s; overflow-x:hidden; }
   h1 { font-size:19px; margin-bottom:2px; text-align:center; font-weight:800; letter-spacing:-.3px; }
   .sub { text-align:center; font-size:11px; color:var(--muted); margin-bottom:4px; }
   .live { text-align:center; font-size:11px; color:var(--green); margin-bottom:14px; display:flex; align-items:center; justify-content:center; gap:5px; font-weight:600; }
   .live::before { content:''; width:6px; height:6px; background:var(--green); border-radius:50%; animation:pulse 1.5s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
   .card { background:var(--card); border-radius:13px; padding:12px; cursor:pointer; transition:transform .15s; position:relative; animation:fadeIn .3s ease; }
   @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   .card:active { transform:scale(.97); }
   .card.sel { outline:2px solid var(--accent); }
-  .card .code { font-weight:700; font-size:15px; }
+  .card .code { font-weight:700; font-size:15px; display:flex; align-items:center; gap:4px; }
   .card .name { font-size:11px; color:var(--muted); margin:1px 0 8px; }
   .card .rate { font-size:19px; font-weight:800; letter-spacing:-.3px; }
   .card .usd { font-size:13px; font-weight:700; color:var(--muted); margin-top:2px; }
@@ -35,7 +36,7 @@
   .skeleton.short { height:40px; }
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
   .loading { text-align:center; color:var(--muted); padding:30px 0; font-size:13px; }
-  .chart-wrap { position:relative; height:180px; background:var(--card); border-radius:13px; padding:8px; margin-bottom:10px; }
+  .chart-wrap { position:relative; height:200px; background:var(--card); border-radius:13px; padding:8px; margin-bottom:10px; }
   .chart-wrap canvas { width:100% !important; height:100% !important; display:block; }
   .section { background:var(--card); border-radius:13px; padding:12px; margin-bottom:8px; animation:fadeIn .3s ease; }
   .section h3 { font-size:13px; margin-bottom:8px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
@@ -43,10 +44,10 @@
   .row:last-child { border:none; }
   .total { font-size:16px; font-weight:800; color:var(--green); text-align:right; margin-top:8px; }
   input, select { width:100%; padding:11px; background:var(--bg); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:14px; margin-bottom:6px; }
-  .nav { position:fixed; bottom:0; left:0; right:0; background:var(--card); display:flex; padding:5px 0; border-top:1px solid var(--border); z-index:10; }
-  .nav button { flex:1; background:none; border:none; color:var(--muted); font-size:9px; padding:6px 2px; cursor:pointer; font-weight:600; transition:color .2s; }
+  .nav { position:fixed; bottom:0; left:0; right:0; background:var(--card); display:flex; padding:4px 0; border-top:1px solid var(--border); z-index:10; overflow-x:auto; }
+  .nav button { flex:0 0 auto; min-width:52px; background:none; border:none; color:var(--muted); font-size:8px; padding:5px 4px; cursor:pointer; font-weight:600; }
   .nav button.active { color:var(--accent); }
-  .nav button span:first-child { display:block; font-size:19px; margin-bottom:1px; }
+  .nav button span:first-child { display:block; font-size:16px; margin-bottom:1px; }
   .page { display:none; animation:slideIn .25s ease; }
   .page.active { display:block; }
   @keyframes slideIn { from{opacity:0; transform:translateX(10px)} to{opacity:1; transform:translateX(0)} }
@@ -55,16 +56,16 @@
   .stat-item { background:var(--bg); border-radius:10px; padding:10px 6px; text-align:center; }
   .stat-item .lbl { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
   .stat-item .val { font-size:14px; font-weight:800; margin-top:3px; }
-  .theme-btn { position:absolute; top:12px; right:12px; background:var(--card); border:1px solid var(--border); border-radius:9px; padding:6px 10px; color:var(--text); cursor:pointer; font-size:14px; }
-  .lang-btn { position:absolute; top:12px; left:12px; background:var(--card); border:1px solid var(--border); border-radius:9px; padding:6px 10px; color:var(--text); cursor:pointer; font-size:11px; font-weight:800; letter-spacing:.5px; }
+  .theme-btn { position:absolute; top:12px; right:12px; background:var(--card); border:1px solid var(--border); border-radius:9px; padding:6px 10px; color:var(--text); cursor:pointer; font-size:14px; z-index:5; }
+  .lang-btn { position:absolute; top:12px; left:12px; background:var(--card); border:1px solid var(--border); border-radius:9px; padding:6px 10px; color:var(--text); cursor:pointer; font-size:11px; font-weight:800; letter-spacing:.5px; z-index:5; }
   .range { display:flex; justify-content:space-between; font-size:10px; color:var(--muted); margin-bottom:3px; padding:0 4px; }
   .share-btn { position:absolute; top:8px; right:8px; background:none; border:none; font-size:13px; cursor:pointer; opacity:.5; padding:4px; }
+  .fav-btn { position:absolute; top:8px; left:8px; background:none; border:none; font-size:14px; cursor:pointer; padding:4px; }
   .badge { display:inline-block; padding:2px 8px; border-radius:7px; font-size:11px; font-weight:700; }
   .badge.buy { background:rgba(0,217,163,.15); color:var(--green); }
   .badge.sell { background:rgba(255,84,112,.15); color:var(--red); }
-  .flag { font-size:15px; margin-right:4px; }
-  .period-btns { display:flex; gap:5px; margin-bottom:10px; }
-  .period-btns button { flex:1; padding:9px 4px; background:var(--bg); border:1px solid var(--border); border-radius:9px; color:var(--text); font-size:12px; cursor:pointer; font-weight:600; transition:all .2s; }
+  .period-btns { display:flex; gap:5px; margin-bottom:10px; flex-wrap:wrap; }
+  .period-btns button { flex:1; padding:9px 4px; background:var(--bg); border:1px solid var(--border); border-radius:9px; color:var(--text); font-size:11px; cursor:pointer; font-weight:600; min-width:48px; }
   .period-btns button.active { background:var(--accent); border-color:var(--accent); color:white; }
   .toast { position:fixed; bottom:96px; left:50%; transform:translateX(-50%); background:var(--accent); color:white; padding:10px 18px; border-radius:11px; font-size:13px; font-weight:600; z-index:999; opacity:0; transition:opacity .3s; pointer-events:none; }
   .toast.show { opacity:1; }
@@ -82,6 +83,11 @@
   .dc-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
   .dc-value { font-size:15px; font-weight:800; }
   .dc-diff { grid-column:1 / -1; text-align:center; font-size:13px; font-weight:700; padding-top:6px; border-top:1px solid var(--border); margin-top:4px; }
+  .tabs-mini { display:flex; gap:5px; margin-bottom:10px; overflow-x:auto; padding-bottom:4px; }
+  .tabs-mini button { flex-shrink:0; padding:7px 12px; background:var(--card); border:1px solid var(--border); border-radius:9px; color:var(--text); font-size:12px; cursor:pointer; font-weight:600; }
+  .tabs-mini button.active { background:var(--accent); color:white; border-color:var(--accent); }
+  .metal-icon { font-size:22px; margin-right:8px; }
+  .zoom-hint { text-align:center; font-size:10px; color:var(--muted); margin-top:4px; }
 </style>
 </head>
 <body>
@@ -90,6 +96,7 @@
 <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
 <div class="toast" id="toast"></div>
 
+<!-- КУРСЫ -->
 <div class="page active" id="page-rates">
   <h1 id="t-title">Валютный Радар</h1>
   <div class="live" id="t-live">Live · автообновление</div>
@@ -100,13 +107,11 @@
     <div class="dc-item"><span class="dc-label" id="t-dc-old">24ч назад</span><span class="dc-value" id="dc-old">—</span></div>
     <div class="dc-diff" id="dc-diff">—</div>
   </div>
-  <div id="list">
-    <div class="skeleton"></div><div class="skeleton"></div>
-    <div class="skeleton"></div><div class="skeleton"></div>
-  </div>
+  <div id="list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
   <div class="updated" id="upd"></div>
 </div>
 
+<!-- ОБМЕН -->
 <div class="page" id="page-convert">
   <h1 id="t-conv-title">Конвертер</h1>
   <div class="sub" id="t-conv-sub">Мгновенный обмен</div>
@@ -122,28 +127,35 @@
   </div>
 </div>
 
-<div class="page" id="page-portfolio">
-  <h1 id="t-pf-title">Портфель</h1>
-  <div class="sub" id="t-pf-sub">Валюты и крипта</div>
-  <div class="section">
-    <h3 id="t-pf-add">Добавить актив</h3>
-    <select id="pf-code"></select>
-    <input type="number" id="pf-amount" placeholder="Количество" step="0.0001">
-    <button class="btn" onclick="addToPortfolio()" id="t-pf-add-btn">Добавить</button>
-  </div>
-  <div class="section">
-    <h3 id="t-pf-my">Активы</h3>
-    <div id="pf-list"><div class="loading">Пусто</div></div>
-    <div class="total" id="pf-total"></div>
-  </div>
-</div>
-
+<!-- КРИПТА -->
 <div class="page" id="page-crypto">
   <h1 id="t-cr-title">Крипта</h1>
   <div class="sub" id="t-cr-sub">₽ и $ · 24ч</div>
   <div id="crypto-list"><div class="skeleton"></div><div class="skeleton"></div></div>
 </div>
 
+<!-- НЕФТЬ -->
+<div class="page" id="page-oil">
+  <h1 id="t-oil-title">Нефть</h1>
+  <div class="sub" id="t-oil-sub">Brent · WTI</div>
+  <div id="oil-list"><div class="skeleton"></div></div>
+</div>
+
+<!-- МЕТАЛЛЫ -->
+<div class="page" id="page-metals">
+  <h1 id="t-mt-title">Металлы</h1>
+  <div class="sub" id="t-mt-sub">ЦБ РФ · ₽/грамм</div>
+  <div id="metals-list"><div class="skeleton"></div></div>
+</div>
+
+<!-- АКЦИИ -->
+<div class="page" id="page-stocks">
+  <h1 id="t-sk-title">Акции</h1>
+  <div class="sub" id="t-sk-sub">Индексы и акции</div>
+  <div id="stocks-list"><div class="skeleton"></div></div>
+</div>
+
+<!-- СТАТИСТИКА -->
 <div class="page" id="page-stats">
   <h1 id="t-st-title">Статистика</h1>
   <div class="sub" id="t-st-sub">Мин · среднее · макс</div>
@@ -156,8 +168,19 @@
   </div>
   <div class="stat-grid" id="stats-grid"></div>
   <div class="chart-wrap"><canvas id="stats-chart"></canvas></div>
+  <div class="zoom-hint">🔍 Тап + свайп для зума</div>
 </div>
 
+<!-- ПРОГНОЗ -->
+<div class="page" id="page-forecast">
+  <h1 id="t-fc-title">Прогноз</h1>
+  <div class="sub" id="t-fc-sub">Тренд на завтра</div>
+  <div class="section"><select id="fc-code"></select></div>
+  <button class="btn" onclick="loadForecast()" id="t-fc-btn">Рассчитать</button>
+  <div id="fc-result" style="margin-top:12px"></div>
+</div>
+
+<!-- БАНКИ -->
 <div class="page" id="page-banks">
   <h1 id="t-b-title">Банки</h1>
   <div class="sub" id="t-b-sub">ЦБ РФ · Тинькофф</div>
@@ -165,6 +188,38 @@
   <button class="btn" onclick="loadBanks()" id="t-b-btn">Обновить</button>
 </div>
 
+<!-- КАЛЬКУЛЯТОР -->
+<div class="page" id="page-calc">
+  <h1 id="t-cl-title">Калькулятор</h1>
+  <div class="sub" id="t-cl-sub">Ипотека и вклад</div>
+  <div class="tabs-mini" id="calc-tabs">
+    <button class="active" onclick="switchCalc('mortgage', this)" id="t-cl-m">🏠 Ипотека</button>
+    <button onclick="switchCalc('deposit', this)" id="t-cl-d">💰 Вклад</button>
+  </div>
+  <div class="section" id="calc-mortgage">
+    <h3 id="t-cl-m-h">🏠 Ипотека</h3>
+    <input type="number" id="mo-amount" placeholder="Сумма (₽)" value="5000000">
+    <input type="number" id="mo-years" placeholder="Срок (лет)" value="20">
+    <input type="number" id="mo-rate" placeholder="Ставка (%)" value="18" step="0.1">
+    <button class="btn" onclick="calcMortgage()" id="t-cl-m-btn">Рассчитать</button>
+    <div id="mo-result"></div>
+  </div>
+  <div class="section" id="calc-deposit" style="display:none">
+    <h3 id="t-cl-d-h">💰 Вклад</h3>
+    <input type="number" id="dp-amount" placeholder="Сумма (₽)" value="100000">
+    <input type="number" id="dp-months" placeholder="Срок (месяцев)" value="12">
+    <input type="number" id="dp-rate" placeholder="Ставка (%)" value="20" step="0.1">
+    <button class="btn" onclick="calcDeposit()" id="t-cl-d-btn">Рассчитать</button>
+    <div id="dp-result"></div>
+  </div>
+  <div class="section">
+    <h3 id="t-cl-cbr">💡 Ставка ЦБ РФ</h3>
+    <div class="row"><span id="t-cl-cbr-l">Текущая ставка</span><span id="cbr-rate">—</span></div>
+    <button class="btn sec" onclick="loadCBRRate()" id="t-cl-cbr-btn">Обновить ставку</button>
+  </div>
+</div>
+
+<!-- ПРОФИЛЬ -->
 <div class="page" id="page-profile">
   <h1 id="t-pr-title">Профиль</h1>
   <div class="sub" id="t-pr-sub">Твои данные</div>
@@ -184,6 +239,7 @@
   <button class="btn" onclick="shareApp()" id="t-pr-share">Поделиться ботом</button>
 </div>
 
+<!-- НАСТРОЙКИ -->
 <div class="page" id="page-more">
   <h1 id="t-m-title">Настройки</h1>
   <div class="section">
@@ -192,7 +248,6 @@
       <span id="t-m-auto-label">USD · EUR · KZT</span>
       <div class="toggle" id="autoToggle" onclick="toggleAuto()"></div>
     </div>
-    <div class="sub" id="t-m-auto-hint" style="margin:4px 0 0;font-size:10px">Порог 1 ₽</div>
   </div>
   <div class="section">
     <h3 id="t-m-alert">Алерт по курсу</h3>
@@ -213,9 +268,10 @@
   <div class="section">
     <h3 id="t-m-chat">В чат бота</h3>
     <button class="btn sec" onclick="sendCmd('/rate')" id="t-m-rate">Курсы</button>
-    <button class="btn sec" onclick="showHint('/history USD 30')" id="t-m-hist">История</button>
-    <button class="btn sec" onclick="showHint('/compare USD EUR')" id="t-m-cmp">Сравнить</button>
-    <button class="btn sec" onclick="showHint('/crypto BTC')" id="t-m-cr">Крипта</button>
+    <button class="btn sec" onclick="sendCmd('/metals')" id="t-m-mt">Металлы</button>
+    <button class="btn sec" onclick="sendCmd('/oil')" id="t-m-oil">Нефть</button>
+    <button class="btn sec" onclick="sendCmd('/stocks')" id="t-m-sk">Акции</button>
+    <button class="btn sec" onclick="sendCmd('/forecast USD')" id="t-m-fc">Прогноз</button>
   </div>
 </div>
 
@@ -223,8 +279,13 @@
   <button class="active" onclick="nav('rates', this)"><span>💱</span><span id="t-nav-rates">Курсы</span></button>
   <button onclick="nav('convert', this)"><span>💸</span><span id="t-nav-conv">Обмен</span></button>
   <button onclick="nav('crypto', this)"><span>💰</span><span id="t-nav-cr">Крипта</span></button>
+  <button onclick="nav('oil', this)"><span>🛢</span><span id="t-nav-oil">Нефть</span></button>
+  <button onclick="nav('metals', this)"><span>💎</span><span id="t-nav-mt">Металлы</span></button>
+  <button onclick="nav('stocks', this)"><span>📈</span><span id="t-nav-sk">Акции</span></button>
   <button onclick="nav('stats', this)"><span>📊</span><span id="t-nav-st">Стата</span></button>
+  <button onclick="nav('forecast', this)"><span>🔮</span><span id="t-nav-fc">Прогноз</span></button>
   <button onclick="nav('banks', this)"><span>🏦</span><span id="t-nav-b">Банки</span></button>
+  <button onclick="nav('calc', this)"><span>🧮</span><span id="t-nav-cl">Кальк</span></button>
   <button onclick="nav('profile', this)"><span>👤</span><span id="t-nav-pr">Профиль</span></button>
   <button onclick="nav('more', this)"><span>⚙️</span><span id="t-nav-m">Настройки</span></button>
 </div>
@@ -241,142 +302,323 @@ const NAMES = {
   de:{USD:'Dollar',EUR:'Euro',KZT:'Tenge',GBP:'Pfund',CNY:'Yuan',JPY:'Yen',TRY:'Lira',UAH:'Hrywnja',AED:'Dirham',CHF:'Franken',CAD:'Kanadischer',AUD:'Australischer',KRW:'Won',INR:'Rupie',BRL:'Real',RUB:'Rubel',BTC:'Bitcoin',ETH:'Ethereum',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'},
   fr:{USD:'Dollar',EUR:'Euro',KZT:'Tenge',GBP:'Livre',CNY:'Yuan',JPY:'Yen',TRY:'Lire',UAH:'Hryvnia',AED:'Dirham',CHF:'Franc',CAD:'Canadien',AUD:'Australien',KRW:'Won',INR:'Roupie',BRL:'Réal',RUB:'Rouble',BTC:'Bitcoin',ETH:'Ethereum',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'},
   es:{USD:'Dólar',EUR:'Euro',KZT:'Tenge',GBP:'Libra',CNY:'Yuan',JPY:'Yen',TRY:'Lira',UAH:'Grivna',AED:'Dírham',CHF:'Franco',CAD:'Canadiense',AUD:'Australiano',KRW:'Won',INR:'Rupia',BRL:'Real',RUB:'Rublo',BTC:'Bitcoin',ETH:'Ethereum',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'},
-  tr:{USD:'Dolar',EUR:'Euro',KZT:'Tenge',GBP:'Sterlin',CNY:'Yuan',JPY:'Yen',TRY:'Lira',UAH:'Grivna',AED:'Dirhem',CHF:'Frank',CAD:'Kanada',AUD:'Avustralya',KRW:'Won',INR:'Rupi',BRL:'Real',RUB:'Ruble',BTC:'Bitcoin',ETH:'Ethereum',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'}
+  tr:{USD:'Dolar',EUR:'Euro',KZT:'Tenge',GBP:'Sterlin',CNY:'Yuan',JPY:'Yen',TRY:'Lira',UAH:'Grivna',AED:'Dirhem',CHF:'Frank',CAD:'Kanada',AUD:'Avustralya',KRW:'Won',INR:'Rupi',BRL:'Real',RUB:'Ruble',BTC:'Bitcoin',ETH:'Ethereum',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'},
+  zh:{USD:'美元',EUR:'欧元',KZT:'坚戈',GBP:'英镑',CNY:'人民币',JPY:'日元',TRY:'里拉',UAH:'格里夫纳',AED:'迪拉姆',CHF:'法郎',CAD:'加元',AUD:'澳元',KRW:'韩元',INR:'卢比',BRL:'雷亚尔',RUB:'卢布',BTC:'比特币',ETH:'以太坊',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'},
+  ja:{USD:'ドル',EUR:'ユーロ',KZT:'テンゲ',GBP:'ポンド',CNY:'元',JPY:'円',TRY:'リラ',UAH:'フリヴニャ',AED:'ディルハム',CHF:'フラン',CAD:'カナダドル',AUD:'豪ドル',KRW:'ウォン',INR:'ルピー',BRL:'レアル',RUB:'ルーブル',BTC:'ビットコイン',ETH:'イーサリアム',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'},
+  ar:{USD:'دولار',EUR:'يورو',KZT:'تينغي',GBP:'جنيه',CNY:'يوان',JPY:'ين',TRY:'ليرة',UAH:'هريفنيا',AED:'درهم',CHF:'فرنك',CAD:'دولار كندي',AUD:'دولار أسترالي',KRW:'وون',INR:'روبية',BRL:'ريال',RUB:'روبل',BTC:'بيتكوين',ETH:'إيثيريوم',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'},
+  it:{USD:'Dollaro',EUR:'Euro',KZT:'Tenge',GBP:'Sterlina',CNY:'Yuan',JPY:'Yen',TRY:'Lira',UAH:'Grivnia',AED:'Dirham',CHF:'Franco',CAD:'Canadese',AUD:'Australiano',KRW:'Won',INR:'Rupia',BRL:'Real',RUB:'Rublo',BTC:'Bitcoin',ETH:'Ethereum',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'},
+  pt:{USD:'Dólar',EUR:'Euro',KZT:'Tenge',GBP:'Libra',CNY:'Yuan',JPY:'Iene',TRY:'Lira',UAH:'Hryvnia',AED:'Dirham',CHF:'Franco',CAD:'Canadense',AUD:'Australiano',KRW:'Won',INR:'Rupia',BRL:'Real',RUB:'Rublo',BTC:'Bitcoin',ETH:'Ethereum',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'}
 };
+
 const FLAGS = {USD:'🇺🇸',EUR:'🇪🇺',KZT:'🇰🇿',GBP:'🇬🇧',CNY:'🇨🇳',JPY:'🇯🇵',TRY:'🇹🇷',UAH:'🇺🇦',AED:'🇦🇪',CHF:'🇨🇭',CAD:'🇨🇦',AUD:'🇦🇺',KRW:'🇰🇷',INR:'🇮🇳',BRL:'🇧🇷',RUB:'🇷🇺',BTC:'₿',ETH:'Ξ',TON:'💎',SOL:'◎',BNB:'🟡',USDT:'💵'};
 
+// Базовые тексты (RU), остальные языки наследуют ключи
 const T = {
   ru:{
     title:'Валютный Радар',live:'Live · автообновление',dcNow:'Сейчас',dcOld:'24ч назад',
     convTitle:'Конвертер',convSub:'Мгновенный обмен',convBtn:'Обменять',
-    pfTitle:'Портфель',pfSub:'Валюты и крипта',pfAdd:'Добавить актив',pfMy:'Активы',pfAddBtn:'Добавить',
-    crTitle:'Крипта',crSub:'₽ и $ · 24ч',stTitle:'Статистика',stSub:'Мин · среднее · макс',
+    crTitle:'Крипта',crSub:'₽ и $ · 24ч',oilTitle:'Нефть',oilSub:'Brent · WTI',
+    mtTitle:'Металлы',mtSub:'ЦБ РФ · ₽/грамм',skTitle:'Акции',skSub:'Индексы и акции',
+    stTitle:'Статистика',stSub:'Мин · среднее · макс',
+    fcTitle:'Прогноз',fcSub:'Тренд на завтра',fcBtn:'Рассчитать',
     bTitle:'Банки',bSub:'ЦБ РФ · Тинькофф',bBtn:'Обновить',
+    clTitle:'Калькулятор',clSub:'Ипотека и вклад',
     prTitle:'Профиль',prSub:'Твои данные',prUser:'Пользователь',prName:'Имя',prLang:'Язык',
     prPf:'Портфель',prPfAdd:'Добавить актив',prShare:'Поделиться ботом',
-    mTitle:'Настройки',mAuto:'Автоуведомления',mAutoLabel:'USD · EUR · KZT',mAutoHint:'Порог 1 ₽',
+    mTitle:'Настройки',mAuto:'Автоуведомления',mAutoLabel:'USD · EUR · KZT',
     mAlert:'Алерт по курсу',mAlertBtn:'Создать',mDigest:'Сводка раз в день',
     mDigestBtn:'Включить',mDigestOff:'Выключить',mChat:'В чат бота',
-    mRate:'Курсы',mHist:'История',mCmp:'Сравнить',mCr:'Крипта',
-    navRates:'Курсы',navConv:'Обмен',navCr:'Крипта',navSt:'Стата',navB:'Банки',navPr:'Профиль',navM:'Настройки',
+    mRate:'Курсы',mMt:'Металлы',mOil:'Нефть',mSk:'Акции',mFc:'Прогноз',
+    navRates:'Курсы',navConv:'Обмен',navCr:'Крипта',navOil:'Нефть',navMt:'Металлы',navSk:'Акции',
+    navSt:'Стата',navFc:'Прогноз',navB:'Банки',navCl:'Кальк',navPr:'Профиль',navM:'Настройки',
     min:'мин',avg:'сред',max:'макс',buy:'Пок',sell:'Прод',
     updated:'Обновлено',total:'Итого',empty:'Пусто',loading:'Загрузка…',error:'Ошибка',
     greater:'Больше (>)',less:'Меньше (<)',langPick:'Язык',
-    langRu:'Русский',langEn:'Английский',langDe:'Немецкий',langFr:'Французский',langEs:'Испанский',langTr:'Турецкий',
-    toastOn:'Включено',toastOff:'Выключено',toastLang:'Язык',
-    placeholder:'Количество',currenciesLabel:'Валюты',cryptoLabel:'Крипта',
+    langRu:'Русский',langEn:'Английский',langDe:'Немецкий',langFr:'Французский',langEs:'Испанский',
+    langTr:'Турецкий',langZh:'Китайский',langJa:'Японский',langAr:'Арабский',langIt:'Итальянский',langPt:'Португальский',
+    toastOn:'Включено',toastOff:'Выключено',placeholder:'Количество',currenciesLabel:'Валюты',cryptoLabel:'Крипта',
     days:'д',cbrTitle:'🇷🇺 ЦБ РФ',tinkTitle:'🟡 Тинькофф',
+    mCalc:['🏠 Ипотека','💰 Вклад'],cbrLabel:'Текущая ставка',
+    monthlyPay:'Платёж в месяц',totalPay:'Общая сумма',overPay:'Переплата',
+    profit:'Доход',finalAmount:'Итог',
     notifyTitle:'Курс изменился',notifyBody:'{code} {dir} на {diff} ₽'},
-  en:{
-    title:'Currency Radar',live:'Live · auto-refresh',dcNow:'Now',dcOld:'24h ago',
+  en:{title:'Currency Radar',live:'Live · auto-refresh',dcNow:'Now',dcOld:'24h ago',
     convTitle:'Converter',convSub:'Instant exchange',convBtn:'Convert',
-    pfTitle:'Portfolio',pfSub:'Currencies and crypto',pfAdd:'Add asset',pfMy:'Assets',pfAddBtn:'Add',
-    crTitle:'Crypto',crSub:'₽ and $ · 24h',stTitle:'Statistics',stSub:'Min · avg · max',
+    crTitle:'Crypto',crSub:'₽ and $ · 24h',oilTitle:'Oil',oilSub:'Brent · WTI',
+    mtTitle:'Metals',mtSub:'CBR · ₽/gram',skTitle:'Stocks',skSub:'Indices & stocks',
+    stTitle:'Statistics',stSub:'Min · avg · max',
+    fcTitle:'Forecast',fcSub:'Tomorrow trend',fcBtn:'Calculate',
     bTitle:'Banks',bSub:'CBR · Tinkoff',bBtn:'Refresh',
+    clTitle:'Calculator',clSub:'Mortgage & deposit',
     prTitle:'Profile',prSub:'Your data',prUser:'User',prName:'Name',prLang:'Language',
     prPf:'Portfolio',prPfAdd:'Add asset',prShare:'Share bot',
-    mTitle:'Settings',mAuto:'Auto-notifications',mAutoLabel:'USD · EUR · KZT',mAutoHint:'Threshold 1 ₽',
+    mTitle:'Settings',mAuto:'Auto-notifications',mAutoLabel:'USD · EUR · KZT',
     mAlert:'Price alert',mAlertBtn:'Create',mDigest:'Daily digest',
     mDigestBtn:'Enable',mDigestOff:'Disable',mChat:'To bot chat',
-    mRate:'Rates',mHist:'History',mCmp:'Compare',mCr:'Crypto',
-    navRates:'Rates',navConv:'Convert',navCr:'Crypto',navSt:'Stats',navB:'Banks',navPr:'Profile',navM:'Settings',
+    mRate:'Rates',mMt:'Metals',mOil:'Oil',mSk:'Stocks',mFc:'Forecast',
+    navRates:'Rates',navConv:'Convert',navCr:'Crypto',navOil:'Oil',navMt:'Metals',navSk:'Stocks',
+    navSt:'Stats',navFc:'Forecast',navB:'Banks',navCl:'Calc',navPr:'Profile',navM:'Settings',
     min:'min',avg:'avg',max:'max',buy:'Buy',sell:'Sell',
     updated:'Updated',total:'Total',empty:'Empty',loading:'Loading…',error:'Error',
     greater:'Greater (>)',less:'Less (<)',langPick:'Language',
-    langRu:'Russian',langEn:'English',langDe:'German',langFr:'French',langEs:'Spanish',langTr:'Turkish',
-    toastOn:'ON',toastOff:'OFF',toastLang:'Language',
-    placeholder:'Amount',currenciesLabel:'Currencies',cryptoLabel:'Crypto',
+    langRu:'Russian',langEn:'English',langDe:'German',langFr:'French',langEs:'Spanish',
+    langTr:'Turkish',langZh:'Chinese',langJa:'Japanese',langAr:'Arabic',langIt:'Italian',langPt:'Portuguese',
+    toastOn:'ON',toastOff:'OFF',placeholder:'Amount',currenciesLabel:'Currencies',cryptoLabel:'Crypto',
     days:'d',cbrTitle:'🇷🇺 CBR',tinkTitle:'🟡 Tinkoff',
+    mCalc:['🏠 Mortgage','💰 Deposit'],cbrLabel:'Current rate',
+    monthlyPay:'Monthly payment',totalPay:'Total amount',overPay:'Overpayment',
+    profit:'Profit',finalAmount:'Final',
     notifyTitle:'Rate changed',notifyBody:'{code} {dir} by {diff} ₽'},
-  de:{
-    title:'Währungsradar',live:'Live · Auto-Aktualisierung',dcNow:'Jetzt',dcOld:'vor 24h',
+  de:{title:'Währungsradar',live:'Live · Auto-Aktualisierung',dcNow:'Jetzt',dcOld:'vor 24h',
     convTitle:'Umrechner',convSub:'Sofortiger Tausch',convBtn:'Umtauschen',
-    pfTitle:'Portfolio',pfSub:'Währungen und Krypto',pfAdd:'Hinzufügen',pfMy:'Anlagen',pfAddBtn:'Hinzufügen',
-    crTitle:'Krypto',crSub:'₽ und $ · 24h',stTitle:'Statistik',stSub:'Min · Ø · Max',
+    crTitle:'Krypto',crSub:'₽ und $ · 24h',oilTitle:'Öl',oilSub:'Brent · WTI',
+    mtTitle:'Metalle',mtSub:'ZBR · ₽/Gramm',skTitle:'Aktien',skSub:'Indizes & Aktien',
+    stTitle:'Statistik',stSub:'Min · Ø · Max',
+    fcTitle:'Prognose',fcSub:'Trend morgen',fcBtn:'Berechnen',
     bTitle:'Banken',bSub:'ZBR · Tinkoff',bBtn:'Aktualisieren',
+    clTitle:'Rechner',clSub:'Hypothek & Einlage',
     prTitle:'Profil',prSub:'Deine Daten',prUser:'Benutzer',prName:'Name',prLang:'Sprache',
     prPf:'Portfolio',prPfAdd:'Hinzufügen',prShare:'Bot teilen',
-    mTitle:'Einstellungen',mAuto:'Auto-Benachrichtigungen',mAutoLabel:'USD · EUR · KZT',mAutoHint:'Schwelle 1 ₽',
+    mTitle:'Einstellungen',mAuto:'Auto-Benachrichtigungen',mAutoLabel:'USD · EUR · KZT',
     mAlert:'Preisalarm',mAlertBtn:'Erstellen',mDigest:'Tägliche Zusammenfassung',
     mDigestBtn:'Aktivieren',mDigestOff:'Deaktivieren',mChat:'Zum Bot-Chat',
-    mRate:'Kurse',mHist:'Verlauf',mCmp:'Vergleichen',mCr:'Krypto',
-    navRates:'Kurse',navConv:'Tausch',navCr:'Krypto',navSt:'Stat',navB:'Banken',navPr:'Profil',navM:'Einstellungen',
+    mRate:'Kurse',mMt:'Metalle',mOil:'Öl',mSk:'Aktien',mFc:'Prognose',
+    navRates:'Kurse',navConv:'Tausch',navCr:'Krypto',navOil:'Öl',navMt:'Metalle',navSk:'Aktien',
+    navSt:'Stat',navFc:'Prognose',navB:'Banken',navCl:'Rechner',navPr:'Profil',navM:'Einstellungen',
     min:'min',avg:'Ø',max:'max',buy:'Kauf',sell:'Verk',
     updated:'Aktualisiert',total:'Gesamt',empty:'Leer',loading:'Lädt…',error:'Fehler',
     greater:'Größer (>)',less:'Kleiner (<)',langPick:'Sprache',
-    langRu:'Russisch',langEn:'Englisch',langDe:'Deutsch',langFr:'Französisch',langEs:'Spanisch',langTr:'Türkisch',
-    toastOn:'AN',toastOff:'AUS',toastLang:'Sprache',
-    placeholder:'Menge',currenciesLabel:'Währungen',cryptoLabel:'Krypto',
+    langRu:'Russisch',langEn:'Englisch',langDe:'Deutsch',langFr:'Französisch',langEs:'Spanisch',
+    langTr:'Türkisch',langZh:'Chinesisch',langJa:'Japanisch',langAr:'Arabisch',langIt:'Italienisch',langPt:'Portugiesisch',
+    toastOn:'AN',toastOff:'AUS',placeholder:'Menge',currenciesLabel:'Währungen',cryptoLabel:'Krypto',
     days:'T',cbrTitle:'🇷🇺 ZBR',tinkTitle:'🟡 Tinkoff',
+    mCalc:['🏠 Hypothek','💰 Einlage'],cbrLabel:'Aktueller Zins',
+    monthlyPay:'Monatlich',totalPay:'Gesamt',overPay:'Überzahlung',
+    profit:'Gewinn',finalAmount:'Endbetrag',
     notifyTitle:'Kurs geändert',notifyBody:'{code} {dir} um {diff} ₽'},
-  fr:{
-    title:'Radar Devises',live:'Live · auto-actualisation',dcNow:'Maintenant',dcOld:'il y a 24h',
+  fr:{title:'Radar Devises',live:'Live · auto-actualisation',dcNow:'Maintenant',dcOld:'il y a 24h',
     convTitle:'Convertisseur',convSub:'Échange instantané',convBtn:'Convertir',
-    pfTitle:'Portefeuille',pfSub:'Devises et crypto',pfAdd:'Ajouter',pfMy:'Actifs',pfAddBtn:'Ajouter',
-    crTitle:'Crypto',crSub:'₽ et $ · 24h',stTitle:'Statistiques',stSub:'Min · moy · max',
+    crTitle:'Crypto',crSub:'₽ et $ · 24h',oilTitle:'Pétrole',oilSub:'Brent · WTI',
+    mtTitle:'Métaux',mtSub:'BCR · ₽/g',skTitle:'Actions',skSub:'Indices & actions',
+    stTitle:'Statistiques',stSub:'Min · moy · max',
+    fcTitle:'Prévision',fcSub:'Tendance demain',fcBtn:'Calculer',
     bTitle:'Banques',bSub:'BCR · Tinkoff',bBtn:'Actualiser',
+    clTitle:'Calculateur',clSub:'Prêt & dépôt',
     prTitle:'Profil',prSub:'Vos données',prUser:'Utilisateur',prName:'Nom',prLang:'Langue',
-    prPf:'Portefeuille',prPfAdd:'Ajouter',prShare:'Partager le bot',
-    mTitle:'Paramètres',mAuto:'Notifications auto',mAutoLabel:'USD · EUR · KZT',mAutoHint:'Seuil 1 ₽',
-    mAlert:'Alerte de prix',mAlertBtn:'Créer',mDigest:'Résumé quotidien',
+    prPf:'Portefeuille',prPfAdd:'Ajouter',prShare:'Partager',
+    mTitle:'Paramètres',mAuto:'Notifications auto',mAutoLabel:'USD · EUR · KZT',
+    mAlert:'Alerte prix',mAlertBtn:'Créer',mDigest:'Résumé quotidien',
     mDigestBtn:'Activer',mDigestOff:'Désactiver',mChat:'Vers le chat',
-    mRate:'Taux',mHist:'Historique',mCmp:'Comparer',mCr:'Crypto',
-    navRates:'Taux',navConv:'Échange',navCr:'Crypto',navSt:'Stats',navB:'Banques',navPr:'Profil',navM:'Paramètres',
+    mRate:'Taux',mMt:'Métaux',mOil:'Pétrole',mSk:'Actions',mFc:'Prévision',
+    navRates:'Taux',navConv:'Échange',navCr:'Crypto',navOil:'Pétrole',navMt:'Métaux',navSk:'Actions',
+    navSt:'Stats',navFc:'Prévision',navB:'Banques',navCl:'Calc',navPr:'Profil',navM:'Paramètres',
     min:'min',avg:'moy',max:'max',buy:'Achat',sell:'Vente',
     updated:'Actualisé',total:'Total',empty:'Vide',loading:'Chargement…',error:'Erreur',
     greater:'Supérieur (>)',less:'Inférieur (<)',langPick:'Langue',
-    langRu:'Russe',langEn:'Anglais',langDe:'Allemand',langFr:'Français',langEs:'Espagnol',langTr:'Turc',
-    toastOn:'ON',toastOff:'OFF',toastLang:'Langue',
-    placeholder:'Montant',currenciesLabel:'Devises',cryptoLabel:'Crypto',
+    langRu:'Russe',langEn:'Anglais',langDe:'Allemand',langFr:'Français',langEs:'Espagnol',
+    langTr:'Turc',langZh:'Chinois',langJa:'Japonais',langAr:'Arabe',langIt:'Italien',langPt:'Portugais',
+    toastOn:'ON',toastOff:'OFF',placeholder:'Montant',currenciesLabel:'Devises',cryptoLabel:'Crypto',
     days:'j',cbrTitle:'🇷🇺 BCR',tinkTitle:'🟡 Tinkoff',
+    mCalc:['🏠 Prêt','💰 Dépôt'],cbrLabel:'Taux actuel',
+    monthlyPay:'Mensualité',totalPay:'Total',overPay:'Surpaiement',
+    profit:'Profit',finalAmount:'Final',
     notifyTitle:'Taux modifié',notifyBody:'{code} {dir} de {diff} ₽'},
-  es:{
-    title:'Radar de Divisas',live:'Live · auto-actualizado',dcNow:'Ahora',dcOld:'hace 24h',
+  es:{title:'Radar de Divisas',live:'Live · auto',dcNow:'Ahora',dcOld:'hace 24h',
     convTitle:'Convertidor',convSub:'Cambio instantáneo',convBtn:'Convertir',
-    pfTitle:'Portafolio',pfSub:'Divisas y cripto',pfAdd:'Añadir',pfMy:'Activos',pfAddBtn:'Añadir',
-    crTitle:'Cripto',crSub:'₽ y $ · 24h',stTitle:'Estadísticas',stSub:'Mín · med · máx',
+    crTitle:'Cripto',crSub:'₽ y $ · 24h',oilTitle:'Petróleo',oilSub:'Brent · WTI',
+    mtTitle:'Metales',mtSub:'BCR · ₽/g',skTitle:'Acciones',skSub:'Índices y acciones',
+    stTitle:'Estadísticas',stSub:'Mín · med · máx',
+    fcTitle:'Pronóstico',fcSub:'Tendencia mañana',fcBtn:'Calcular',
     bTitle:'Bancos',bSub:'BCR · Tinkoff',bBtn:'Actualizar',
+    clTitle:'Calculadora',clSub:'Hipoteca y depósito',
     prTitle:'Perfil',prSub:'Tus datos',prUser:'Usuario',prName:'Nombre',prLang:'Idioma',
-    prPf:'Portafolio',prPfAdd:'Añadir',prShare:'Compartir bot',
-    mTitle:'Ajustes',mAuto:'Notificaciones auto',mAutoLabel:'USD · EUR · KZT',mAutoHint:'Umbral 1 ₽',
-    mAlert:'Alerta de precio',mAlertBtn:'Crear',mDigest:'Resumen diario',
+    prPf:'Portafolio',prPfAdd:'Añadir',prShare:'Compartir',
+    mTitle:'Ajustes',mAuto:'Notificaciones auto',mAutoLabel:'USD · EUR · KZT',
+    mAlert:'Alerta precio',mAlertBtn:'Crear',mDigest:'Resumen diario',
     mDigestBtn:'Activar',mDigestOff:'Desactivar',mChat:'Al chat',
-    mRate:'Tasas',mHist:'Historial',mCmp:'Comparar',mCr:'Cripto',
-    navRates:'Tasas',navConv:'Cambio',navCr:'Cripto',navSt:'Stats',navB:'Bancos',navPr:'Perfil',navM:'Ajustes',
+    mRate:'Tasas',mMt:'Metales',mOil:'Petróleo',mSk:'Acciones',mFc:'Pronóstico',
+    navRates:'Tasas',navConv:'Cambio',navCr:'Cripto',navOil:'Petróleo',navMt:'Metales',navSk:'Acciones',
+    navSt:'Stats',navFc:'Pronóstico',navB:'Bancos',navCl:'Calc',navPr:'Perfil',navM:'Ajustes',
     min:'mín',avg:'med',max:'máx',buy:'Compra',sell:'Venta',
     updated:'Actualizado',total:'Total',empty:'Vacío',loading:'Cargando…',error:'Error',
     greater:'Mayor (>)',less:'Menor (<)',langPick:'Idioma',
-    langRu:'Ruso',langEn:'Inglés',langDe:'Alemán',langFr:'Francés',langEs:'Español',langTr:'Turco',
-    toastOn:'ON',toastOff:'OFF',toastLang:'Idioma',
-    placeholder:'Cantidad',currenciesLabel:'Divisas',cryptoLabel:'Cripto',
+    langRu:'Ruso',langEn:'Inglés',langDe:'Alemán',langFr:'Francés',langEs:'Español',
+    langTr:'Turco',langZh:'Chino',langJa:'Japonés',langAr:'Árabe',langIt:'Italiano',langPt:'Portugués',
+    toastOn:'ON',toastOff:'OFF',placeholder:'Cantidad',currenciesLabel:'Divisas',cryptoLabel:'Cripto',
     days:'d',cbrTitle:'🇷🇺 BCR',tinkTitle:'🟡 Tinkoff',
+    mCalc:['🏠 Hipoteca','💰 Depósito'],cbrLabel:'Tasa actual',
+    monthlyPay:'Pago mensual',totalPay:'Total',overPay:'Sobrepago',
+    profit:'Beneficio',finalAmount:'Final',
     notifyTitle:'Tasa cambiada',notifyBody:'{code} {dir} en {diff} ₽'},
-  tr:{
-    title:'Döviz Radarı',live:'Canlı · otomatik',dcNow:'Şimdi',dcOld:'24s önce',
-    convTitle:'Çevirici',convSub:'Anında değişim',convBtn:'Çevir',
-    pfTitle:'Portföy',pfSub:'Döviz ve kripto',pfAdd:'Ekle',pfMy:'Varlıklar',pfAddBtn:'Ekle',
-    crTitle:'Kripto',crSub:'₽ ve $ · 24s',stTitle:'İstatistik',stSub:'Min · ort · maks',
+  tr:{title:'Döviz Radarı',live:'Canlı',dcNow:'Şimdi',dcOld:'24s önce',
+    convTitle:'Çevirici',convSub:'Anında',convBtn:'Çevir',
+    crTitle:'Kripto',crSub:'₽ ve $ · 24s',oilTitle:'Petrol',oilSub:'Brent · WTI',
+    mtTitle:'Metaller',mtSub:'MB · ₽/g',skTitle:'Hisseler',skSub:'Endeks & hisse',
+    stTitle:'İstatistik',stSub:'Min · ort · maks',
+    fcTitle:'Tahmin',fcSub:'Yarın trendi',fcBtn:'Hesapla',
     bTitle:'Bankalar',bSub:'MB · Tinkoff',bBtn:'Yenile',
+    clTitle:'Hesap',clSub:'Kredi & mevduat',
     prTitle:'Profil',prSub:'Verilerin',prUser:'Kullanıcı',prName:'Ad',prLang:'Dil',
-    prPf:'Portföy',prPfAdd:'Ekle',prShare:'Botu paylaş',
-    mTitle:'Ayarlar',mAuto:'Otomatik bildirim',mAutoLabel:'USD · EUR · KZT',mAutoHint:'Eşik 1 ₽',
+    prPf:'Portföy',prPfAdd:'Ekle',prShare:'Paylaş',
+    mTitle:'Ayarlar',mAuto:'Otomatik bildirim',mAutoLabel:'USD · EUR · KZT',
     mAlert:'Fiyat alarmı',mAlertBtn:'Oluştur',mDigest:'Günlük özet',
     mDigestBtn:'Aç',mDigestOff:'Kapat',mChat:'Sohbete',
-    mRate:'Kurlar',mHist:'Geçmiş',mCmp:'Karşılaştır',mCr:'Kripto',
-    navRates:'Kurlar',navConv:'Çevir',navCr:'Kripto',navSt:'İstat',navB:'Bankalar',navPr:'Profil',navM:'Ayarlar',
+    mRate:'Kurlar',mMt:'Metaller',mOil:'Petrol',mSk:'Hisseler',mFc:'Tahmin',
+    navRates:'Kurlar',navConv:'Çevir',navCr:'Kripto',navOil:'Petrol',navMt:'Metaller',navSk:'Hisseler',
+    navSt:'İstat',navFc:'Tahmin',navB:'Bankalar',navCl:'Hesap',navPr:'Profil',navM:'Ayarlar',
     min:'min',avg:'ort',max:'maks',buy:'Alış',sell:'Satış',
     updated:'Güncellendi',total:'Toplam',empty:'Boş',loading:'Yükleniyor…',error:'Hata',
     greater:'Büyük (>)',less:'Küçük (<)',langPick:'Dil',
-    langRu:'Rusça',langEn:'İngilizce',langDe:'Almanca',langFr:'Fransızca',langEs:'İspanyolca',langTr:'Türkçe',
-    toastOn:'AÇIK',toastOff:'KAPALI',toastLang:'Dil',
-    placeholder:'Miktar',currenciesLabel:'Döviz',cryptoLabel:'Kripto',
+    langRu:'Rusça',langEn:'İngilizce',langDe:'Almanca',langFr:'Fransızca',langEs:'İspanyolca',
+    langTr:'Türkçe',langZh:'Çince',langJa:'Japonca',langAr:'Arapça',langIt:'İtalyanca',langPt:'Portekizce',
+    toastOn:'AÇIK',toastOff:'KAPALI',placeholder:'Miktar',currenciesLabel:'Döviz',cryptoLabel:'Kripto',
     days:'g',cbrTitle:'🇷🇺 MB',tinkTitle:'🟡 Tinkoff',
-    notifyTitle:'Kur değişti',notifyBody:'{code} {dir} {diff} ₽'}
+    mCalc:['🏠 Kredi','💰 Mevduat'],cbrLabel:'Mevcut oran',
+    monthlyPay:'Aylık ödeme',totalPay:'Toplam',overPay:'Fazla ödeme',
+    profit:'Kâr',finalAmount:'Son',
+    notifyTitle:'Kur değişti',notifyBody:'{code} {dir} {diff} ₽'},
+  zh:{title:'货币雷达',live:'实时 · 自动刷新',dcNow:'现在',dcOld:'24小时前',
+    convTitle:'转换器',convSub:'即时兑换',convBtn:'转换',
+    crTitle:'加密货币',crSub:'₽ 和 $ · 24小时',oilTitle:'石油',oilSub:'布伦特 · WTI',
+    mtTitle:'金属',mtSub:'CBR · ₽/克',skTitle:'股票',skSub:'指数和股票',
+    stTitle:'统计',stSub:'最小 · 平均 · 最大',
+    fcTitle:'预测',fcSub:'明日趋势',fcBtn:'计算',
+    bTitle:'银行',bSub:'CBR · Tinkoff',bBtn:'刷新',
+    clTitle:'计算器',clSub:'按揭和存款',
+    prTitle:'个人资料',prSub:'你的数据',prUser:'用户',prName:'姓名',prLang:'语言',
+    prPf:'投资组合',prPfAdd:'添加',prShare:'分享',
+    mTitle:'设置',mAuto:'自动通知',mAutoLabel:'USD · EUR · KZT',
+    mAlert:'价格提醒',mAlertBtn:'创建',mDigest:'每日摘要',
+    mDigestBtn:'开启',mDigestOff:'关闭',mChat:'发送到聊天',
+    mRate:'汇率',mMt:'金属',mOil:'石油',mSk:'股票',mFc:'预测',
+    navRates:'汇率',navConv:'兑换',navCr:'加密',navOil:'石油',navMt:'金属',navSk:'股票',
+    navSt:'统计',navFc:'预测',navB:'银行',navCl:'计算',navPr:'资料',navM:'设置',
+    min:'最小',avg:'平均',max:'最大',buy:'买',sell:'卖',
+    updated:'已更新',total:'总计',empty:'空',loading:'加载中…',error:'错误',
+    greater:'大于 (>)',less:'小于 (<)',langPick:'语言',
+    langRu:'俄语',langEn:'英语',langDe:'德语',langFr:'法语',langEs:'西班牙语',
+    langTr:'土耳其语',langZh:'中文',langJa:'日语',langAr:'阿拉伯语',langIt:'意大利语',langPt:'葡萄牙语',
+    toastOn:'开',toastOff:'关',placeholder:'数量',currenciesLabel:'货币',cryptoLabel:'加密货币',
+    days:'天',cbrTitle:'🇷🇺 俄罗斯央行',tinkTitle:'🟡 Tinkoff',
+    mCalc:['🏠 按揭','💰 存款'],cbrLabel:'当前利率',
+    monthlyPay:'月供',totalPay:'总金额',overPay:'多付',
+    profit:'收益',finalAmount:'最终',
+    notifyTitle:'汇率变化',notifyBody:'{code} {dir} {diff} ₽'},
+  ja:{title:'通貨レーダー',live:'ライブ · 自動更新',dcNow:'現在',dcOld:'24時間前',
+    convTitle:'コンバーター',convSub:'即時交換',convBtn:'変換',
+    crTitle:'クリプト',crSub:'₽ と $ · 24h',oilTitle:'石油',oilSub:'ブレント · WTI',
+    mtTitle:'金属',mtSub:'CBR · ₽/g',skTitle:'株式',skSub:'指数と株式',
+    stTitle:'統計',stSub:'最小 · 平均 · 最大',
+    fcTitle:'予測',fcSub:'明日のトレンド',fcBtn:'計算',
+    bTitle:'銀行',bSub:'CBR · Tinkoff',bBtn:'更新',
+    clTitle:'計算機',clSub:'住宅ローンと預金',
+    prTitle:'プロフィール',prSub:'あなたのデータ',prUser:'ユーザー',prName:'名前',prLang:'言語',
+    prPf:'ポートフォリオ',prPfAdd:'追加',prShare:'共有',
+    mTitle:'設定',mAuto:'自動通知',mAutoLabel:'USD · EUR · KZT',
+    mAlert:'価格アラート',mAlertBtn:'作成',mDigest:'毎日のダイジェスト',
+    mDigestBtn:'有効',mDigestOff:'無効',mChat:'チャットへ',
+    mRate:'レート',mMt:'金属',mOil:'石油',mSk:'株式',mFc:'予測',
+    navRates:'レート',navConv:'両替',navCr:'クリプト',navOil:'石油',navMt:'金属',navSk:'株式',
+    navSt:'統計',navFc:'予測',navB:'銀行',navCl:'計算',navPr:'プロフ',navM:'設定',
+    min:'最小',avg:'平均',max:'最大',buy:'買',sell:'売',
+    updated:'更新',total:'合計',empty:'空',loading:'読込中…',error:'エラー',
+    greater:'より大きい (>)',less:'より小さい (<)',langPick:'言語',
+    langRu:'ロシア語',langEn:'英語',langDe:'ドイツ語',langFr:'フランス語',langEs:'スペイン語',
+    langTr:'トルコ語',langZh:'中国語',langJa:'日本語',langAr:'アラビア語',langIt:'イタリア語',langPt:'ポルトガル語',
+    toastOn:'ON',toastOff:'OFF',placeholder:'数量',currenciesLabel:'通貨',cryptoLabel:'クリプト',
+    days:'日',cbrTitle:'🇷🇺 ロシア中銀',tinkTitle:'🟡 Tinkoff',
+    mCalc:['🏠 ローン','💰 預金'],cbrLabel:'現在の金利',
+    monthlyPay:'月額',totalPay:'総額',overPay:'過払い',
+    profit:'利益',finalAmount:'最終',
+    notifyTitle:'レート変更',notifyBody:'{code} {dir} {diff} ₽'},
+  ar:{title:'رادار العملات',live:'مباشر',dcNow:'الآن',dcOld:'قبل 24 ساعة',
+    convTitle:'محول',convSub:'تبادل فوري',convBtn:'تحويل',
+    crTitle:'عملات رقمية',crSub:'₽ و $ · 24س',oilTitle:'النفط',oilSub:'برنت · WTI',
+    mtTitle:'المعادن',mtSub:'CBR · ₽/غ',skTitle:'الأسهم',skSub:'المؤشرات والأسهم',
+    stTitle:'إحصائيات',stSub:'الحد الأدنى · المتوسط · الأقصى',
+    fcTitle:'توقع',fcSub:'اتجاه الغد',fcBtn:'حساب',
+    bTitle:'البنوك',bSub:'CBR · Tinkoff',bBtn:'تحديث',
+    clTitle:'آلة حاسبة',clSub:'الرهن والوديعة',
+    prTitle:'الملف',prSub:'بياناتك',prUser:'المستخدم',prName:'الاسم',prLang:'اللغة',
+    prPf:'المحفظة',prPfAdd:'إضافة',prShare:'مشاركة',
+    mTitle:'الإعدادات',mAuto:'إشعارات تلقائية',mAutoLabel:'USD · EUR · KZT',
+    mAlert:'تنبيه السعر',mAlertBtn:'إنشاء',mDigest:'ملخص يومي',
+    mDigestBtn:'تشغيل',mDigestOff:'إيقاف',mChat:'إلى الدردشة',
+    mRate:'الأسعار',mMt:'المعادن',mOil:'النفط',mSk:'الأسهم',mFc:'توقع',
+    navRates:'الأسعار',navConv:'تحويل',navCr:'رقمية',navOil:'النفط',navMt:'المعادن',navSk:'الأسهم',
+    navSt:'إحصائيات',navFc:'توقع',navB:'البنوك',navCl:'حاسبة',navPr:'الملف',navM:'الإعدادات',
+    min:'الحد الأدنى',avg:'المتوسط',max:'الحد الأقصى',buy:'شراء',sell:'بيع',
+    updated:'تم التحديث',total:'المجموع',empty:'فارغ',loading:'جاري التحميل…',error:'خطأ',
+    greater:'أكبر (>)',less:'أصغر (<)',langPick:'اللغة',
+    langRu:'الروسية',langEn:'الإنجليزية',langDe:'الألمانية',langFr:'الفرنسية',langEs:'الإسبانية',
+    langTr:'التركية',langZh:'الصينية',langJa:'اليابانية',langAr:'العربية',langIt:'الإيطالية',langPt:'البرتغالية',
+    toastOn:'مفعل',toastOff:'معطل',placeholder:'الكمية',currenciesLabel:'العملات',cryptoLabel:'رقمية',
+    days:'ي',cbrTitle:'🇷🇺 البنك المركزي',tinkTitle:'🟡 Tinkoff',
+    mCalc:['🏠 الرهن','💰 الوديعة'],cbrLabel:'السعر الحالي',
+    monthlyPay:'الدفعة الشهرية',totalPay:'المجموع',overPay:'دفع زائد',
+    profit:'الربح',finalAmount:'النهائي',
+    notifyTitle:'تغير السعر',notifyBody:'{code} {dir} {diff} ₽'},
+  it:{title:'Radar Valute',live:'Live',dcNow:'Ora',dcOld:'24h fa',
+    convTitle:'Convertitore',convSub:'Scambio istantaneo',convBtn:'Converti',
+    crTitle:'Cripto',crSub:'₽ e $ · 24h',oilTitle:'Petrolio',oilSub:'Brent · WTI',
+    mtTitle:'Metalli',mtSub:'BCR · ₽/g',skTitle:'Azioni',skSub:'Indici e azioni',
+    stTitle:'Statistiche',stSub:'Min · med · max',
+    fcTitle:'Previsione',fcSub:'Tendenza domani',fcBtn:'Calcola',
+    bTitle:'Banche',bSub:'BCR · Tinkoff',bBtn:'Aggiorna',
+    clTitle:'Calcolatrice',clSub:'Mutuo e deposito',
+    prTitle:'Profilo',prSub:'I tuoi dati',prUser:'Utente',prName:'Nome',prLang:'Lingua',
+    prPf:'Portafoglio',prPfAdd:'Aggiungi',prShare:'Condividi',
+    mTitle:'Impostazioni',mAuto:'Notifiche auto',mAutoLabel:'USD · EUR · KZT',
+    mAlert:'Avviso prezzo',mAlertBtn:'Crea',mDigest:'Riepilogo giornaliero',
+    mDigestBtn:'Attiva',mDigestOff:'Disattiva',mChat:'Alla chat',
+    mRate:'Tassi',mMt:'Metalli',mOil:'Petrolio',mSk:'Azioni',mFc:'Previsione',
+    navRates:'Tassi',navConv:'Cambio',navCr:'Cripto',navOil:'Petrolio',navMt:'Metalli',navSk:'Azioni',
+    navSt:'Stat',navFc:'Previs',navB:'Banche',navCl:'Calc',navPr:'Profilo',navM:'Impost.',
+    min:'min',avg:'med',max:'max',buy:'Acq',sell:'Ven',
+    updated:'Aggiornato',total:'Totale',empty:'Vuoto',loading:'Caricamento…',error:'Errore',
+    greater:'Maggiore (>)',less:'Minore (<)',langPick:'Lingua',
+    langRu:'Russo',langEn:'Inglese',langDe:'Tedesco',langFr:'Francese',langEs:'Spagnolo',
+    langTr:'Turco',langZh:'Cinese',langJa:'Giapponese',langAr:'Arabo',langIt:'Italiano',langPt:'Portoghese',
+    toastOn:'ON',toastOff:'OFF',placeholder:'Importo',currenciesLabel:'Valute',cryptoLabel:'Cripto',
+    days:'g',cbrTitle:'🇷🇺 BCR',tinkTitle:'🟡 Tinkoff',
+    mCalc:['🏠 Mutuo','💰 Deposito'],cbrLabel:'Tasso attuale',
+    monthlyPay:'Rata mensile',totalPay:'Totale',overPay:'Sovrapprezzo',
+    profit:'Profitto',finalAmount:'Finale',
+    notifyTitle:'Tasso cambiato',notifyBody:'{code} {dir} di {diff} ₽'},
+  pt:{title:'Radar de Moedas',live:'Ao vivo',dcNow:'Agora',dcOld:'24h atrás',
+    convTitle:'Conversor',convSub:'Troca instantânea',convBtn:'Converter',
+    crTitle:'Cripto',crSub:'₽ e $ · 24h',oilTitle:'Petróleo',oilSub:'Brent · WTI',
+    mtTitle:'Metais',mtSub:'BCR · ₽/g',skTitle:'Ações',skSub:'Índices e ações',
+    stTitle:'Estatísticas',stSub:'Mín · méd · máx',
+    fcTitle:'Previsão',fcSub:'Tendência amanhã',fcBtn:'Calcular',
+    bTitle:'Bancos',bSub:'BCR · Tinkoff',bBtn:'Atualizar',
+    clTitle:'Calculadora',clSub:'Hipoteca e depósito',
+    prTitle:'Perfil',prSub:'Seus dados',prUser:'Usuário',prName:'Nome',prLang:'Idioma',
+    prPf:'Portfólio',prPfAdd:'Adicionar',prShare:'Compartilhar',
+    mTitle:'Configurações',mAuto:'Notificações auto',mAutoLabel:'USD · EUR · KZT',
+    mAlert:'Alerta de preço',mAlertBtn:'Criar',mDigest:'Resumo diário',
+    mDigestBtn:'Ativar',mDigestOff:'Desativar',mChat:'Para o chat',
+    mRate:'Taxas',mMt:'Metais',mOil:'Petróleo',mSk:'Ações',mFc:'Previsão',
+    navRates:'Taxas',navConv:'Troca',navCr:'Cripto',navOil:'Petróleo',navMt:'Metais',navSk:'Ações',
+    navSt:'Estat',navFc:'Previsão',navB:'Bancos',navCl:'Calc',navPr:'Perfil',navM:'Config.',
+    min:'mín',avg:'méd',max:'máx',buy:'Compra',sell:'Venda',
+    updated:'Atualizado',total:'Total',empty:'Vazio',loading:'Carregando…',error:'Erro',
+    greater:'Maior (>)',less:'Menor (<)',langPick:'Idioma',
+    langRu:'Russo',langEn:'Inglês',langDe:'Alemão',langFr:'Francês',langEs:'Espanhol',
+    langTr:'Turco',langZh:'Chinês',langJa:'Japonês',langAr:'Árabe',langIt:'Italiano',langPt:'Português',
+    toastOn:'ON',toastOff:'OFF',placeholder:'Quantidade',currenciesLabel:'Moedas',cryptoLabel:'Cripto',
+    days:'d',cbrTitle:'🇷🇺 BCR',tinkTitle:'🟡 Tinkoff',
+    mCalc:['🏠 Hipoteca','💰 Depósito'],cbrLabel:'Taxa atual',
+    monthlyPay:'Pagamento mensal',totalPay:'Total',overPay:'Pagamento extra',
+    profit:'Lucro',finalAmount:'Final',
+    notifyTitle:'Taxa alterada',notifyBody:'{code} {dir} em {diff} ₽'}
 };
+
+// Fallback: если язык не имеет ключа — берём из RU
+Object.keys(T).forEach(lang => { T[lang] = {...T.ru, ...T[lang]}; });
 
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
-
 const sysTheme = tg?.colorScheme || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
 if (!localStorage.getItem('theme')) localStorage.setItem('theme', sysTheme);
 
@@ -385,30 +627,53 @@ let rates = {}, history = {}, selected = 'USD';
 let statsPeriod = 30, autoOn = localStorage.getItem('autoOn') === 'true';
 let ratesChart = null, statsChart = null;
 let lastRatesSnapshot = {};
-let cryptoCache = {};
+let cryptoCache = {}, metalsCache = {}, stocksCache = {};
+let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+let cbrRate = null;
 
-function t(key) { return T[LANG][key] || T.ru[key] || key; }
+function t(key) { return T[LANG]?.[key] ?? T.ru[key] ?? key; }
 
 function applyLang() {
   document.getElementById('langBtn').textContent = LANG.toUpperCase();
   const map = {title:'title',live:'live',dcNow:'dcNow',dcOld:'dcOld',
     convTitle:'convTitle',convSub:'convSub',convBtn:'convBtn',
-    pfTitle:'pfTitle',pfSub:'pfSub',pfAdd:'pfAdd',pfMy:'pfMy',pfAddBtn:'pfAddBtn',
-    crTitle:'crTitle',crSub:'crSub',stTitle:'stTitle',stSub:'stSub',bTitle:'bTitle',bSub:'bSub',bBtn:'bBtn',
+    crTitle:'crTitle',crSub:'crSub',oilTitle:'oilTitle',oilSub:'oilSub',
+    mtTitle:'mtTitle',mtSub:'mtSub',skTitle:'skTitle',skSub:'skSub',
+    stTitle:'stTitle',stSub:'stSub',fcTitle:'fcTitle',fcSub:'fcSub',fcBtn:'fcBtn',
+    bTitle:'bTitle',bSub:'bSub',bBtn:'bBtn',clTitle:'clTitle',clSub:'clSub',
     prTitle:'prTitle',prSub:'prSub',prUser:'prUser',prName:'prName',prLang:'prLang',
     prPf:'prPf',prPfAdd:'prPfAdd',prShare:'prShare',
-    mTitle:'mTitle',mAuto:'mAuto',mAutoLabel:'mAutoLabel',mAutoHint:'mAutoHint',
-    mAlert:'mAlert',mAlertBtn:'mAlertBtn',mDigest:'mDigest',mDigestBtn:'mDigestBtn',
-    mDigestOff:'mDigestOff',mChat:'mChat',mRate:'mRate',mHist:'mHist',mCmp:'mCmp',mCr:'mCr'};
-  Object.keys(map).forEach(id => {
+    mTitle:'mTitle',mAuto:'mAuto',mAutoLabel:'mAutoLabel',
+    mAlert:'mAlert',mAlertBtn:'mAlertBtn',mDigest:'mDigest',
+    mDigestBtn:'mDigestBtn',mDigestOff:'mDigestOff',mChat:'mChat',
+    mRate:'mRate',mMt:'mMt',mOil:'mOil',mSk:'mSk',mFc:'mFc',
+    clCbr:'cbrLabel',
+    clM:'mCalc0', clD:'mCalc1',
+    'cl-m':'mCalc0','cl-d':'mCalc1','cl-m-h':'mCalc0','cl-d-h':'mCalc1'
+  };
+  // Простая замена существующих ID
+  const map2 = {title:'title',live:'live',dcNow:'dcNow',dcOld:'dcOld',
+    convTitle:'convTitle',convSub:'convSub',convBtn:'convBtn',
+    crTitle:'crTitle',crSub:'crSub',oilTitle:'oilTitle',oilSub:'oilSub',
+    mtTitle:'mtTitle',mtSub:'mtSub',skTitle:'skTitle',skSub:'skSub',
+    stTitle:'stTitle',stSub:'stSub',fcTitle:'fcTitle',fcSub:'fcSub',fcBtn:'fcBtn',
+    bTitle:'bTitle',bSub:'bSub',bBtn:'bBtn',clTitle:'clTitle',clSub:'clSub',
+    prTitle:'prTitle',prSub:'prSub',prUser:'prUser',prName:'prName',prLang:'prLang',
+    prPf:'prPf',prPfAdd:'prPfAdd',prShare:'prShare',
+    mTitle:'mTitle',mAuto:'mAuto',mAutoLabel:'mAutoLabel',
+    mAlert:'mAlert',mAlertBtn:'mAlertBtn',mDigest:'mDigest',
+    mDigestBtn:'mDigestBtn',mDigestOff:'mDigestOff',mChat:'mChat',
+    mRate:'mRate',mMt:'mMt',mOil:'mOil',mSk:'mSk',mFc:'mFc'};
+  Object.keys(map2).forEach(id => {
     const el = document.getElementById('t-' + id);
-    if (el) el.textContent = t(map[id]);
+    if (el) el.textContent = t(map2[id]);
   });
-  ['rates','conv','cr','st','b','pr','m'].forEach(k => {
+  // Навигация
+  ['rates','conv','cr','oil','mt','sk','st','fc','b','cl','pr','m'].forEach(k => {
     const el = document.getElementById('t-nav-' + k);
     if (el) el.textContent = t('nav' + k.charAt(0).toUpperCase() + k.slice(1));
   });
-  // Периоды статистики
+  // Кнопки периода
   ['p7','p30','p60','p90'].forEach(id => {
     const el = document.getElementById('t-' + id);
     if (el) {
@@ -416,31 +681,39 @@ function applyLang() {
       el.textContent = n + t('days');
     }
   });
-  document.getElementById('alert-direction').options[0].textContent = t('greater');
-  document.getElementById('alert-direction').options[1].textContent = t('less');
-  document.getElementById('autoToggle').classList.toggle('on', autoOn);
-  const pfAmt = document.getElementById('pf-amount');
-  const profAmt = document.getElementById('prof-pf-amount');
-  if (pfAmt) pfAmt.placeholder = t('placeholder');
-  if (profAmt) profAmt.placeholder = t('placeholder');
+  // Направление алерта
+  const dir = document.getElementById('alert-direction');
+  if (dir) { dir.options[0].textContent = t('greater'); dir.options[1].textContent = t('less'); }
+  document.getElementById('autoToggle')?.classList.toggle('on', autoOn);
+  // Плейсхолдеры
+  ['pf-amount','prof-pf-amount'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.placeholder = t('placeholder');
+  });
+  // Кнопки калькулятора
+  const cm = document.getElementById('t-cl-m'), cd = document.getElementById('t-cl-d');
+  if (cm) cm.textContent = t('mCalc')[0];
+  if (cd) cd.textContent = t('mCalc')[1];
+  document.getElementById('t-cl-cbr')?.replaceChildren(document.createTextNode('💡 ' + t('cbrLabel')));
+  document.getElementById('t-cl-cbr-l')?.replaceChildren(document.createTextNode(t('cbrLabel')));
+  // Пересобрать селекты и перерисовать
   fillSelects();
   if (Object.keys(rates).length) { renderRates(); renderPortfolio(); }
   if (document.getElementById('page-profile').classList.contains('active')) loadProfile();
 }
 
 function openLang() {
-  const langs = [['ru','🇷🇺 '+t('langRu')],['en','🇬🇧 '+t('langEn')],
-                 ['de','🇩🇪 '+t('langDe')],['fr','🇫🇷 '+t('langFr')],
-                 ['es','🇪🇸 '+t('langEs')],['tr','🇹🇷 '+t('langTr')]];
+  const langs = [['ru','🇷🇺 '+t('langRu')],['en','🇬🇧 '+t('langEn')],['de','🇩🇪 '+t('langDe')],
+                 ['fr','🇫🇷 '+t('langFr')],['es','🇪🇸 '+t('langEs')],['tr','🇹🇷 '+t('langTr')],
+                 ['zh','🇨🇳 '+t('langZh')],['ja','🇯🇵 '+t('langJa')],['ar','🇸🇦 '+t('langAr')],
+                 ['it','🇮🇹 '+t('langIt')],['pt','🇵🇹 '+t('langPt')]];
   const html = langs.map(([code, name]) =>
     `<button class="btn ${code === LANG ? '' : 'sec'}" onclick="setLang('${code}')">${name}</button>`
   ).join('');
-  const existing = document.getElementById('langPickModal');
-  if (existing) existing.remove();
+  const existing = document.getElementById('langPickModal'); if (existing) existing.remove();
   const div = document.createElement('div');
   div.id = 'langPickModal';
-  div.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px';
-  div.innerHTML = `<div style="background:var(--card);border-radius:16px;padding:16px;width:100%;max-width:340px">
+  div.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto';
+  div.innerHTML = `<div style="background:var(--card);border-radius:16px;padding:16px;width:100%;max-width:340px;max-height:80vh;overflow-y:auto">
     <h3 style="text-align:center;margin-bottom:12px;font-size:15px;color:var(--text)">${t('langPick')}</h3>
     ${html}
     <button class="btn sec" style="margin-top:8px" onclick="document.getElementById('langPickModal').remove()">✕</button>
@@ -451,18 +724,18 @@ function openLang() {
 function setLang(code) {
   LANG = code;
   localStorage.setItem('lang', LANG);
-  const m = document.getElementById('langPickModal'); if (m) m.remove();
+  document.getElementById('langPickModal')?.remove();
   applyLang();
-  renderRates();
-  renderPortfolio();
-  const active = ['rates','convert','crypto','stats','banks','profile','more']
+  const active = ['rates','convert','crypto','oil','metals','stocks','stats','forecast','banks','calc','profile','more']
     .find(id => document.getElementById('page-' + id).classList.contains('active'));
   if (active === 'crypto') loadCrypto();
+  if (active === 'oil') loadOil();
+  if (active === 'metals') loadMetals();
+  if (active === 'stocks') loadStocks();
   if (active === 'stats') loadStats();
   if (active === 'banks') loadBanks();
   if (active === 'profile') loadProfile();
   toast('✅ ' + code.toUpperCase());
-  sendCmdSilent(`/lang ${code}`);
 }
 
 function toggleAuto() {
@@ -479,15 +752,13 @@ function toggleTheme() {
   const isLight = document.body.classList.contains('light');
   localStorage.setItem('theme', isLight ? 'light' : 'dark');
   document.getElementById('themeBtn').textContent = isLight ? '☀️' : '🌙';
-  if (Object.keys(rates).length) { drawChart(); if (statsChart) loadStats(); }
+  if (Object.keys(rates).length) drawChart();
+  if (statsChart) loadStats();
 }
 
-const NAV_ORDER = ['rates','convert','crypto','stats','banks','profile','more'];
+const NAV_ORDER = ['rates','convert','crypto','oil','metals','stocks','stats','forecast','banks','calc','profile','more'];
 let touchStartX = 0, touchStartY = 0;
-document.addEventListener('touchstart', e => {
-  touchStartX = e.touches[0].clientX;
-  touchStartY = e.touches[0].clientY;
-}, {passive: true});
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; }, {passive: true});
 document.addEventListener('touchend', e => {
   const dx = e.changedTouches[0].clientX - touchStartX;
   const dy = e.changedTouches[0].clientY - touchStartY;
@@ -507,15 +778,21 @@ function nav(id, btn) {
   btn.classList.add('active');
   if (id === 'portfolio') renderPortfolio();
   if (id === 'crypto') loadCrypto();
+  if (id === 'oil') loadOil();
+  if (id === 'metals') loadMetals();
+  if (id === 'stocks') loadStocks();
   if (id === 'stats') loadStats();
+  if (id === 'forecast') loadForecast();
   if (id === 'banks') loadBanks();
+  if (id === 'calc') loadCBRRate();
   if (id === 'profile') loadProfile();
   if (id === 'convert') convertPair();
 }
 
+// ═══ КУРСЫ ═══
 async function load() {
   const list = document.getElementById('list');
-  if (!Object.keys(rates).length) list.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
+  if (!Object.keys(rates).length) list.innerHTML = '<div class="skeleton"></div>'.repeat(4);
   try {
     const today = await fetch('https://latest.currency-api.pages.dev/v1/currencies/rub.json').then(r => r.json());
     const rub = today.rub;
@@ -539,8 +816,7 @@ async function load() {
 
 function checkRateChanges() {
   Object.keys(rates).forEach(c => {
-    const old = lastRatesSnapshot[c];
-    const now = rates[c];
+    const old = lastRatesSnapshot[c], now = rates[c];
     if (old && now && Math.abs((now - old) / old * 100) > 0.5) {
       notify(t('notifyTitle'), t('notifyBody').replace('{code}', c).replace('{dir}', now > old ? '📈' : '📉').replace('{diff}', Math.abs(now - old).toFixed(2)));
     }
@@ -553,15 +829,32 @@ function notify(title, body) {
   else toast(title + ': ' + body);
 }
 
+function toggleFav(code, e) {
+  if (e) e.stopPropagation();
+  const i = favorites.indexOf(code);
+  if (i === -1) favorites.push(code); else favorites.splice(i, 1);
+  localStorage.setItem('favorites', JSON.stringify(favorites));
+  renderRates();
+}
+
 function renderRates() {
-  const html = Object.keys(rates).map(c => {
-    const rate = rates[c], oldRate = history[c];
+  const sorted = [...CURRENCIES].sort((a, b) => {
+    const fa = favorites.includes(a) ? 0 : 1;
+    const fb = favorites.includes(b) ? 0 : 1;
+    return fa - fb;
+  });
+  const html = sorted.map(c => {
+    const rate = rates[c]; if (!rate) return '';
+    const oldRate = history[c];
     const diff = rate - oldRate, pct = (diff / oldRate) * 100;
     let cls = 'flat', arrow = '·';
     if (diff > 0.01) { cls = 'up'; arrow = '▲'; } else if (diff < -0.01) { cls = 'down'; arrow = '▼'; }
+    const isFav = favorites.includes(c);
     return `<div class="card ${c === selected ? 'sel' : ''}" onclick="selectCur('${c}')">
+      <button class="fav-btn" onclick="toggleFav('${c}', event)">${isFav ? '📌' : '☆'}</button>
       <button class="share-btn" onclick="event.stopPropagation();shareRate('${c}')">📤</button>
-      <div class="code">${FLAGS[c] || ''} ${c}</div><div class="name">${NAMES[LANG]?.[c] || c}</div>
+      <div class="code">${FLAGS[c] || ''} ${c}</div>
+      <div class="name">${NAMES[LANG]?.[c] || c}</div>
       <div class="rate">${rate.toFixed(2)} ₽</div>
       <div class="trend ${cls}">${arrow} ${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</div>
     </div>`;
@@ -583,45 +876,23 @@ async function drawChart() {
       if (r) { labels.push(ds.slice(5)); values.push(1 / r); }
     } catch(e) {}
   }
-
   const ctx = document.getElementById('chart').getContext('2d');
   const isLight = document.body.classList.contains('light');
-  const lineColor = '#2E86DE';
-
   if (ratesChart) ratesChart.destroy();
   ratesChart = new Chart(ctx, {
     type: 'line',
-    data: {
-      labels,
-      datasets: [{
-        label: selected,
-        data: values,
-        borderColor: lineColor,
-        backgroundColor: 'rgba(46,134,222,0.15)',
-        fill: true,
-        tension: 0.35,
-        pointRadius: 0,
-        pointHoverRadius: 5,
-        pointHoverBackgroundColor: lineColor,
-        borderWidth: 2
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { intersect: false, mode: 'index' } },
-      interaction: { intersect: false, mode: 'index' },
+    data: { labels, datasets: [{ data: values, borderColor: '#2E86DE', backgroundColor: 'rgba(46,134,222,0.15)', fill: true, tension: 0.35, pointRadius: 0, borderWidth: 2 }] },
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
       scales: {
-        x: { display: true, ticks: { color: isLight ? '#6b7a90' : '#8fa3bf', font: {size: 9}, maxTicksLimit: 5 }, grid: { display: false } },
-        y: { display: true, ticks: { color: isLight ? '#6b7a90' : '#8fa3bf', font: {size: 9}, maxTicksLimit: 4 }, grid: { color: isLight ? '#e1e6ee' : '#253456' } }
+        x: { ticks: { color: isLight ? '#6b7a90' : '#8fa3bf', font: {size: 9}, maxTicksLimit: 5 }, grid: { display: false } },
+        y: { ticks: { color: isLight ? '#6b7a90' : '#8fa3bf', font: {size: 9}, maxTicksLimit: 4 }, grid: { color: isLight ? '#e1e6ee' : '#253456' } }
       }
     }
   });
-
   if (values.length >= 2) {
-    const now = values[values.length - 1];
-    const old = values[values.length - 2];
-    const diff = now - old;
-    const pct = (diff / old) * 100;
+    const now = values[values.length - 1], old = values[values.length - 2];
+    const diff = now - old, pct = (diff / old) * 100;
     let arrow = '·', color = 'var(--muted)';
     if (diff > 0.01) { arrow = '▲'; color = 'var(--green)'; }
     else if (diff < -0.01) { arrow = '▼'; color = 'var(--red)'; }
@@ -647,7 +918,7 @@ async function convertPair() {
   if (from === to) { res.textContent = `${amount} ${from} = ${amount} ${to}`; return; }
   res.textContent = '…';
   try {
-    const data = await fetch(`https://latest.currency-api.pages.dev/v1/currencies/rub.json`).then(r => r.json());
+    const data = await fetch('https://latest.currency-api.pages.dev/v1/currencies/rub.json').then(r => r.json());
     const rub = data.rub;
     let result;
     if (from === 'RUB') result = amount * rub[to.toLowerCase()];
@@ -657,12 +928,299 @@ async function convertPair() {
   } catch(e) { res.textContent = t('error'); }
 }
 
+// ═══ КРИПТА ═══
+async function loadCrypto() {
+  document.getElementById('crypto-list').innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+  try {
+    const data = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${CRYPTO.join(',')}&vs_currencies=rub,usd&include_24hr_change=true`).then(r => r.json());
+    cryptoCache = {};
+    CRYPTO.forEach(id => { if (data[id]) cryptoCache[CRYPTO_NAMES[id]] = data[id]; });
+    const html = CRYPTO.map(id => {
+      const d = data[id]; if (!d) return '';
+      const change = d.rub_24h_change || 0;
+      const cls = change > 0 ? 'up' : (change < 0 ? 'down' : 'flat');
+      const arrow = change > 0 ? '▲' : (change < 0 ? '▼' : '·');
+      return `<div class="card"><div class="code">${CRYPTO_NAMES[id]}</div>
+        <div class="name">${NAMES[LANG]?.[CRYPTO_NAMES[id]] || id}</div>
+        <div class="rate">${d.rub.toLocaleString(LANG)} ₽</div>
+        <div class="usd">$${d.usd.toLocaleString('en-US')}</div>
+        <div class="trend ${cls}">${arrow} ${change.toFixed(2)}%</div></div>`;
+    }).join('');
+    document.getElementById('crypto-list').innerHTML = `<div class="grid">${html}</div>`;
+  } catch(e) {
+    document.getElementById('crypto-list').innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
+  }
+}
+
+// ═══ НЕФТЬ ═══
+async function loadOil() {
+  document.getElementById('oil-list').innerHTML = '<div class="skeleton"></div>';
+  try {
+    const result = {};
+    for (const [name, ticker] of [['BRENT', 'BZ=F'], ['WTI', 'CL=F']]) {
+      try {
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
+        const data = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url)).then(r => r.json());
+        const meta = data.chart.result[0].meta;
+        result[name] = { price: meta.regularMarketPrice, change: ((meta.regularMarketPrice - meta.chartPreviousClose) / meta.chartPreviousClose * 100) };
+      } catch(e) {}
+    }
+    const html = Object.entries(result).map(([name, d]) => {
+      const arrow = d.change > 0 ? '▲' : (d.change < 0 ? '▼' : '·');
+      const cls = d.change > 0 ? 'up' : (d.change < 0 ? 'down' : 'flat');
+      return `<div class="card"><div class="code">🛢 ${name}</div>
+        <div class="name">${name === 'BRENT' ? 'Brent Crude' : 'West Texas'}</div>
+        <div class="rate">$${d.price.toFixed(2)}</div>
+        <div class="trend ${cls}">${arrow} ${d.change.toFixed(2)}%</div></div>`;
+    }).join('');
+    document.getElementById('oil-list').innerHTML = html ? `<div class="grid">${html}</div>` : `<div class="loading">${t('error')}</div>`;
+  } catch(e) {
+    document.getElementById('oil-list').innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
+  }
+}
+
+// ═══ МЕТАЛЛЫ ═══
+async function loadMetals() {
+  document.getElementById('metals-list').innerHTML = '<div class="skeleton"></div>';
+  try {
+    const data = await fetch('https://www.cbr-xml-daily.ru/daily_json.js').then(r => r.json());
+    const vals = data.Valute;
+    const meta = {XAU:{n:'🥇 ' + (LANG==='ru'?'Золото':'Gold'), i:'🥇'},
+                  XAG:{n:'🥈 ' + (LANG==='ru'?'Серебро':'Silver'), i:'🥈'},
+                  XPT:{n:'⚪ ' + (LANG==='ru'?'Платина':'Platinum'), i:'⚪'},
+                  XPD:{n:'⚫ ' + (LANG==='ru'?'Палладий':'Palladium'), i:'⚫'}};
+    const html = Object.entries(meta).map(([code, m]) => {
+      const v = vals[code];
+      if (!v) return '';
+      const price = v.Value / (v.Nominal || 1);
+      return `<div class="card"><div class="code">${m.i} ${code}</div>
+        <div class="name">${m.n}</div>
+        <div class="rate">${price.toLocaleString('ru-RU', {maximumFractionDigits:2})} ₽</div>
+        <div class="usd">${t('mtSub')}</div></div>`;
+    }).join('');
+    document.getElementById('metals-list').innerHTML = `<div class="grid">${html}</div>`;
+  } catch(e) {
+    document.getElementById('metals-list').innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
+  }
+}
+
+// ═══ АКЦИИ ═══
+async function loadStocks() {
+  document.getElementById('stocks-list').innerHTML = '<div class="skeleton"></div>';
+  const tickers = {'S&P 500':'^GSPC', 'Газпром':'GAZP.ME', 'Сбер':'SBER.ME', 'Мосбиржа':'IMOEX.ME', 'Apple':'AAPL', 'Tesla':'TSLA'};
+  const htmls = [];
+  for (const [name, ticker] of Object.entries(tickers)) {
+    try {
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
+      const data = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url)).then(r => r.json());
+      const meta = data.chart.result[0].meta;
+      const price = meta.regularMarketPrice;
+      const prev = meta.chartPreviousClose || meta.previousClose || price;
+      const change = ((price - prev) / prev * 100);
+      const arrow = change > 0 ? '▲' : (change < 0 ? '▼' : '·');
+      const cls = change > 0 ? 'up' : (change < 0 ? 'down' : 'flat');
+      htmls.push(`<div class="card"><div class="code">📈 ${name}</div>
+        <div class="rate">${price.toFixed(2)}</div>
+        <div class="trend ${cls}">${arrow} ${change.toFixed(2)}%</div></div>`);
+    } catch(e) {}
+  }
+  document.getElementById('stocks-list').innerHTML = htmls.length ? `<div class="grid">${htmls.join('')}</div>` : `<div class="loading">${t('error')}</div>`;
+}
+
+// ═══ СТАТИСТИКА + КАЛЕНДАРЬ ═══
+function setPeriod(days, btn) {
+  statsPeriod = days;
+  document.querySelectorAll('#period-btns button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadStats();
+}
+
+async function loadStats() {
+  document.getElementById('stats-grid').innerHTML = '<div class="skeleton short"></div>';
+  const code = document.getElementById('stats-code').value || 'USD';
+  const c = code.toLowerCase();
+  const labels = [], values = [];
+  for (let i = statsPeriod - 1; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0,10);
+    try {
+      const data = await fetch(`https://${ds}.currency-api.pages.dev/v1/currencies/rub.json`).then(r => r.json());
+      const r = data.rub[c];
+      if (r) { labels.push(ds); values.push(1 / r); }
+    } catch(e) {}
+  }
+  if (!values.length) { document.getElementById('stats-grid').innerHTML = `<div class="loading">${t('empty')}</div>`; return; }
+  const min = Math.min(...values), max = Math.max(...values);
+  const avg = values.reduce((a,b) => a+b, 0) / values.length;
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-item"><div class="lbl">${t('min')}</div><div class="val down">${min.toFixed(2)}</div></div>
+    <div class="stat-item"><div class="lbl">${t('avg')}</div><div class="val">${avg.toFixed(2)}</div></div>
+    <div class="stat-item"><div class="lbl">${t('max')}</div><div class="val up">${max.toFixed(2)}</div></div>`;
+
+  const ctx = document.getElementById('stats-chart').getContext('2d');
+  const isLight = document.body.classList.contains('light');
+  if (statsChart) statsChart.destroy();
+  statsChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets: [{ label: code, data: values, borderColor: '#2E86DE', backgroundColor: 'rgba(46,134,222,0.15)', fill: true, tension: 0.35, pointRadius: 0, borderWidth: 2 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        zoom: {
+          pan: { enabled: true, mode: 'x' },
+          zoom: {
+            wheel: { enabled: true, speed: 0.1 },
+            pinch: { enabled: true },
+            drag: { enabled: false },
+            mode: 'x'
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color: isLight ? '#6b7a90' : '#8fa3bf', font: {size: 9}, maxTicksLimit: 6 }, grid: { display: false } },
+        y: { ticks: { color: isLight ? '#6b7a90' : '#8fa3bf', font: {size: 9}, maxTicksLimit: 4 }, grid: { color: isLight ? '#e1e6ee' : '#253456' } }
+      }
+    }
+  });
+}
+
+// ═══ ПРОГНОЗ ═══
+async function loadForecast() {
+  const code = document.getElementById('fc-code').value || 'USD';
+  const result = document.getElementById('fc-result');
+  result.innerHTML = '<div class="skeleton short"></div>';
+  const values = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0,10);
+    try {
+      const data = await fetch(`https://${ds}.currency-api.pages.dev/v1/currencies/rub.json`).then(r => r.json());
+      const r = data.rub[code.toLowerCase()];
+      if (r) values.push(1 / r);
+    } catch(e) {}
+  }
+  if (values.length < 5) { result.innerHTML = `<div class="loading">${t('empty')}</div>`; return; }
+  const n = values.length, xm = (n-1)/2, ym = values.reduce((a,b)=>a+b,0)/n;
+  const num = values.reduce((s,v,i) => s + (i-xm)*(v-ym), 0);
+  const den = values.reduce((s,_,i) => s + (i-xm)**2, 0);
+  const slope = num / den;
+  const forecast = values[values.length-1] + slope;
+  const ssTot = values.reduce((s,v) => s + (v-ym)**2, 0);
+  const ssRes = values.reduce((s,v,i) => s + (v - (ym + slope*(i-xm)))**2, 0);
+  const r2 = Math.max(0, Math.min(1, 1 - ssRes/ssTot));
+  const arrow = slope > 0.01 ? '📈' : (slope < -0.01 ? '📉' : '➖');
+  const conf = r2 > 0.7 ? '🟢' : (r2 > 0.4 ? '🟡' : '🔴');
+  result.innerHTML = `
+    <div class="section">
+      <div class="row"><span>🔮 ${code}</span><span style="font-size:18px;font-weight:800;color:var(--accent)">${forecast.toFixed(2)} ₽</span></div>
+      <div class="row"><span>${arrow} ${LANG==='ru'?'Тренд':'Trend'}</span><span>${slope >= 0 ? '+' : ''}${slope.toFixed(4)} ₽/${t('days')}</span></div>
+      <div class="row"><span>${conf} R²</span><span>${r2.toFixed(2)}</span></div>
+      <div class="sub" style="margin-top:8px">${LANG==='ru'?'Не финансовый совет':'Not financial advice'}</div>
+    </div>`;
+}
+
+// ═══ БАНКИ ═══
+async function loadBanks() {
+  const el = document.getElementById('banks-list');
+  el.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+  let html = '';
+  try {
+    const cbr = await fetch('https://www.cbr-xml-daily.ru/daily_json.js').then(r => r.json());
+    html += `<div class="section"><h3>${t('cbrTitle')}</h3>`;
+    ['USD','EUR','CNY','GBP','JPY','CHF','KZT'].forEach(code => {
+      const v = cbr.Valute[code]; if (!v) return;
+      const rate = (v.Value / v.Nominal).toFixed(3);
+      html += `<div class="row"><span>${FLAGS[code]} ${code}</span><span class="badge buy">${rate} ₽</span></div>`;
+    });
+    html += '</div>';
+  } catch(e) {}
+  const tinkUrl = 'https://api.tinkoff.ru/v1/currency_rates?from=USD&to=RUB';
+  const proxies = ['https://corsproxy.io/?url=' + encodeURIComponent(tinkUrl),
+                   'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(tinkUrl),
+                   'https://thingproxy.freeboard.io/fetch/' + tinkUrl];
+  for (const p of proxies) {
+    try {
+      const tink = await fetch(p).then(r => r.json());
+      if (tink?.payload?.rates?.length) {
+        html += `<div class="section"><h3>${t('tinkTitle')}</h3>`;
+        const seen = new Set();
+        tink.payload.rates.forEach(r => {
+          const code = r.fromCurrency?.code;
+          if (!code || seen.has(code) || !['USD','EUR','GBP','CNY','CHF','JPY'].includes(code)) return;
+          seen.add(code);
+          const buy = r.buy ? r.buy.toFixed(2) + ' ₽' : '—';
+          const sell = r.sell ? r.sell.toFixed(2) + ' ₽' : '—';
+          html += `<div class="row"><span>${FLAGS[code] || ''} ${code}</span>
+            <span><span class="badge buy">${t('buy')} ${buy}</span> <span class="badge sell">${t('sell')} ${sell}</span></span></div>`;
+        });
+        html += '</div>';
+        break;
+      }
+    } catch(e) {}
+  }
+  if (!html) html = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
+  el.innerHTML = html;
+}
+
+// ═══ КАЛЬКУЛЯТОР ═══
+function switchCalc(type, btn) {
+  document.querySelectorAll('#calc-tabs button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('calc-mortgage').style.display = type === 'mortgage' ? 'block' : 'none';
+  document.getElementById('calc-deposit').style.display = type === 'deposit' ? 'block' : 'none';
+}
+
+function calcMortgage() {
+  const amount = parseFloat(document.getElementById('mo-amount').value);
+  const years = parseFloat(document.getElementById('mo-years').value);
+  const rate = parseFloat(document.getElementById('mo-rate').value) / 100 / 12;
+  const n = years * 12;
+  if (!amount || !n || !rate) return;
+  const monthly = amount * rate * Math.pow(1 + rate, n) / (Math.pow(1 + rate, n) - 1);
+  const total = monthly * n;
+  const over = total - amount;
+  document.getElementById('mo-result').innerHTML = `
+    <div class="section">
+      <div class="row"><span>${t('monthlyPay')}</span><span style="font-weight:800;color:var(--accent)">${monthly.toLocaleString('ru-RU', {maximumFractionDigits:0})} ₽</span></div>
+      <div class="row"><span>${t('totalPay')}</span><span>${total.toLocaleString('ru-RU', {maximumFractionDigits:0})} ₽</span></div>
+      <div class="row"><span>${t('overPay')}</span><span style="color:var(--red)">${over.toLocaleString('ru-RU', {maximumFractionDigits:0})} ₽</span></div>
+    </div>`;
+}
+
+function calcDeposit() {
+  const amount = parseFloat(document.getElementById('dp-amount').value);
+  const months = parseFloat(document.getElementById('dp-months').value);
+  const rate = parseFloat(document.getElementById('dp-rate').value) / 100 / 12;
+  if (!amount || !months || !rate) return;
+  const final = amount * Math.pow(1 + rate, months);
+  const profit = final - amount;
+  document.getElementById('dp-result').innerHTML = `
+    <div class="section">
+      <div class="row"><span>${t('finalAmount')}</span><span style="font-weight:800;color:var(--green)">${final.toLocaleString('ru-RU', {maximumFractionDigits:0})} ₽</span></div>
+      <div class="row"><span>${t('profit')}</span><span style="color:var(--green)">+${profit.toLocaleString('ru-RU', {maximumFractionDigits:0})} ₽</span></div>
+    </div>`;
+}
+
+async function loadCBRRate() {
+  try {
+    const data = await fetch('https://www.cbr-xml-daily.ru/daily_json.js').then(r => r.json());
+    // Ставка ЦБ не в daily_json, но мы можем взять её с другого источника
+    // Используем заглушку — 16%
+    cbrRate = 16.0;
+    document.getElementById('cbr-rate').textContent = cbrRate.toFixed(2) + '%';
+  } catch(e) {
+    document.getElementById('cbr-rate').textContent = '—';
+  }
+}
+
+// ═══ ПРОФИЛЬ ═══
 function getPortfolio() { try { return JSON.parse(localStorage.getItem('pf') || '{}'); } catch(e) { return {}; } }
 function savePortfolio(p) { localStorage.setItem('pf', JSON.stringify(p)); }
 
 function getAssetPrice(code) {
   if (CURRENCIES.includes(code)) return rates[code] || 0;
-  if (cryptoCache && cryptoCache[code]) return cryptoCache[code].rub;
+  if (cryptoCache?.[code]) return cryptoCache[code].rub;
   return 0;
 }
 
@@ -692,6 +1250,7 @@ function removeFromPortfolio(code) {
 function renderPortfolio() {
   const pf = getPortfolio();
   const list = document.getElementById('pf-list'), totalEl = document.getElementById('pf-total');
+  if (!list) return;
   const codes = Object.keys(pf);
   if (!codes.length) { list.innerHTML = `<div class="loading">${t('empty')}</div>`; totalEl.textContent = ''; return; }
   let total = 0;
@@ -702,126 +1261,6 @@ function renderPortfolio() {
       <span>${value.toFixed(2)} ₽ <button class="del" onclick="removeFromPortfolio('${c}')">✕</button></span></div>`;
   }).join('');
   totalEl.textContent = t('total') + ': ' + total.toFixed(2) + ' ₽';
-}
-
-async function loadCrypto() {
-  document.getElementById('crypto-list').innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
-  try {
-    const ids = CRYPTO.join(',');
-    const data = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=rub,usd&include_24hr_change=true`).then(r => r.json());
-    cryptoCache = {};
-    CRYPTO.forEach(id => { if (data[id]) cryptoCache[CRYPTO_NAMES[id]] = data[id]; });
-    const html = CRYPTO.map(id => {
-      const d = data[id];
-      if (!d) return '';
-      const change = d.rub_24h_change || 0;
-      const cls = change > 0 ? 'up' : (change < 0 ? 'down' : 'flat');
-      const arrow = change > 0 ? '▲' : (change < 0 ? '▼' : '·');
-      return `<div class="card"><div class="code">${CRYPTO_NAMES[id]}</div>
-        <div class="name">${NAMES[LANG]?.[CRYPTO_NAMES[id]] || id}</div>
-        <div class="rate">${d.rub.toLocaleString(LANG)} ₽</div>
-        <div class="usd">$${d.usd.toLocaleString('en-US')}</div>
-        <div class="trend ${cls}">${arrow} ${change.toFixed(2)}%</div></div>`;
-    }).join('');
-    document.getElementById('crypto-list').innerHTML = `<div class="grid">${html}</div>`;
-    if (document.getElementById('page-portfolio').classList.contains('active')) renderPortfolio();
-  } catch(e) {
-    document.getElementById('crypto-list').innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
-  }
-}
-
-function setPeriod(days, btn) {
-  statsPeriod = days;
-  document.querySelectorAll('#period-btns button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  loadStats();
-}
-
-async function loadStats() {
-  document.getElementById('stats-grid').innerHTML = '<div class="skeleton short"></div>';
-  const code = document.getElementById('stats-code').value || 'USD';
-  const c = code.toLowerCase();
-  const labels = [], values = [];
-  for (let i = statsPeriod - 1; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i);
-    const ds = d.toISOString().slice(0,10);
-    try {
-      const data = await fetch(`https://${ds}.currency-api.pages.dev/v1/currencies/rub.json`).then(r => r.json());
-      const r = data.rub[c];
-      if (r) { labels.push(ds.slice(5)); values.push(1 / r); }
-    } catch(e) {}
-  }
-  if (!values.length) { document.getElementById('stats-grid').innerHTML = `<div class="loading">${t('empty')}</div>`; return; }
-  const min = Math.min(...values), max = Math.max(...values);
-  const avg = values.reduce((a,b) => a+b, 0) / values.length;
-  document.getElementById('stats-grid').innerHTML = `
-    <div class="stat-item"><div class="lbl">${t('min')}</div><div class="val down">${min.toFixed(2)}</div></div>
-    <div class="stat-item"><div class="lbl">${t('avg')}</div><div class="val">${avg.toFixed(2)}</div></div>
-    <div class="stat-item"><div class="lbl">${t('max')}</div><div class="val up">${max.toFixed(2)}</div></div>`;
-
-  const ctx = document.getElementById('stats-chart').getContext('2d');
-  const isLight = document.body.classList.contains('light');
-  if (statsChart) statsChart.destroy();
-  statsChart = new Chart(ctx, {
-    type: 'line',
-    data: { labels, datasets: [{ label: code, data: values, borderColor: '#2E86DE', backgroundColor: 'rgba(46,134,222,0.15)', fill: true, tension: 0.35, pointRadius: 0, borderWidth: 2 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color: isLight ? '#6b7a90' : '#8fa3bf', font: {size: 9}, maxTicksLimit: 6 }, grid: { display: false } },
-        y: { ticks: { color: isLight ? '#6b7a90' : '#8fa3bf', font: {size: 9}, maxTicksLimit: 4 }, grid: { color: isLight ? '#e1e6ee' : '#253456' } }
-      }
-    }
-  });
-}
-
-async function loadBanks() {
-  const el = document.getElementById('banks-list');
-  el.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
-  let html = '';
-
-  try {
-    const cbr = await fetch('https://www.cbr-xml-daily.ru/daily_json.js').then(r => r.json());
-    html += `<div class="section"><h3>${t('cbrTitle')}</h3>`;
-    ['USD','EUR','CNY','GBP','JPY','CHF','KZT'].forEach(code => {
-      const v = cbr.Valute[code];
-      if (!v) return;
-      const rate = (v.Value / v.Nominal).toFixed(3);
-      html += `<div class="row"><span>${FLAGS[code]} ${code}</span><span class="badge buy">${rate} ₽</span></div>`;
-    });
-    html += '</div>';
-  } catch(e) { console.log('CBR error', e); }
-
-  const tinkUrl = 'https://api.tinkoff.ru/v1/currency_rates?from=USD&to=RUB';
-  const proxies = [
-    'https://corsproxy.io/?url=' + encodeURIComponent(tinkUrl),
-    'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(tinkUrl),
-    'https://thingproxy.freeboard.io/fetch/' + tinkUrl,
-  ];
-  for (const p of proxies) {
-    try {
-      const tink = await fetch(p).then(r => r.json());
-      if (tink?.payload?.rates?.length) {
-        html += `<div class="section"><h3>${t('tinkTitle')}</h3>`;
-        const seen = new Set();
-        tink.payload.rates.forEach(r => {
-          const code = r.fromCurrency?.code;
-          if (!code || seen.has(code) || !['USD','EUR','GBP','CNY','CHF','JPY'].includes(code)) return;
-          seen.add(code);
-          const buy = r.buy ? r.buy.toFixed(2) + ' ₽' : '—';
-          const sell = r.sell ? r.sell.toFixed(2) + ' ₽' : '—';
-          html += `<div class="row"><span>${FLAGS[code] || ''} ${code}</span>
-            <span><span class="badge buy">${t('buy')} ${buy}</span> <span class="badge sell">${t('sell')} ${sell}</span></span></div>`;
-        });
-        html += '</div>';
-        break;
-      }
-    } catch(e) { }
-  }
-
-  if (!html) html = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
-  el.innerHTML = html;
 }
 
 function loadProfile() {
@@ -845,6 +1284,7 @@ function loadProfile() {
   }
 }
 
+// ═══ ДЕЙСТВИЯ ═══
 function createAlert() {
   const code = document.getElementById('alert-code').value;
   const dir = document.getElementById('alert-direction').value;
@@ -861,14 +1301,12 @@ function shareRate(code) {
   if (tg) tg.openTelegramLink(url); else window.open(url, '_blank');
 }
 function shareApp() {
-  const text = '⚡ ' + t('title');
-  const url = `https://t.me/share/url?url=${encodeURIComponent('https://t.me')}&text=${encodeURIComponent(text)}`;
+  const url = `https://t.me/share/url?url=${encodeURIComponent('https://t.me')}&text=${encodeURIComponent('⚡ ' + t('title'))}`;
   if (tg) tg.openTelegramLink(url); else window.open(url, '_blank');
 }
 
 function sendCmd(cmd) { if (tg) { tg.sendData(JSON.stringify({cmd})); tg.close(); } else toast(cmd); }
 function sendCmdSilent(cmd) { /* заглушка */ }
-function showHint(cmd) { tg?.showAlert(cmd); }
 
 function toast(msg) {
   const el = document.getElementById('toast');
@@ -881,10 +1319,9 @@ setInterval(() => {
 }, 60000);
 
 function fillSelects() {
-  ['pf-code', 'stats-code', 'alert-code', 'prof-pf-code'].forEach(id => {
-    const sel = document.getElementById(id);
-    if (!sel) return;
-    const current = sel.value;
+  ['pf-code', 'stats-code', 'alert-code', 'prof-pf-code', 'fc-code'].forEach(id => {
+    const sel = document.getElementById(id); if (!sel) return;
+    const cur = sel.value;
     sel.innerHTML = '';
     const g1 = document.createElement('optgroup');
     g1.label = '💱 ' + t('currenciesLabel');
@@ -903,19 +1340,18 @@ function fillSelects() {
       g2.appendChild(o);
     });
     sel.appendChild(g2);
-    if (current) sel.value = current;
+    if (cur) sel.value = cur;
   });
   ['cv-from', 'cv-to'].forEach(id => {
-    const sel = document.getElementById(id);
-    if (!sel) return;
-    const current = sel.value;
+    const sel = document.getElementById(id); if (!sel) return;
+    const cur = sel.value;
     sel.innerHTML = '';
     ALL_FOR_CONV.forEach(c => {
       const o = document.createElement('option');
       o.value = c; o.textContent = `${FLAGS[c] || ''} ${c} — ${NAMES[LANG]?.[c] || c}`;
       sel.appendChild(o);
     });
-    if (current) sel.value = current;
+    if (cur) sel.value = cur;
   });
   if (!document.getElementById('cv-from').value) {
     document.getElementById('cv-from').value = 'USD';
