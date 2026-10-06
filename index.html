@@ -191,15 +191,16 @@
   <button class="btn" onclick="shareApp()" id="t-pr-share">Поделиться ботом</button>
 </div>
 
-<!-- ЕЩЁ -->
+<!-- НАСТРОЙКИ -->
 <div class="page" id="page-more">
-  <h1 id="t-m-title">Ещё</h1>
+  <h1 id="t-m-title">Настройки</h1>
   <div class="section">
     <h3 id="t-m-auto">Автоуведомления</h3>
     <div class="toggle-row">
       <span id="t-m-auto-label">USD · EUR · KZT</span>
       <div class="toggle" id="autoToggle" onclick="toggleAuto()"></div>
     </div>
+    <div class="sub" id="t-m-auto-hint" style="margin:4px 0 0;font-size:10px">Порог 1 ₽</div>
   </div>
   <div class="section">
     <h3 id="t-m-alert">Алерт по курсу</h3>
@@ -218,7 +219,7 @@
     <button class="btn sec" onclick="sendCmd('/digest off')" id="t-m-digest-off">Выключить</button>
   </div>
   <div class="section">
-    <h3 id="t-m-analytics">В чат бота</h3>
+    <h3 id="t-m-chat">В чат бота</h3>
     <button class="btn sec" onclick="sendCmd('/rate')" id="t-m-rate">Курсы</button>
     <button class="btn sec" onclick="showHint('/history USD 30')" id="t-m-hist">История</button>
     <button class="btn sec" onclick="showHint('/compare USD EUR')" id="t-m-cmp">Сравнить</button>
@@ -233,7 +234,7 @@
   <button onclick="nav('stats', this)"><span>📊</span><span id="t-nav-st">Стата</span></button>
   <button onclick="nav('banks', this)"><span>🏦</span><span id="t-nav-b">Банки</span></button>
   <button onclick="nav('profile', this)"><span>👤</span><span id="t-nav-pr">Профиль</span></button>
-  <button onclick="nav('more', this)"><span>⚙️</span><span id="t-nav-m">Ещё</span></button>
+  <button onclick="nav('more', this)"><span>⚙️</span><span id="t-nav-m">Настройки</span></button>
 </div>
 
 <script>
@@ -253,102 +254,126 @@ const NAMES = {
 const FLAGS = {USD:'🇺🇸',EUR:'🇪🇺',KZT:'🇰🇿',GBP:'🇬🇧',CNY:'🇨🇳',JPY:'🇯🇵',TRY:'🇹🇷',UAH:'🇺🇦',AED:'🇦🇪',CHF:'🇨🇭',CAD:'🇨🇦',AUD:'🇦🇺',KRW:'🇰🇷',INR:'🇮🇳',BRL:'🇧🇷',RUB:'🇷🇺',BTC:'₿',ETH:'Ξ',TON:'💎',SOL:'◎',BNB:'🟡',USDT:'💵'};
 
 const T = {
-  ru:{title:'Валютный Радар',live:'Live · автообновление',dcNow:'Сейчас',dcOld:'24ч назад',
-      convTitle:'Конвертер',convSub:'Мгновенный обмен',convBtn:'Обменять',
-      pfTitle:'Портфель',pfSub:'Валюты и крипта',pfAdd:'Добавить актив',pfMy:'Активы',pfAddBtn:'Добавить',
-      crTitle:'Крипта',crSub:'₽ и $ · 24ч',stTitle:'Статистика',stSub:'Мин · среднее · макс',
-      bTitle:'Банки',bSub:'ЦБ РФ · Тинькофф',bBtn:'Обновить',
-      prTitle:'Профиль',prSub:'Твои данные',prUser:'Пользователь',prName:'Имя',prLang:'Язык',
-      prPf:'Портфель',prPfAdd:'Добавить актив',prShare:'Поделиться ботом',
-      mTitle:'Ещё',mAuto:'Автоуведомления',mAutoLabel:'USD · EUR · KZT',mAutoHint:'Порог 1 ₽',
-      mAlert:'Алерт по курсу',mAlertBtn:'Создать',mDigest:'Сводка раз в день',
-      mDigestBtn:'Включить',mDigestOff:'Выключить',mAnalytics:'В чат бота',
-      mRate:'Курсы',mHist:'История',mCmp:'Сравнить',mCr:'Крипта',
-      navRates:'Курсы',navConv:'Обмен',navCr:'Крипта',navSt:'Стата',navB:'Банки',navPr:'Профиль',navM:'Ещё',
-      min:'мин',avg:'сред',max:'макс',buy:'Пок',sell:'Прод',
-      updated:'Обновлено',total:'Итого',empty:'Пусто',loading:'Загрузка…',error:'Ошибка',
-      greater:'Больше (>)',less:'Меньше (<)',langPick:'Язык',
-      notifyTitle:'Курс изменился',notifyBody:'{code} {dir} на {diff} ₽'},
-  en:{title:'Currency Radar',live:'Live · auto-refresh',dcNow:'Now',dcOld:'24h ago',
-      convTitle:'Converter',convSub:'Instant exchange',convBtn:'Convert',
-      pfTitle:'Portfolio',pfSub:'Currencies and crypto',pfAdd:'Add asset',pfMy:'Assets',pfAddBtn:'Add',
-      crTitle:'Crypto',crSub:'₽ and $ · 24h',stTitle:'Statistics',stSub:'Min · avg · max',
-      bTitle:'Banks',bSub:'CBR · Tinkoff',bBtn:'Refresh',
-      prTitle:'Profile',prSub:'Your data',prUser:'User',prName:'Name',prLang:'Language',
-      prPf:'Portfolio',prPfAdd:'Add asset',prShare:'Share bot',
-      mTitle:'More',mAuto:'Auto-notifications',mAutoLabel:'USD · EUR · KZT',mAutoHint:'Threshold 1 ₽',
-      mAlert:'Price alert',mAlertBtn:'Create',mDigest:'Daily digest',
-      mDigestBtn:'Enable',mDigestOff:'Disable',mAnalytics:'To bot chat',
-      mRate:'Rates',mHist:'History',mCmp:'Compare',mCr:'Crypto',
-      navRates:'Rates',navConv:'Convert',navCr:'Crypto',navSt:'Stats',navB:'Banks',navPr:'Profile',navM:'More',
-      min:'min',avg:'avg',max:'max',buy:'Buy',sell:'Sell',
-      updated:'Updated',total:'Total',empty:'Empty',loading:'Loading…',error:'Error',
-      greater:'Greater (>)',less:'Less (<)',langPick:'Language',
-      notifyTitle:'Rate changed',notifyBody:'{code} {dir} by {diff} ₽'},
-  de:{title:'Währungsradar',live:'Live · Auto-Aktualisierung',dcNow:'Jetzt',dcOld:'vor 24h',
-      convTitle:'Umrechner',convSub:'Sofortiger Tausch',convBtn:'Umtauschen',
-      pfTitle:'Portfolio',pfSub:'Währungen und Krypto',pfAdd:'Hinzufügen',pfMy:'Anlagen',pfAddBtn:'Hinzufügen',
-      crTitle:'Krypto',crSub:'₽ und $ · 24h',stTitle:'Statistik',stSub:'Min · Ø · Max',
-      bTitle:'Banken',bSub:'ZBR · Tinkoff',bBtn:'Aktualisieren',
-      prTitle:'Profil',prSub:'Deine Daten',prUser:'Benutzer',prName:'Name',prLang:'Sprache',
-      prPf:'Portfolio',prPfAdd:'Hinzufügen',prShare:'Bot teilen',
-      mTitle:'Mehr',mAuto:'Auto-Benachrichtigungen',mAutoLabel:'USD · EUR · KZT',mAutoHint:'Schwelle 1 ₽',
-      mAlert:'Preisalarm',mAlertBtn:'Erstellen',mDigest:'Tägliche Zusammenfassung',
-      mDigestBtn:'Aktivieren',mDigestOff:'Deaktivieren',mAnalytics:'Zum Bot-Chat',
-      mRate:'Kurse',mHist:'Verlauf',mCmp:'Vergleichen',mCr:'Krypto',
-      navRates:'Kurse',navConv:'Tausch',navCr:'Krypto',navSt:'Stat',navB:'Banken',navPr:'Profil',navM:'Mehr',
-      min:'min',avg:'Ø',max:'max',buy:'Kauf',sell:'Verk',
-      updated:'Aktualisiert',total:'Gesamt',empty:'Leer',loading:'Lädt…',error:'Fehler',
-      greater:'Größer (>)',less:'Kleiner (<)',langPick:'Sprache',
-      notifyTitle:'Kurs geändert',notifyBody:'{code} {dir} um {diff} ₽'},
-  fr:{title:'Radar Devises',live:'Live · auto-actualisation',dcNow:'Maintenant',dcOld:'il y a 24h',
-      convTitle:'Convertisseur',convSub:'Échange instantané',convBtn:'Convertir',
-      pfTitle:'Portefeuille',pfSub:'Devises et crypto',pfAdd:'Ajouter',pfMy:'Actifs',pfAddBtn:'Ajouter',
-      crTitle:'Crypto',crSub:'₽ et $ · 24h',stTitle:'Statistiques',stSub:'Min · moy · max',
-      bTitle:'Banques',bSub:'BCR · Tinkoff',bBtn:'Actualiser',
-      prTitle:'Profil',prSub:'Vos données',prUser:'Utilisateur',prName:'Nom',prLang:'Langue',
-      prPf:'Portefeuille',prPfAdd:'Ajouter',prShare:'Partager le bot',
-      mTitle:'Plus',mAuto:'Notifications auto',mAutoLabel:'USD · EUR · KZT',mAutoHint:'Seuil 1 ₽',
-      mAlert:'Alerte de prix',mAlertBtn:'Créer',mDigest:'Résumé quotidien',
-      mDigestBtn:'Activer',mDigestOff:'Désactiver',mAnalytics:'Vers le chat',
-      mRate:'Taux',mHist:'Historique',mCmp:'Comparer',mCr:'Crypto',
-      navRates:'Taux',navConv:'Échange',navCr:'Crypto',navSt:'Stats',navB:'Banques',navPr:'Profil',navM:'Plus',
-      min:'min',avg:'moy',max:'max',buy:'Achat',sell:'Vente',
-      updated:'Actualisé',total:'Total',empty:'Vide',loading:'Chargement…',error:'Erreur',
-      greater:'Supérieur (>)',less:'Inférieur (<)',langPick:'Langue',
-      notifyTitle:'Taux modifié',notifyBody:'{code} {dir} de {diff} ₽'},
-  es:{title:'Radar de Divisas',live:'Live · auto-actualizado',dcNow:'Ahora',dcOld:'hace 24h',
-      convTitle:'Convertidor',convSub:'Cambio instantáneo',convBtn:'Convertir',
-      pfTitle:'Portafolio',pfSub:'Divisas y cripto',pfAdd:'Añadir',pfMy:'Activos',pfAddBtn:'Añadir',
-      crTitle:'Cripto',crSub:'₽ y $ · 24h',stTitle:'Estadísticas',stSub:'Mín · med · máx',
-      bTitle:'Bancos',bSub:'BCR · Tinkoff',bBtn:'Actualizar',
-      prTitle:'Perfil',prSub:'Tus datos',prUser:'Usuario',prName:'Nombre',prLang:'Idioma',
-      prPf:'Portafolio',prPfAdd:'Añadir',prShare:'Compartir bot',
-      mTitle:'Más',mAuto:'Notificaciones auto',mAutoLabel:'USD · EUR · KZT',mAutoHint:'Umbral 1 ₽',
-      mAlert:'Alerta de precio',mAlertBtn:'Crear',mDigest:'Resumen diario',
-      mDigestBtn:'Activar',mDigestOff:'Desactivar',mAnalytics:'Al chat',
-      mRate:'Tasas',mHist:'Historial',mCmp:'Comparar',mCr:'Cripto',
-      navRates:'Tasas',navConv:'Cambio',navCr:'Cripto',navSt:'Stats',navB:'Bancos',navPr:'Perfil',navM:'Más',
-      min:'mín',avg:'med',max:'máx',buy:'Compra',sell:'Venta',
-      updated:'Actualizado',total:'Total',empty:'Vacío',loading:'Cargando…',error:'Error',
-      greater:'Mayor (>)',less:'Menor (<)',langPick:'Idioma',
-      notifyTitle:'Tasa cambiada',notifyBody:'{code} {dir} en {diff} ₽'},
-  tr:{title:'Döviz Radarı',live:'Canlı · otomatik',dcNow:'Şimdi',dcOld:'24s önce',
-      convTitle:'Çevirici',convSub:'Anında değişim',convBtn:'Çevir',
-      pfTitle:'Portföy',pfSub:'Döviz ve kripto',pfAdd:'Ekle',pfMy:'Varlıklar',pfAddBtn:'Ekle',
-      crTitle:'Kripto',crSub:'₽ ve $ · 24s',stTitle:'İstatistik',stSub:'Min · ort · maks',
-      bTitle:'Bankalar',bSub:'MB · Tinkoff',bBtn:'Yenile',
-      prTitle:'Profil',prSub:'Verilerin',prUser:'Kullanıcı',prName:'Ad',prLang:'Dil',
-      prPf:'Portföy',prPfAdd:'Ekle',prShare:'Botu paylaş',
-      mTitle:'Daha',mAuto:'Otomatik bildirim',mAutoLabel:'USD · EUR · KZT',mAutoHint:'Eşik 1 ₽',
-      mAlert:'Fiyat alarmı',mAlertBtn:'Oluştur',mDigest:'Günlük özet',
-      mDigestBtn:'Aç',mDigestOff:'Kapat',mAnalytics:'Sohbete',
-      mRate:'Kurlar',mHist:'Geçmiş',mCmp:'Karşılaştır',mCr:'Kripto',
-      navRates:'Kurlar',navConv:'Çevir',navCr:'Kripto',navSt:'İstat',navB:'Bankalar',navPr:'Profil',navM:'Daha',
-      min:'min',avg:'ort',max:'maks',buy:'Alış',sell:'Satış',
-      updated:'Güncellendi',total:'Toplam',empty:'Boş',loading:'Yükleniyor…',error:'Hata',
-      greater:'Büyük (>)',less:'Küçük (<)',langPick:'Dil',
-      notifyTitle:'Kur değişti',notifyBody:'{code} {dir} {diff} ₽'}
+  ru:{
+    title:'Валютный Радар',live:'Live · автообновление',dcNow:'Сейчас',dcOld:'24ч назад',
+    convTitle:'Конвертер',convSub:'Мгновенный обмен',convBtn:'Обменять',
+    pfTitle:'Портфель',pfSub:'Валюты и крипта',pfAdd:'Добавить актив',pfMy:'Активы',pfAddBtn:'Добавить',
+    crTitle:'Крипта',crSub:'₽ и $ · 24ч',stTitle:'Статистика',stSub:'Мин · среднее · макс',
+    bTitle:'Банки',bSub:'ЦБ РФ · Тинькофф',bBtn:'Обновить',
+    prTitle:'Профиль',prSub:'Твои данные',prUser:'Пользователь',prName:'Имя',prLang:'Язык',
+    prPf:'Портфель',prPfAdd:'Добавить актив',prShare:'Поделиться ботом',
+    mTitle:'Настройки',mAuto:'Автоуведомления',mAutoLabel:'USD · EUR · KZT',mAutoHint:'Порог 1 ₽',
+    mAlert:'Алерт по курсу',mAlertBtn:'Создать',mDigest:'Сводка раз в день',
+    mDigestBtn:'Включить',mDigestOff:'Выключить',mChat:'В чат бота',
+    mRate:'Курсы',mHist:'История',mCmp:'Сравнить',mCr:'Крипта',
+    navRates:'Курсы',navConv:'Обмен',navCr:'Крипта',navSt:'Стата',navB:'Банки',navPr:'Профиль',navM:'Настройки',
+    min:'мин',avg:'сред',max:'макс',buy:'Пок',sell:'Прод',
+    updated:'Обновлено',total:'Итого',empty:'Пусто',loading:'Загрузка…',error:'Ошибка',
+    greater:'Больше (>)',less:'Меньше (<)',langPick:'Язык',
+    langRu:'Русский',langEn:'Английский',langDe:'Немецкий',langFr:'Французский',langEs:'Испанский',langTr:'Турецкий',
+    toastOn:'Включено',toastOff:'Выключено',toastLang:'Язык',
+    placeholder:'Количество',
+    notifyTitle:'Курс изменился',notifyBody:'{code} {dir} на {diff} ₽'},
+  en:{
+    title:'Currency Radar',live:'Live · auto-refresh',dcNow:'Now',dcOld:'24h ago',
+    convTitle:'Converter',convSub:'Instant exchange',convBtn:'Convert',
+    pfTitle:'Portfolio',pfSub:'Currencies and crypto',pfAdd:'Add asset',pfMy:'Assets',pfAddBtn:'Add',
+    crTitle:'Crypto',crSub:'₽ and $ · 24h',stTitle:'Statistics',stSub:'Min · avg · max',
+    bTitle:'Banks',bSub:'CBR · Tinkoff',bBtn:'Refresh',
+    prTitle:'Profile',prSub:'Your data',prUser:'User',prName:'Name',prLang:'Language',
+    prPf:'Portfolio',prPfAdd:'Add asset',prShare:'Share bot',
+    mTitle:'Settings',mAuto:'Auto-notifications',mAutoLabel:'USD · EUR · KZT',mAutoHint:'Threshold 1 ₽',
+    mAlert:'Price alert',mAlertBtn:'Create',mDigest:'Daily digest',
+    mDigestBtn:'Enable',mDigestOff:'Disable',mChat:'To bot chat',
+    mRate:'Rates',mHist:'History',mCmp:'Compare',mCr:'Crypto',
+    navRates:'Rates',navConv:'Convert',navCr:'Crypto',navSt:'Stats',navB:'Banks',navPr:'Profile',navM:'Settings',
+    min:'min',avg:'avg',max:'max',buy:'Buy',sell:'Sell',
+    updated:'Updated',total:'Total',empty:'Empty',loading:'Loading…',error:'Error',
+    greater:'Greater (>)',less:'Less (<)',langPick:'Language',
+    langRu:'Russian',langEn:'English',langDe:'German',langFr:'French',langEs:'Spanish',langTr:'Turkish',
+    toastOn:'ON',toastOff:'OFF',toastLang:'Language',
+    placeholder:'Amount',
+    notifyTitle:'Rate changed',notifyBody:'{code} {dir} by {diff} ₽'},
+  de:{
+    title:'Währungsradar',live:'Live · Auto-Aktualisierung',dcNow:'Jetzt',dcOld:'vor 24h',
+    convTitle:'Umrechner',convSub:'Sofortiger Tausch',convBtn:'Umtauschen',
+    pfTitle:'Portfolio',pfSub:'Währungen und Krypto',pfAdd:'Hinzufügen',pfMy:'Anlagen',pfAddBtn:'Hinzufügen',
+    crTitle:'Krypto',crSub:'₽ und $ · 24h',stTitle:'Statistik',stSub:'Min · Ø · Max',
+    bTitle:'Banken',bSub:'ZBR · Tinkoff',bBtn:'Aktualisieren',
+    prTitle:'Profil',prSub:'Deine Daten',prUser:'Benutzer',prName:'Name',prLang:'Sprache',
+    prPf:'Portfolio',prPfAdd:'Hinzufügen',prShare:'Bot teilen',
+    mTitle:'Einstellungen',mAuto:'Auto-Benachrichtigungen',mAutoLabel:'USD · EUR · KZT',mAutoHint:'Schwelle 1 ₽',
+    mAlert:'Preisalarm',mAlertBtn:'Erstellen',mDigest:'Tägliche Zusammenfassung',
+    mDigestBtn:'Aktivieren',mDigestOff:'Deaktivieren',mChat:'Zum Bot-Chat',
+    mRate:'Kurse',mHist:'Verlauf',mCmp:'Vergleichen',mCr:'Krypto',
+    navRates:'Kurse',navConv:'Tausch',navCr:'Krypto',navSt:'Stat',navB:'Banken',navPr:'Profil',navM:'Einstellungen',
+    min:'min',avg:'Ø',max:'max',buy:'Kauf',sell:'Verk',
+    updated:'Aktualisiert',total:'Gesamt',empty:'Leer',loading:'Lädt…',error:'Fehler',
+    greater:'Größer (>)',less:'Kleiner (<)',langPick:'Sprache',
+    langRu:'Russisch',langEn:'Englisch',langDe:'Deutsch',langFr:'Französisch',langEs:'Spanisch',langTr:'Türkisch',
+    toastOn:'AN',toastOff:'AUS',toastLang:'Sprache',
+    placeholder:'Menge',
+    notifyTitle:'Kurs geändert',notifyBody:'{code} {dir} um {diff} ₽'},
+  fr:{
+    title:'Radar Devises',live:'Live · auto-actualisation',dcNow:'Maintenant',dcOld:'il y a 24h',
+    convTitle:'Convertisseur',convSub:'Échange instantané',convBtn:'Convertir',
+    pfTitle:'Portefeuille',pfSub:'Devises et crypto',pfAdd:'Ajouter',pfMy:'Actifs',pfAddBtn:'Ajouter',
+    crTitle:'Crypto',crSub:'₽ et $ · 24h',stTitle:'Statistiques',stSub:'Min · moy · max',
+    bTitle:'Banques',bSub:'BCR · Tinkoff',bBtn:'Actualiser',
+    prTitle:'Profil',prSub:'Vos données',prUser:'Utilisateur',prName:'Nom',prLang:'Langue',
+    prPf:'Portefeuille',prPfAdd:'Ajouter',prShare:'Partager le bot',
+    mTitle:'Paramètres',mAuto:'Notifications auto',mAutoLabel:'USD · EUR · KZT',mAutoHint:'Seuil 1 ₽',
+    mAlert:'Alerte de prix',mAlertBtn:'Créer',mDigest:'Résumé quotidien',
+    mDigestBtn:'Activer',mDigestOff:'Désactiver',mChat:'Vers le chat',
+    mRate:'Taux',mHist:'Historique',mCmp:'Comparer',mCr:'Crypto',
+    navRates:'Taux',navConv:'Échange',navCr:'Crypto',navSt:'Stats',navB:'Banques',navPr:'Profil',navM:'Paramètres',
+    min:'min',avg:'moy',max:'max',buy:'Achat',sell:'Vente',
+    updated:'Actualisé',total:'Total',empty:'Vide',loading:'Chargement…',error:'Erreur',
+    greater:'Supérieur (>)',less:'Inférieur (<)',langPick:'Langue',
+    langRu:'Russe',langEn:'Anglais',langDe:'Allemand',langFr:'Français',langEs:'Espagnol',langTr:'Turc',
+    toastOn:'ON',toastOff:'OFF',toastLang:'Langue',
+    placeholder:'Montant',
+    notifyTitle:'Taux modifié',notifyBody:'{code} {dir} de {diff} ₽'},
+  es:{
+    title:'Radar de Divisas',live:'Live · auto-actualizado',dcNow:'Ahora',dcOld:'hace 24h',
+    convTitle:'Convertidor',convSub:'Cambio instantáneo',convBtn:'Convertir',
+    pfTitle:'Portafolio',pfSub:'Divisas y cripto',pfAdd:'Añadir',pfMy:'Activos',pfAddBtn:'Añadir',
+    crTitle:'Cripto',crSub:'₽ y $ · 24h',stTitle:'Estadísticas',stSub:'Mín · med · máx',
+    bTitle:'Bancos',bSub:'BCR · Tinkoff',bBtn:'Actualizar',
+    prTitle:'Perfil',prSub:'Tus datos',prUser:'Usuario',prName:'Nombre',prLang:'Idioma',
+    prPf:'Portafolio',prPfAdd:'Añadir',prShare:'Compartir bot',
+    mTitle:'Ajustes',mAuto:'Notificaciones auto',mAutoLabel:'USD · EUR · KZT',mAutoHint:'Umbral 1 ₽',
+    mAlert:'Alerta de precio',mAlertBtn:'Crear',mDigest:'Resumen diario',
+    mDigestBtn:'Activar',mDigestOff:'Desactivar',mChat:'Al chat',
+    mRate:'Tasas',mHist:'Historial',mCmp:'Comparar',mCr:'Cripto',
+    navRates:'Tasas',navConv:'Cambio',navCr:'Cripto',navSt:'Stats',navB:'Bancos',navPr:'Perfil',navM:'Ajustes',
+    min:'mín',avg:'med',max:'máx',buy:'Compra',sell:'Venta',
+    updated:'Actualizado',total:'Total',empty:'Vacío',loading:'Cargando…',error:'Error',
+    greater:'Mayor (>)',less:'Menor (<)',langPick:'Idioma',
+    langRu:'Ruso',langEn:'Inglés',langDe:'Alemán',langFr:'Francés',langEs:'Español',langTr:'Turco',
+    toastOn:'ON',toastOff:'OFF',toastLang:'Idioma',
+    placeholder:'Cantidad',
+    notifyTitle:'Tasa cambiada',notifyBody:'{code} {dir} en {diff} ₽'},
+  tr:{
+    title:'Döviz Radarı',live:'Canlı · otomatik',dcNow:'Şimdi',dcOld:'24s önce',
+    convTitle:'Çevirici',convSub:'Anında değişim',convBtn:'Çevir',
+    pfTitle:'Portföy',pfSub:'Döviz ve kripto',pfAdd:'Ekle',pfMy:'Varlıklar',pfAddBtn:'Ekle',
+    crTitle:'Kripto',crSub:'₽ ve $ · 24s',stTitle:'İstatistik',stSub:'Min · ort · maks',
+    bTitle:'Bankalar',bSub:'MB · Tinkoff',bBtn:'Yenile',
+    prTitle:'Profil',prSub:'Verilerin',prUser:'Kullanıcı',prName:'Ad',prLang:'Dil',
+    prPf:'Portföy',prPfAdd:'Ekle',prShare:'Botu paylaş',
+    mTitle:'Ayarlar',mAuto:'Otomatik bildirim',mAutoLabel:'USD · EUR · KZT',mAutoHint:'Eşik 1 ₽',
+    mAlert:'Fiyat alarmı',mAlertBtn:'Oluştur',mDigest:'Günlük özet',
+    mDigestBtn:'Aç',mDigestOff:'Kapat',mChat:'Sohbete',
+    mRate:'Kurlar',mHist:'Geçmiş',mCmp:'Karşılaştır',mCr:'Kripto',
+    navRates:'Kurlar',navConv:'Çevir',navCr:'Kripto',navSt:'İstat',navB:'Bankalar',navPr:'Profil',navM:'Ayarlar',
+    min:'min',avg:'ort',max:'maks',buy:'Alış',sell:'Satış',
+    updated:'Güncellendi',total:'Toplam',empty:'Boş',loading:'Yükleniyor…',error:'Hata',
+    greater:'Büyük (>)',less:'Küçük (<)',langPick:'Dil',
+    langRu:'Rusça',langEn:'İngilizce',langDe:'Almanca',langFr:'Fransızca',langEs:'İspanyolca',langTr:'Türkçe',
+    toastOn:'AÇIK',toastOff:'KAPALI',toastLang:'Dil',
+    placeholder:'Miktar',
+    notifyTitle:'Kur değişti',notifyBody:'{code} {dir} {diff} ₽'}
 };
 
 const tg = window.Telegram?.WebApp;
@@ -376,7 +401,7 @@ function applyLang() {
     prPf:'prPf',prPfAdd:'prPfAdd',prShare:'prShare',
     mTitle:'mTitle',mAuto:'mAuto',mAutoLabel:'mAutoLabel',mAutoHint:'mAutoHint',
     mAlert:'mAlert',mAlertBtn:'mAlertBtn',mDigest:'mDigest',mDigestBtn:'mDigestBtn',
-    mDigestOff:'mDigestOff',mAnalytics:'mAnalytics',mRate:'mRate',mHist:'mHist',mCmp:'mCmp',mCr:'mCr'};
+    mDigestOff:'mDigestOff',mChat:'mChat',mRate:'mRate',mHist:'mHist',mCmp:'mCmp',mCr:'mCr'};
   Object.keys(map).forEach(id => {
     const el = document.getElementById('t-' + id);
     if (el) el.textContent = t(map[id]);
@@ -388,11 +413,19 @@ function applyLang() {
   document.getElementById('alert-direction').options[0].textContent = t('greater');
   document.getElementById('alert-direction').options[1].textContent = t('less');
   document.getElementById('autoToggle').classList.toggle('on', autoOn);
+  // Плейсхолдеры
+  const pfAmt = document.getElementById('pf-amount');
+  const profAmt = document.getElementById('prof-pf-amount');
+  if (pfAmt) pfAmt.placeholder = t('placeholder');
+  if (profAmt) profAmt.placeholder = t('placeholder');
   if (Object.keys(rates).length) { renderRates(); renderPortfolio(); }
+  if (document.getElementById('page-profile').classList.contains('active')) loadProfile();
 }
 
 function openLang() {
-  const langs = [['ru','🇷🇺 Русский'],['en','🇬🇧 English'],['de','🇩🇪 Deutsch'],['fr','🇫🇷 Français'],['es','🇪🇸 Español'],['tr','🇹🇷 Türkçe']];
+  const langs = [['ru','🇷🇺 '+t('langRu')],['en','🇬🇧 '+t('langEn')],
+                 ['de','🇩🇪 '+t('langDe')],['fr','🇫🇷 '+t('langFr')],
+                 ['es','🇪🇸 '+t('langEs')],['tr','🇹🇷 '+t('langTr')]];
   const html = langs.map(([code, name]) =>
     `<button class="btn ${code === LANG ? '' : 'sec'}" onclick="setLang('${code}')">${name}</button>`
   ).join('');
@@ -415,6 +448,7 @@ function setLang(code) {
   const m = document.getElementById('langPickModal'); if (m) m.remove();
   applyLang();
   renderRates(); loadCrypto(); renderPortfolio();
+  fillSelects();
   toast('✅ ' + code.toUpperCase());
   sendCmdSilent(`/lang ${code}`);
 }
@@ -424,7 +458,7 @@ function toggleAuto() {
   localStorage.setItem('autoOn', autoOn);
   document.getElementById('autoToggle').classList.toggle('on', autoOn);
   sendCmdSilent(autoOn ? '/autosub on' : '/autosub off');
-  toast(autoOn ? '🔔 ON' : '🔕 OFF');
+  toast(autoOn ? '🔔 ' + t('toastOn') : '🔕 ' + t('toastOff'));
 }
 
 if (localStorage.getItem('theme') === 'light') { document.body.classList.add('light'); document.getElementById('themeBtn').textContent = '☀️'; }
@@ -838,6 +872,7 @@ function fillSelects() {
   ['pf-code', 'stats-code', 'alert-code', 'prof-pf-code'].forEach(id => {
     const sel = document.getElementById(id);
     if (!sel) return;
+    const current = sel.value;
     sel.innerHTML = '';
     const g1 = document.createElement('optgroup');
     g1.label = '💱 ' + (LANG === 'ru' ? 'Валюты' : 'Currencies');
@@ -856,20 +891,27 @@ function fillSelects() {
       g2.appendChild(o);
     });
     sel.appendChild(g2);
+    if (current) sel.value = current;
   });
   ['cv-from', 'cv-to'].forEach(id => {
     const sel = document.getElementById(id);
     if (!sel) return;
+    const current = sel.value;
     sel.innerHTML = '';
     ALL_FOR_CONV.forEach(c => {
       const o = document.createElement('option');
       o.value = c; o.textContent = `${FLAGS[c] || ''} ${c} — ${NAMES[LANG]?.[c] || c}`;
       sel.appendChild(o);
     });
+    if (current) sel.value = current;
   });
-  document.getElementById('cv-from').value = 'USD';
-  document.getElementById('cv-to').value = 'RUB';
-  document.getElementById('alert-code').value = 'USD';
+  if (!document.getElementById('cv-from').value) {
+    document.getElementById('cv-from').value = 'USD';
+    document.getElementById('cv-to').value = 'RUB';
+  }
+  if (!document.getElementById('alert-code').value) {
+    document.getElementById('alert-code').value = 'USD';
+  }
 }
 
 fillSelects();
