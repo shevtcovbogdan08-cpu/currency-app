@@ -9,60 +9,70 @@
   :root { --bg:#0f1a2e; --card:#1b2a4e; --accent:#2E86DE; --green:#00D9A3; --red:#ff5470; --text:#e6ecf5; --muted:#8fa3bf; --border:#253456; }
   body.light { --bg:#f4f6fa; --card:#ffffff; --accent:#2E86DE; --green:#00a878; --red:#e63946; --text:#1a2332; --muted:#6b7a90; --border:#e1e6ee; }
   * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-  body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; padding:16px 16px 90px; min-height:100vh; transition:background .3s,color .3s; }
-  h1 { font-size:22px; margin-bottom:4px; text-align:center; }
-  .sub { text-align:center; font-size:13px; color:var(--muted); margin-bottom:6px; }
-  .live { text-align:center; font-size:11px; color:var(--green); margin-bottom:20px; display:flex; align-items:center; justify-content:center; gap:4px; }
+  body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; padding:14px 14px 86px; min-height:100vh; transition:background .3s,color .3s; }
+  h1 { font-size:19px; margin-bottom:2px; text-align:center; font-weight:800; letter-spacing:-.3px; }
+  .sub { text-align:center; font-size:11px; color:var(--muted); margin-bottom:4px; }
+  .live { text-align:center; font-size:11px; color:var(--green); margin-bottom:14px; display:flex; align-items:center; justify-content:center; gap:5px; font-weight:600; }
   .live::before { content:''; width:6px; height:6px; background:var(--green); border-radius:50%; animation:pulse 1.5s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
-  .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
-  .card { background:var(--card); border-radius:14px; padding:14px; cursor:pointer; transition:transform .15s,background .3s; position:relative; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+  .card { background:var(--card); border-radius:13px; padding:12px; cursor:pointer; transition:transform .15s; position:relative; }
   .card:active { transform:scale(.97); }
   .card.sel { outline:2px solid var(--accent); }
-  .card .code { font-weight:700; font-size:17px; }
-  .card .name { font-size:12px; color:var(--muted); margin:2px 0 10px; }
-  .card .rate { font-size:20px; font-weight:800; }
-  .card .trend { font-size:13px; margin-top:6px; font-weight:600; }
+  .card .code { font-weight:700; font-size:15px; }
+  .card .name { font-size:11px; color:var(--muted); margin:1px 0 8px; }
+  .card .rate { font-size:19px; font-weight:800; letter-spacing:-.3px; }
+  .card .trend { font-size:12px; margin-top:5px; font-weight:600; }
   .up { color:var(--green); } .down { color:var(--red); } .flat { color:var(--muted); }
-  .btn { width:100%; padding:15px; background:var(--accent); color:white; border:none; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer; margin-top:8px; }
-  .btn.sec { background:var(--card); color:var(--text); border:1px solid var(--border); }
-  .btn:active { opacity:.85; }
-  .updated { text-align:center; font-size:12px; color:var(--muted); margin-top:14px; }
-  .loading { text-align:center; color:var(--muted); padding:40px 0; }
-  canvas { width:100%; background:var(--card); border-radius:14px; padding:8px; margin-bottom:14px; display:block; }
-  .section { background:var(--card); border-radius:14px; padding:14px; margin-bottom:10px; }
-  .section h3 { font-size:15px; margin-bottom:10px; }
-  .row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); }
+  .btn { width:100%; padding:13px; background:var(--accent); color:white; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; margin-top:6px; }
+  .btn.sec { background:var(--card); color:var(--text); border:1px solid var(--border); font-weight:600; }
+  .btn:active { opacity:.85; transform:scale(.98); }
+  .updated { text-align:center; font-size:11px; color:var(--muted); margin-top:10px; }
+  .loading { text-align:center; color:var(--muted); padding:30px 0; font-size:13px; }
+  canvas { width:100%; background:var(--card); border-radius:13px; padding:6px; margin-bottom:10px; display:block; }
+  .section { background:var(--card); border-radius:13px; padding:12px; margin-bottom:8px; }
+  .section h3 { font-size:13px; margin-bottom:8px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
+  .row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid var(--border); font-size:13px; }
   .row:last-child { border:none; }
-  .total { font-size:18px; font-weight:800; color:var(--green); text-align:right; margin-top:10px; }
-  input, select { width:100%; padding:12px; background:var(--bg); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:15px; margin-bottom:8px; }
-  .nav { position:fixed; bottom:0; left:0; right:0; background:var(--card); display:flex; padding:6px 0; border-top:1px solid var(--border); }
-  .nav button { flex:1; background:none; border:none; color:var(--muted); font-size:10px; padding:8px 2px; cursor:pointer; }
-  .nav button.active { color:var(--accent); font-weight:700; }
-  .nav button span { display:block; font-size:20px; margin-bottom:2px; }
+  .total { font-size:16px; font-weight:800; color:var(--green); text-align:right; margin-top:8px; }
+  input, select { width:100%; padding:11px; background:var(--bg); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:14px; margin-bottom:6px; }
+  .nav { position:fixed; bottom:0; left:0; right:0; background:var(--card); display:flex; padding:5px 0; border-top:1px solid var(--border); z-index:10; }
+  .nav button { flex:1; background:none; border:none; color:var(--muted); font-size:9px; padding:6px 2px; cursor:pointer; font-weight:600; }
+  .nav button.active { color:var(--accent); }
+  .nav button span:first-child { display:block; font-size:19px; margin-bottom:1px; }
   .page { display:none; } .page.active { display:block; }
-  .del { background:var(--red); color:white; border:none; border-radius:8px; padding:4px 10px; font-size:12px; cursor:pointer; }
-  .stat-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px; }
-  .stat-item { background:var(--bg); border-radius:10px; padding:10px; text-align:center; }
-  .stat-item .lbl { font-size:11px; color:var(--muted); }
-  .stat-item .val { font-size:15px; font-weight:700; margin-top:4px; }
-  .theme-btn { position:absolute; top:16px; right:16px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:8px 12px; color:var(--text); cursor:pointer; font-size:16px; }
-  .lang-btn { position:absolute; top:16px; left:16px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:8px 12px; color:var(--text); cursor:pointer; font-size:14px; font-weight:700; }
-  .range { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-bottom:4px; }
-  .share-btn { position:absolute; top:10px; right:10px; background:none; border:none; font-size:16px; cursor:pointer; opacity:.6; }
-  .badge { display:inline-block; padding:3px 10px; border-radius:8px; font-size:12px; font-weight:700; }
+  .del { background:var(--red); color:white; border:none; border-radius:7px; padding:3px 8px; font-size:11px; cursor:pointer; }
+  .stat-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:10px; }
+  .stat-item { background:var(--bg); border-radius:10px; padding:10px 6px; text-align:center; }
+  .stat-item .lbl { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
+  .stat-item .val { font-size:14px; font-weight:800; margin-top:3px; }
+  .theme-btn { position:absolute; top:12px; right:12px; background:var(--card); border:1px solid var(--border); border-radius:9px; padding:6px 10px; color:var(--text); cursor:pointer; font-size:14px; }
+  .lang-btn { position:absolute; top:12px; left:12px; background:var(--card); border:1px solid var(--border); border-radius:9px; padding:6px 10px; color:var(--text); cursor:pointer; font-size:11px; font-weight:800; letter-spacing:.5px; }
+  .range { display:flex; justify-content:space-between; font-size:10px; color:var(--muted); margin-bottom:3px; padding:0 4px; }
+  .share-btn { position:absolute; top:8px; right:8px; background:none; border:none; font-size:13px; cursor:pointer; opacity:.5; padding:4px; }
+  .badge { display:inline-block; padding:2px 8px; border-radius:7px; font-size:11px; font-weight:700; }
   .badge.buy { background:rgba(0,217,163,.15); color:var(--green); }
   .badge.sell { background:rgba(255,84,112,.15); color:var(--red); }
-  .flag { font-size:18px; margin-right:6px; }
-  .period-btns { display:flex; gap:6px; margin-bottom:10px; }
-  .period-btns button { flex:1; padding:8px 4px; background:var(--bg); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:12px; cursor:pointer; }
+  .flag { font-size:15px; margin-right:4px; }
+  .period-btns { display:flex; gap:5px; margin-bottom:10px; }
+  .period-btns button { flex:1; padding:9px 4px; background:var(--bg); border:1px solid var(--border); border-radius:9px; color:var(--text); font-size:12px; cursor:pointer; font-weight:600; }
   .period-btns button.active { background:var(--accent); border-color:var(--accent); color:white; }
-  .toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:var(--accent); color:white; padding:12px 20px; border-radius:12px; font-size:14px; font-weight:600; z-index:999; opacity:0; transition:opacity .3s; pointer-events:none; }
+  .toast { position:fixed; bottom:96px; left:50%; transform:translateX(-50%); background:var(--accent); color:white; padding:10px 18px; border-radius:11px; font-size:13px; font-weight:600; z-index:999; opacity:0; transition:opacity .3s; pointer-events:none; }
   .toast.show { opacity:1; }
-  .conv-row { display:flex; gap:6px; align-items:center; margin-bottom:8px; }
+  .conv-row { display:flex; gap:5px; align-items:center; margin-bottom:6px; }
   .conv-row select { margin:0; }
-  .conv-arrow { font-size:20px; }
-  .conv-result { text-align:center; font-size:20px; font-weight:800; padding:14px; background:var(--bg); border-radius:12px; margin-top:8px; }
+  .swap-btn { background:var(--accent); color:white; border:none; border-radius:10px; padding:11px 14px; font-size:16px; cursor:pointer; flex-shrink:0; }
+  .conv-result { text-align:center; font-size:18px; font-weight:800; padding:14px; background:var(--bg); border-radius:11px; margin-top:6px; color:var(--green); }
+  .toggle-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; }
+  .toggle { position:relative; width:46px; height:26px; background:var(--border); border-radius:13px; cursor:pointer; transition:background .2s; flex-shrink:0; }
+  .toggle.on { background:var(--green); }
+  .toggle::after { content:''; position:absolute; top:3px; left:3px; width:20px; height:20px; background:white; border-radius:50%; transition:transform .2s; }
+  .toggle.on::after { transform:translateX(20px); }
+  .day-compare { background:var(--card); border-radius:12px; padding:10px 12px; margin-bottom:10px; font-size:12px; display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .dc-item { display:flex; flex-direction:column; gap:2px; }
+  .dc-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
+  .dc-value { font-size:15px; font-weight:800; }
+  .dc-diff { grid-column:1 / -1; text-align:center; font-size:13px; font-weight:700; padding-top:6px; border-top:1px solid var(--border); margin-top:4px; }
 </style>
 </head>
 <body>
@@ -73,44 +83,53 @@
 
 <!-- КУРСЫ -->
 <div class="page active" id="page-rates">
-  <h1 id="t-title">⚡ Валютный Радар</h1>
-  <div class="sub" id="t-sub">Курсы валют</div>
-  <div class="live" id="t-live">Курс в реальном времени</div>
-  <canvas id="chart" height="180"></canvas>
+  <h1 id="t-title">Валютный Радар</h1>
+  <div class="live" id="t-live">Live · автообновление</div>
+  <canvas id="chart" height="150"></canvas>
   <div class="range"><span id="rmin">—</span><span id="rmax">—</span></div>
-  <div id="list"><div class="loading">Загрузка...</div></div>
+  <div class="day-compare">
+    <div class="dc-item">
+      <span class="dc-label" id="t-dc-now">Сейчас</span>
+      <span class="dc-value" id="dc-now">—</span>
+    </div>
+    <div class="dc-item">
+      <span class="dc-label" id="t-dc-old">24ч назад</span>
+      <span class="dc-value" id="dc-old">—</span>
+    </div>
+    <div class="dc-diff" id="dc-diff">—</div>
+  </div>
+  <div id="list"><div class="loading">Загрузка…</div></div>
   <div class="updated" id="upd"></div>
 </div>
 
-<!-- КОНВЕРТЕР (отдельная вкладка) -->
+<!-- КОНВЕРТЕР -->
 <div class="page" id="page-convert">
-  <h1 id="t-conv-title">💸 Конвертер</h1>
-  <div class="sub" id="t-conv-sub">Перевод между валютами</div>
+  <h1 id="t-conv-title">Конвертер</h1>
+  <div class="sub" id="t-conv-sub">Мгновенный обмен</div>
   <div class="section">
-    <h3 id="t-conv-from">Из</h3>
     <input type="number" id="cv-amount" value="100" step="0.01">
     <div class="conv-row">
       <select id="cv-from"></select>
-      <button class="btn sec" style="width:auto;padding:10px 14px;margin:0" onclick="swapCur()">⇄</button>
+      <button class="swap-btn" onclick="swapCur()">⇄</button>
       <select id="cv-to"></select>
     </div>
-    <button class="btn" onclick="convertPair()" id="t-conv-btn">Конвертировать</button>
+    <button class="btn" onclick="convertPair()" id="t-conv-btn">Обменять</button>
     <div class="conv-result" id="cv-result">—</div>
   </div>
 </div>
 
 <!-- ПОРТФЕЛЬ -->
 <div class="page" id="page-portfolio">
-  <h1 id="t-pf-title">💼 Портфель</h1>
-  <div class="sub" id="t-pf-sub">Добавляй валюты — считаем в рублях</div>
+  <h1 id="t-pf-title">Портфель</h1>
+  <div class="sub" id="t-pf-sub">Считаем в рублях</div>
   <div class="section">
-    <h3 id="t-pf-add">Добавить</h3>
+    <h3 id="t-pf-add">Добавить актив</h3>
     <select id="pf-code"></select>
-    <input type="number" id="pf-amount" placeholder="Сумма" step="0.01">
+    <input type="number" id="pf-amount" placeholder="Количество" step="0.01">
     <button class="btn" onclick="addToPortfolio()" id="t-pf-add-btn">Добавить</button>
   </div>
   <div class="section">
-    <h3 id="t-pf-my">Мои активы</h3>
+    <h3 id="t-pf-my">Активы</h3>
     <div id="pf-list"><div class="loading">Пусто</div></div>
     <div class="total" id="pf-total"></div>
   </div>
@@ -118,17 +137,16 @@
 
 <!-- КРИПТА -->
 <div class="page" id="page-crypto">
-  <h1 id="t-cr-title">💰 Крипта</h1>
-  <div class="sub" id="t-cr-sub">Курсы в рублях и долларах</div>
-  <div id="crypto-list"><div class="loading">Загрузка...</div></div>
+  <h1 id="t-cr-title">Крипта</h1>
+  <div class="sub" id="t-cr-sub">₽ и $ · 24ч</div>
+  <div id="crypto-list"><div class="loading">Загрузка…</div></div>
 </div>
 
 <!-- СТАТИСТИКА -->
 <div class="page" id="page-stats">
-  <h1 id="t-st-title">📊 Статистика</h1>
-  <div class="sub" id="t-st-sub">Выбери период и валюту</div>
+  <h1 id="t-st-title">Статистика</h1>
+  <div class="sub" id="t-st-sub">Мин · среднее · макс</div>
   <div class="section">
-    <h3 id="t-st-cur">Валюта</h3>
     <select id="stats-code"></select>
   </div>
   <div class="period-btns" id="period-btns">
@@ -138,69 +156,71 @@
     <button onclick="setPeriod(90, this)">90д</button>
   </div>
   <div class="stat-grid" id="stats-grid"></div>
-  <canvas id="stats-chart" height="180"></canvas>
+  <canvas id="stats-chart" height="150"></canvas>
 </div>
 
 <!-- БАНКИ -->
 <div class="page" id="page-banks">
-  <h1 id="t-b-title">🏦 Банковские курсы</h1>
-  <div class="sub" id="t-b-sub">Курсы ЦБ РФ (официальные)</div>
-  <div id="banks-list"><div class="loading">Загрузка...</div></div>
-  <button class="btn" onclick="loadBanks()" id="t-b-btn">🔄 Обновить</button>
+  <h1 id="t-b-title">Банки</h1>
+  <div class="sub" id="t-b-sub">ЦБ РФ и Тинькофф</div>
+  <div id="banks-list"><div class="loading">Загрузка…</div></div>
+  <button class="btn" onclick="loadBanks()" id="t-b-btn">Обновить</button>
 </div>
 
 <!-- ПРОФИЛЬ -->
 <div class="page" id="page-profile">
-  <h1 id="t-pr-title">👤 Профиль</h1>
-  <div class="sub" id="t-pr-sub">Твои данные и настройки</div>
+  <h1 id="t-pr-title">Профиль</h1>
+  <div class="sub" id="t-pr-sub">Твои данные</div>
   <div class="section">
-    <h3 id="t-pr-user">👤 Пользователь</h3>
+    <h3 id="t-pr-user">Пользователь</h3>
     <div class="row"><span id="t-pr-name">Имя</span><span id="prof-name">—</span></div>
     <div class="row"><span id="t-pr-lang">Язык</span><span id="prof-lang">—</span></div>
   </div>
   <div class="section">
-    <h3 id="t-pr-pf">💼 Портфель</h3>
+    <h3 id="t-pr-pf">Портфель</h3>
     <div id="prof-portfolio"><div class="loading">Пусто</div></div>
     <div class="total" id="prof-total"></div>
   </div>
-  <button class="btn" onclick="shareApp()" id="t-pr-share">📤 Поделиться ботом</button>
+  <button class="btn" onclick="shareApp()" id="t-pr-share">Поделиться ботом</button>
 </div>
 
 <!-- ЕЩЁ -->
 <div class="page" id="page-more">
-  <h1 id="t-m-title">⚙️ Ещё</h1>
+  <h1 id="t-m-title">Ещё</h1>
 
   <div class="section">
-    <h3 id="t-m-alert">🎯 Создать алерт</h3>
+    <h3 id="t-m-auto">Автоуведомления</h3>
+    <div class="toggle-row">
+      <span id="t-m-auto-label">USD · EUR · KZT</span>
+      <div class="toggle" id="autoToggle" onclick="toggleAuto()"></div>
+    </div>
+    <div class="sub" id="t-m-auto-hint" style="margin:4px 0 0;font-size:10px">Порог 1 ₽</div>
+  </div>
+
+  <div class="section">
+    <h3 id="t-m-alert">Алерт по курсу</h3>
     <select id="alert-code"></select>
     <select id="alert-direction">
       <option value=">">Больше (>)</option>
       <option value="<">Меньше (<)</option>
     </select>
-    <input type="number" id="alert-target" placeholder="Целевой курс (₽)" step="0.01">
-    <button class="btn" onclick="createAlert()" id="t-m-alert-btn">Создать алерт</button>
+    <input type="number" id="alert-target" placeholder="Курс в ₽" step="0.01">
+    <button class="btn" onclick="createAlert()" id="t-m-alert-btn">Создать</button>
   </div>
 
   <div class="section">
-    <h3 id="t-m-sub">🔔 Подписаться на изменение</h3>
-    <select id="sub-code"></select>
-    <input type="number" id="sub-threshold" placeholder="Порог (₽)" step="0.01" value="1">
-    <button class="btn" onclick="createSub()" id="t-m-sub-btn">Подписаться</button>
-  </div>
-
-  <div class="section">
-    <h3 id="t-m-digest">⏰ Ежедневная сводка</h3>
+    <h3 id="t-m-digest">Сводка раз в день</h3>
     <input type="time" id="digest-time" value="09:00">
-    <button class="btn" onclick="setDigest()" id="t-m-digest-btn">Включить сводку</button>
-    <button class="btn sec" onclick="sendCmd('/digest off')" id="t-m-digest-off">Отключить</button>
+    <button class="btn sec" onclick="setDigest()" id="t-m-digest-btn">Включить</button>
+    <button class="btn sec" onclick="sendCmd('/digest off')" id="t-m-digest-off">Выключить</button>
   </div>
 
   <div class="section">
-    <h3 id="t-m-analytics">📊 Аналитика в чат</h3>
-    <button class="btn sec" onclick="sendCmd('/rate')" id="t-m-rate">💱 Курсы в чат</button>
-    <button class="btn sec" onclick="showHint('/history USD 30')" id="t-m-hist">📊 История</button>
-    <button class="btn sec" onclick="showHint('/compare USD EUR')" id="t-m-cmp">⚖️ Сравнить</button>
-    <button class="btn sec" onclick="showHint('/crypto BTC')" id="t-m-cr">💰 Крипта</button>
+    <h3 id="t-m-analytics">В чат бота</h3>
+    <button class="btn sec" onclick="sendCmd('/rate')" id="t-m-rate">Курсы</button>
+    <button class="btn sec" onclick="showHint('/history USD 30')" id="t-m-hist">История</button>
+    <button class="btn sec" onclick="showHint('/compare USD EUR')" id="t-m-cmp">Сравнить</button>
+    <button class="btn sec" onclick="showHint('/crypto BTC')" id="t-m-cr">Крипта</button>
   </div>
 </div>
 
@@ -216,10 +236,10 @@
 
 <script>
 const CURRENCIES = ['USD','EUR','KZT','GBP','CNY','JPY','TRY','UAH','AED','CHF','CAD','AUD','KRW','INR','BRL'];
-const ALL_FOR_CONV = ['RUB', ...CURRENCIES]; // RUB добавлен для конвертера
+const ALL_FOR_CONV = ['RUB', ...CURRENCIES];
 const NAMES = {
-  ru: {USD:'Доллар',EUR:'Евро',KZT:'Тенге',GBP:'Фунт',CNY:'Юань',JPY:'Йена',TRY:'Лира',UAH:'Гривна',AED:'Дирхам',CHF:'Франк',CAD:'Канадский доллар',AUD:'Австралийский доллар',KRW:'Вона',INR:'Рупия',BRL:'Реал',RUB:'Рубль'},
-  en: {USD:'Dollar',EUR:'Euro',KZT:'Tenge',GBP:'Pound',CNY:'Yuan',JPY:'Yen',TRY:'Lira',UAH:'Hryvnia',AED:'Dirham',CHF:'Franc',CAD:'Canadian dollar',AUD:'Australian dollar',KRW:'Won',INR:'Rupee',BRL:'Real',RUB:'Ruble'}
+  ru: {USD:'Доллар',EUR:'Евро',KZT:'Тенге',GBP:'Фунт',CNY:'Юань',JPY:'Йена',TRY:'Лира',UAH:'Гривна',AED:'Дирхам',CHF:'Франк',CAD:'Канадский',AUD:'Австралийский',KRW:'Вона',INR:'Рупия',BRL:'Реал',RUB:'Рубль'},
+  en: {USD:'Dollar',EUR:'Euro',KZT:'Tenge',GBP:'Pound',CNY:'Yuan',JPY:'Yen',TRY:'Lira',UAH:'Hryvnia',AED:'Dirham',CHF:'Franc',CAD:'Canadian',AUD:'Australian',KRW:'Won',INR:'Rupee',BRL:'Real',RUB:'Ruble'}
 };
 const FLAGS = {USD:'🇺🇸',EUR:'🇪🇺',KZT:'🇰🇿',GBP:'🇬🇧',CNY:'🇨🇳',JPY:'🇯🇵',TRY:'🇹🇷',UAH:'🇺🇦',AED:'🇦🇪',CHF:'🇨🇭',CAD:'🇨🇦',AUD:'🇦🇺',KRW:'🇰🇷',INR:'🇮🇳',BRL:'🇧🇷',RUB:'🇷🇺'};
 const CRYPTO = ['bitcoin','ethereum','the-open-network','solana','binancecoin','tether'];
@@ -227,35 +247,39 @@ const CRYPTO_NAMES = {bitcoin:'BTC',ethereum:'ETH','the-open-network':'TON',sola
 
 const T = {
   ru: {
-    title:'⚡ Валютный Радар', sub:'Курсы валют', live:'Курс в реальном времени',
-    convTitle:'💸 Конвертер', convSub:'Перевод между валютами', convBtn:'Конвертировать',
-    pfTitle:'💼 Портфель', pfSub:'Добавляй валюты — считаем в рублях', pfAdd:'Добавить', pfMy:'Мои активы', pfAddBtn:'Добавить',
-    crTitle:'💰 Крипта', crSub:'Курсы в рублях и долларах',
-    stTitle:'📊 Статистика', stSub:'Выбери период и валюту', stCur:'Валюта',
-    bTitle:'🏦 Банковские курсы', bSub:'Курсы ЦБ РФ (официальные)', bBtn:'🔄 Обновить',
-    prTitle:'👤 Профиль', prSub:'Твои данные и настройки', prUser:'👤 Пользователь', prName:'Имя', prLang:'Язык', prPf:'💼 Портфель', prShare:'📤 Поделиться ботом',
-    mTitle:'⚙️ Ещё', mAlert:'🎯 Создать алерт', mAlertBtn:'Создать алерт', mSub:'🔔 Подписаться на изменение', mSubBtn:'Подписаться',
-    mDigest:'⏰ Ежедневная сводка', mDigestBtn:'Включить сводку', mDigestOff:'Отключить',
-    mAnalytics:'📊 Аналитика в чат', mRate:'💱 Курсы в чат', mHist:'📊 История', mCmp:'⚖️ Сравнить', mCr:'💰 Крипта',
+    title:'Валютный Радар', live:'Live · автообновление',
+    dcNow:'Сейчас', dcOld:'24ч назад',
+    convTitle:'Конвертер', convSub:'Мгновенный обмен', convBtn:'Обменять',
+    pfTitle:'Портфель', pfSub:'Считаем в рублях', pfAdd:'Добавить актив', pfMy:'Активы', pfAddBtn:'Добавить',
+    crTitle:'Крипта', crSub:'₽ и $ · 24ч',
+    stTitle:'Статистика', stSub:'Мин · среднее · макс',
+    bTitle:'Банки', bSub:'ЦБ РФ и Тинькофф', bBtn:'Обновить',
+    prTitle:'Профиль', prSub:'Твои данные', prUser:'Пользователь', prName:'Имя', prLang:'Язык', prPf:'Портфель', prShare:'Поделиться ботом',
+    mTitle:'Ещё', mAuto:'Автоуведомления', mAutoLabel:'USD · EUR · KZT', mAutoHint:'Порог 1 ₽',
+    mAlert:'Алерт по курсу', mAlertBtn:'Создать',
+    mDigest:'Сводка раз в день', mDigestBtn:'Включить', mDigestOff:'Выключить',
+    mAnalytics:'В чат бота', mRate:'Курсы', mHist:'История', mCmp:'Сравнить', mCr:'Крипта',
     navRates:'Курсы', navConv:'Обмен', navCr:'Крипта', navSt:'Стата', navB:'Банки', navPr:'Профиль', navM:'Ещё',
-    min:'Мин', avg:'Среднее', max:'Макс', buy:'Покупка', sell:'Продажа',
-    updated:'Обновлено', total:'Итого', empty:'Пусто', loading:'Загрузка...', error:'⚠️ Ошибка',
+    min:'мин', avg:'сред', max:'макс', buy:'Пок', sell:'Прод',
+    updated:'Обновлено', total:'Итого', empty:'Пусто', loading:'Загрузка…', error:'Ошибка',
     greater:'Больше (>)', less:'Меньше (<)'
   },
   en: {
-    title:'⚡ Currency Radar', sub:'Exchange rates', live:'Real-time rates',
-    convTitle:'💸 Converter', convSub:'Convert between currencies', convBtn:'Convert',
-    pfTitle:'💼 Portfolio', pfSub:'Add currencies — calculate in rubles', pfAdd:'Add', pfMy:'My assets', pfAddBtn:'Add',
-    crTitle:'💰 Crypto', crSub:'Rates in rubles and dollars',
-    stTitle:'📊 Statistics', stSub:'Pick period and currency', stCur:'Currency',
-    bTitle:'🏦 Bank rates', bSub:'CBR rates (official)', bBtn:'🔄 Refresh',
-    prTitle:'👤 Profile', prSub:'Your data and settings', prUser:'👤 User', prName:'Name', prLang:'Language', prPf:'💼 Portfolio', prShare:'📤 Share bot',
-    mTitle:'⚙️ More', mAlert:'🎯 Create alert', mAlertBtn:'Create alert', mSub:'🔔 Subscribe to change', mSubBtn:'Subscribe',
-    mDigest:'⏰ Daily digest', mDigestBtn:'Enable digest', mDigestOff:'Disable',
-    mAnalytics:'📊 Analytics to chat', mRate:'💱 Rates to chat', mHist:'📊 History', mCmp:'⚖️ Compare', mCr:'💰 Crypto',
+    title:'Currency Radar', live:'Live · auto-refresh',
+    dcNow:'Now', dcOld:'24h ago',
+    convTitle:'Converter', convSub:'Instant exchange', convBtn:'Convert',
+    pfTitle:'Portfolio', pfSub:'Calculate in rubles', pfAdd:'Add asset', pfMy:'Assets', pfAddBtn:'Add',
+    crTitle:'Crypto', crSub:'₽ and $ · 24h',
+    stTitle:'Statistics', stSub:'Min · avg · max',
+    bTitle:'Banks', bSub:'CBR and Tinkoff', bBtn:'Refresh',
+    prTitle:'Profile', prSub:'Your data', prUser:'User', prName:'Name', prLang:'Language', prPf:'Portfolio', prShare:'Share bot',
+    mTitle:'More', mAuto:'Auto-notifications', mAutoLabel:'USD · EUR · KZT', mAutoHint:'Threshold 1 ₽',
+    mAlert:'Price alert', mAlertBtn:'Create',
+    mDigest:'Daily digest', mDigestBtn:'Enable', mDigestOff:'Disable',
+    mAnalytics:'To bot chat', mRate:'Rates', mHist:'History', mCmp:'Compare', mCr:'Crypto',
     navRates:'Rates', navConv:'Convert', navCr:'Crypto', navSt:'Stats', navB:'Banks', navPr:'Profile', navM:'More',
-    min:'Min', avg:'Avg', max:'Max', buy:'Buy', sell:'Sell',
-    updated:'Updated', total:'Total', empty:'Empty', loading:'Loading...', error:'⚠️ Error',
+    min:'min', avg:'avg', max:'max', buy:'Buy', sell:'Sell',
+    updated:'Updated', total:'Total', empty:'Empty', loading:'Loading…', error:'Error',
     greater:'Greater (>)', less:'Less (<)'
   }
 };
@@ -266,66 +290,39 @@ if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#0f1a2e'); tg.setBackgroun
 let LANG = localStorage.getItem('lang') || 'ru';
 let rates = {}, history = {}, selected = 'USD';
 let statsPeriod = 30;
+let autoOn = localStorage.getItem('autoOn') === 'true';
 
-// ═══ ПЕРЕВОД ═══
 function t(key) { return T[LANG][key] || key; }
 
 function applyLang() {
   document.getElementById('langBtn').textContent = LANG === 'ru' ? 'RU' : 'EN';
-  document.getElementById('t-title').textContent = t('title');
-  document.getElementById('t-sub').textContent = t('sub');
-  document.getElementById('t-live').textContent = t('live');
-  document.getElementById('t-conv-title').textContent = t('convTitle');
-  document.getElementById('t-conv-sub').textContent = t('convSub');
-  document.getElementById('t-conv-btn').textContent = t('convBtn');
-  document.getElementById('t-pf-title').textContent = t('pfTitle');
-  document.getElementById('t-pf-sub').textContent = t('pfSub');
-  document.getElementById('t-pf-add').textContent = t('pfAdd');
-  document.getElementById('t-pf-my').textContent = t('pfMy');
-  document.getElementById('t-pf-add-btn').textContent = t('pfAddBtn');
-  document.getElementById('t-cr-title').textContent = t('crTitle');
-  document.getElementById('t-cr-sub').textContent = t('crSub');
-  document.getElementById('t-st-title').textContent = t('stTitle');
-  document.getElementById('t-st-sub').textContent = t('stSub');
-  document.getElementById('t-st-cur').textContent = t('stCur');
-  document.getElementById('t-b-title').textContent = t('bTitle');
-  document.getElementById('t-b-sub').textContent = t('bSub');
-  document.getElementById('t-b-btn').textContent = t('bBtn');
-  document.getElementById('t-pr-title').textContent = t('prTitle');
-  document.getElementById('t-pr-sub').textContent = t('prSub');
-  document.getElementById('t-pr-user').textContent = t('prUser');
-  document.getElementById('t-pr-name').textContent = t('prName');
-  document.getElementById('t-pr-lang').textContent = t('prLang');
-  document.getElementById('t-pr-pf').textContent = t('prPf');
-  document.getElementById('t-pr-share').textContent = t('prShare');
-  document.getElementById('t-m-title').textContent = t('mTitle');
-  document.getElementById('t-m-alert').textContent = t('mAlert');
-  document.getElementById('t-m-alert-btn').textContent = t('mAlertBtn');
-  document.getElementById('t-m-sub').textContent = t('mSub');
-  document.getElementById('t-m-sub-btn').textContent = t('mSubBtn');
-  document.getElementById('t-m-digest').textContent = t('mDigest');
-  document.getElementById('t-m-digest-btn').textContent = t('mDigestBtn');
-  document.getElementById('t-m-digest-off').textContent = t('mDigestOff');
-  document.getElementById('t-m-analytics').textContent = t('mAnalytics');
-  document.getElementById('t-m-rate').textContent = t('mRate');
-  document.getElementById('t-m-hist').textContent = t('mHist');
-  document.getElementById('t-m-cmp').textContent = t('mCmp');
-  document.getElementById('t-m-cr').textContent = t('mCr');
-  document.getElementById('t-nav-rates').textContent = t('navRates');
-  document.getElementById('t-nav-conv').textContent = t('navConv');
-  document.getElementById('t-nav-cr').textContent = t('navCr');
-  document.getElementById('t-nav-st').textContent = t('navSt');
-  document.getElementById('t-nav-b').textContent = t('navB');
-  document.getElementById('t-nav-pr').textContent = t('navPr');
-  document.getElementById('t-nav-m').textContent = t('navM');
-  // Опции направлений
+  const map = {
+    title:'title', live:'live', dcNow:'dcNow', dcOld:'dcOld',
+    convTitle:'convTitle', convSub:'convSub', convBtn:'convBtn',
+    pfTitle:'pfTitle', pfSub:'pfSub', pfAdd:'pfAdd', pfMy:'pfMy', pfAddBtn:'pfAddBtn',
+    crTitle:'crTitle', crSub:'crSub', stTitle:'stTitle', stSub:'stSub',
+    bTitle:'bTitle', bSub:'bSub', bBtn:'bBtn',
+    prTitle:'prTitle', prSub:'prSub', prUser:'prUser', prName:'prName', prLang:'prLang',
+    prPf:'prPf', prShare:'prShare',
+    mTitle:'mTitle', mAuto:'mAuto', mAutoLabel:'mAutoLabel', mAutoHint:'mAutoHint',
+    mAlert:'mAlert', mAlertBtn:'mAlertBtn', mDigest:'mDigest', mDigestBtn:'mDigestBtn',
+    mDigestOff:'mDigestOff', mAnalytics:'mAnalytics', mRate:'mRate', mHist:'mHist',
+    mCmp:'mCmp', mCr:'mCr'
+  };
+  Object.keys(map).forEach(id => {
+    const el = document.getElementById('t-' + id);
+    if (el) el.textContent = t(map[id]);
+  });
+  ['rates','conv','cr','st','b','pr','m'].forEach(k => {
+    const el = document.getElementById('t-nav-' + k);
+    if (el) el.textContent = t('nav' + k.charAt(0).toUpperCase() + k.slice(1));
+  });
   const dir = document.getElementById('alert-direction');
   dir.options[0].textContent = t('greater');
   dir.options[1].textContent = t('less');
-  // Перерисовать
+  const tgEl = document.getElementById('autoToggle');
+  if (tgEl) tgEl.classList.toggle('on', autoOn);
   if (Object.keys(rates).length) { renderRates(); renderPortfolio(); }
-  // Отправить в бот
-  sendCmdSilent(`/lang ${LANG}`);
 }
 
 function toggleLang() {
@@ -335,7 +332,14 @@ function toggleLang() {
   toast(LANG === 'ru' ? '🇷🇺 Русский' : '🇬🇧 English');
 }
 
-// ═══ НАВИГАЦИЯ ═══
+function toggleAuto() {
+  autoOn = !autoOn;
+  localStorage.setItem('autoOn', autoOn);
+  document.getElementById('autoToggle').classList.toggle('on', autoOn);
+  sendCmdSilent(autoOn ? '/autosub on' : '/autosub off');
+  toast(autoOn ? (LANG === 'ru' ? 'Уведомления вкл' : 'Notifications ON') : (LANG === 'ru' ? 'Уведомления выкл' : 'Notifications OFF'));
+}
+
 function nav(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
@@ -349,7 +353,6 @@ function nav(id, btn) {
   if (id === 'convert') convertPair();
 }
 
-// ═══ КУРСЫ ═══
 async function load() {
   document.getElementById('list').innerHTML = `<div class="loading">${t('loading')}</div>`;
   try {
@@ -365,7 +368,7 @@ async function load() {
       }
     });
     renderRates(); drawChart();
-    document.getElementById('upd').textContent = t('updated') + ': ' + new Date().toLocaleTimeString();
+    document.getElementById('upd').textContent = t('updated') + ' ' + new Date().toLocaleTimeString();
   } catch(e) {
     document.getElementById('list').innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
   }
@@ -375,8 +378,8 @@ function renderRates() {
   const html = Object.keys(rates).map(c => {
     const rate = rates[c], oldRate = history[c];
     const diff = rate - oldRate, pct = (diff / oldRate) * 100;
-    let cls = 'flat', arrow = '➖';
-    if (diff > 0.01) { cls = 'up'; arrow = '📈'; } else if (diff < -0.01) { cls = 'down'; arrow = '📉'; }
+    let cls = 'flat', arrow = '·';
+    if (diff > 0.01) { cls = 'up'; arrow = '▲'; } else if (diff < -0.01) { cls = 'down'; arrow = '▼'; }
     return `<div class="card ${c === selected ? 'sel' : ''}" onclick="selectCur('${c}')">
       <button class="share-btn" onclick="event.stopPropagation();shareRate('${c}')">📤</button>
       <div class="code">${FLAGS[c] || ''} ${c}</div><div class="name">${NAMES[LANG][c] || c}</div>
@@ -402,6 +405,22 @@ async function drawChart() {
     } catch(e) {}
   }
   paintChart('chart', values, selected);
+
+  // Блок «Сейчас / 24ч назад»
+  if (values.length >= 2) {
+    const now = values[values.length - 1];
+    const old = values[values.length - 2];
+    const diff = now - old;
+    const pct = (diff / old) * 100;
+    let arrow = '·', color = 'var(--muted)';
+    if (diff > 0.01) { arrow = '▲'; color = 'var(--green)'; }
+    else if (diff < -0.01) { arrow = '▼'; color = 'var(--red)'; }
+    document.getElementById('dc-now').textContent = now.toFixed(2) + ' ₽';
+    document.getElementById('dc-old').textContent = old.toFixed(2) + ' ₽';
+    const dc = document.getElementById('dc-diff');
+    dc.textContent = `${arrow} ${diff >= 0 ? '+' : ''}${diff.toFixed(2)} ₽ (${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%)`;
+    dc.style.color = color;
+  }
 }
 
 function paintChart(canvasId, values, label) {
@@ -409,13 +428,13 @@ function paintChart(canvasId, values, label) {
   if (!canvas || !values.length) return;
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
-  const w = canvas.clientWidth - 16, h = canvas.clientHeight - 16;
+  const w = canvas.clientWidth - 12, h = canvas.clientHeight - 12;
   canvas.width = w * dpr; canvas.height = h * dpr;
   ctx.setTransform(1,0,0,1,0,0); ctx.scale(dpr, dpr);
   ctx.clearRect(0, 0, w, h);
   const isLight = document.body.classList.contains('light');
   const min = Math.min(...values), max = Math.max(...values), range = max - min || 1;
-  const pad = 10, stepX = (w - pad * 2) / (values.length - 1 || 1);
+  const pad = 8, stepX = (w - pad * 2) / (values.length - 1 || 1);
   ctx.strokeStyle = '#2E86DE'; ctx.lineWidth = 2;
   ctx.beginPath();
   values.forEach((v, i) => {
@@ -427,14 +446,13 @@ function paintChart(canvasId, values, label) {
   ctx.fillStyle = 'rgba(46,134,222,0.15)';
   ctx.lineTo(w - pad, h - pad); ctx.lineTo(pad, h - pad); ctx.closePath(); ctx.fill();
   ctx.fillStyle = isLight ? '#1a2332' : '#e6ecf5';
-  ctx.font = 'bold 12px sans-serif';
-  ctx.fillText(`${label}: ${values[values.length-1].toFixed(2)} ₽`, 8, 16);
+  ctx.font = 'bold 11px sans-serif';
+  ctx.fillText(`${label}  ${values[values.length-1].toFixed(2)} ₽`, 6, 14);
   const rmin = document.getElementById('rmin'), rmax = document.getElementById('rmax');
   if (rmin) rmin.textContent = '↓ ' + min.toFixed(2);
   if (rmax) rmax.textContent = '↑ ' + max.toFixed(2);
 }
 
-// ═══ КОНВЕРТЕР (исправлен: добавлен RUB) ═══
 function swapCur() {
   const f = document.getElementById('cv-from');
   const to = document.getElementById('cv-to');
@@ -449,31 +467,18 @@ async function convertPair() {
   const res = document.getElementById('cv-result');
   if (!amount && amount !== 0) { res.textContent = '—'; return; }
   if (from === to) { res.textContent = `${amount} ${from} = ${amount} ${to}`; return; }
-  res.textContent = '...';
+  res.textContent = '…';
   try {
-    // Конвертируем через RUB как базу
     const data = await fetch(`https://latest.currency-api.pages.dev/v1/currencies/rub.json`).then(r => r.json());
     const rub = data.rub;
-    // Курс: сколько X за 1 RUB
     let result;
-    if (from === 'RUB') {
-      // RUB → to: сумма * (сколько to за 1 RUB)
-      result = amount * rub[to.toLowerCase()];
-    } else if (to === 'RUB') {
-      // from → RUB: сумма / (сколько from за 1 RUB)
-      result = amount / rub[from.toLowerCase()];
-    } else {
-      // from → to: сначала from в RUB, потом RUB в to
-      const rubAmount = amount / rub[from.toLowerCase()];
-      result = rubAmount * rub[to.toLowerCase()];
-    }
+    if (from === 'RUB') result = amount * rub[to.toLowerCase()];
+    else if (to === 'RUB') result = amount / rub[from.toLowerCase()];
+    else result = (amount / rub[from.toLowerCase()]) * rub[to.toLowerCase()];
     res.textContent = `${amount} ${from} = ${result.toFixed(4)} ${to}`;
-  } catch(e) {
-    res.textContent = t('error');
-  }
+  } catch(e) { res.textContent = t('error'); }
 }
 
-// ═══ ПОРТФЕЛЬ ═══
 function getPortfolio() { try { return JSON.parse(localStorage.getItem('pf') || '{}'); } catch(e) { return {}; } }
 function savePortfolio(p) { localStorage.setItem('pf', JSON.stringify(p)); }
 
@@ -507,7 +512,6 @@ function renderPortfolio() {
   totalEl.textContent = t('total') + ': ' + total.toFixed(2) + ' ₽';
 }
 
-// ═══ КРИПТА ═══
 async function loadCrypto() {
   document.getElementById('crypto-list').innerHTML = `<div class="loading">${t('loading')}</div>`;
   try {
@@ -518,11 +522,11 @@ async function loadCrypto() {
       if (!d) return '';
       const change = d.rub_24h_change || 0;
       const cls = change > 0 ? 'up' : (change < 0 ? 'down' : 'flat');
-      const arrow = change > 0 ? '📈' : (change < 0 ? '📉' : '➖');
+      const arrow = change > 0 ? '▲' : (change < 0 ? '▼' : '·');
       return `<div class="card"><div class="code">${CRYPTO_NAMES[id]}</div>
         <div class="name">${id}</div>
         <div class="rate">${d.rub.toLocaleString(LANG)} ₽</div>
-        <div class="trend ${cls}">${arrow} ${change.toFixed(2)}% / ${d.usd}$</div></div>`;
+        <div class="trend ${cls}">${arrow} ${change.toFixed(2)}% · $${d.usd}</div></div>`;
     }).join('');
     document.getElementById('crypto-list').innerHTML = `<div class="grid">${html}</div>`;
   } catch(e) {
@@ -530,7 +534,6 @@ async function loadCrypto() {
   }
 }
 
-// ═══ СТАТИСТИКА ═══
 function setPeriod(days, btn) {
   statsPeriod = days;
   document.querySelectorAll('#period-btns button').forEach(b => b.classList.remove('active'));
@@ -555,37 +558,30 @@ async function loadStats() {
   const min = Math.min(...values), max = Math.max(...values);
   const avg = values.reduce((a,b) => a+b, 0) / values.length;
   document.getElementById('stats-grid').innerHTML = `
-    <div class="stat-item"><div class="lbl">${t('min')}</div><div class="val down">${min.toFixed(2)} ₽</div></div>
-    <div class="stat-item"><div class="lbl">${t('avg')}</div><div class="val">${avg.toFixed(2)} ₽</div></div>
-    <div class="stat-item"><div class="lbl">${t('max')}</div><div class="val up">${max.toFixed(2)} ₽</div></div>`;
+    <div class="stat-item"><div class="lbl">${t('min')}</div><div class="val down">${min.toFixed(2)}</div></div>
+    <div class="stat-item"><div class="lbl">${t('avg')}</div><div class="val">${avg.toFixed(2)}</div></div>
+    <div class="stat-item"><div class="lbl">${t('max')}</div><div class="val up">${max.toFixed(2)}</div></div>`;
   paintChart('stats-chart', values, code);
 }
 
-// ═══ БАНКИ (через ЦБ РФ — работает без CORS) ═══
 async function loadBanks() {
   const el = document.getElementById('banks-list');
   el.innerHTML = `<div class="loading">${t('loading')}</div>`;
   try {
     const xml = await fetch('https://www.cbr-xml-daily.ru/daily_json.js').then(r => r.json());
     const valutes = xml.Valute;
-    const banksData = [
-      { name: '🇷🇺 ЦБ РФ', source: 'cbr' },
-    ];
-    // Показываем ЦБ РФ (курс покупки/продажи нет, но есть официальный)
-    let html = '<div class="section"><h3>🇷🇺 ЦБ РФ — официальный</h3>';
-    ['USD', 'EUR', 'CNY', 'GBP', 'JPY'].forEach(code => {
+    let html = '<div class="section"><h3>🇷🇺 ЦБ РФ</h3>';
+    ['USD','EUR','CNY','GBP','JPY'].forEach(code => {
       const v = valutes[code];
       if (!v) return;
-      const rate = (v.Value / v.Nominal).toFixed(4);
+      const rate = (v.Value / v.Nominal).toFixed(3);
       html += `<div class="row"><span>${FLAGS[code]} ${code}</span><span class="badge buy">${rate} ₽</span></div>`;
     });
     html += '</div>';
-
-    // Попробуем загрузить Тинькофф через CORS-прокси
     try {
       const tink = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.tinkoff.ru/v1/currency_rates?from=USD&to=RUB')).then(r => r.json());
       if (tink?.payload?.rates?.length) {
-        html += '<div class="section"><h3>🟡 Тинькофф (обмен валют)</h3>';
+        html += '<div class="section"><h3>🟡 Тинькофф</h3>';
         const seen = new Set();
         tink.payload.rates.forEach(r => {
           const code = r.fromCurrency?.code;
@@ -594,19 +590,17 @@ async function loadBanks() {
           const buy = r.buy ? r.buy.toFixed(2) + ' ₽' : '—';
           const sell = r.sell ? r.sell.toFixed(2) + ' ₽' : '—';
           html += `<div class="row"><span>${FLAGS[code] || ''} ${code}</span>
-            <span><span class="badge buy">${t('buy')}: ${buy}</span> <span class="badge sell">${t('sell')}: ${sell}</span></span></div>`;
+            <span><span class="badge buy">${t('buy')} ${buy}</span> <span class="badge sell">${t('sell')} ${sell}</span></span></div>`;
         });
         html += '</div>';
       }
-    } catch(e) { console.log('Tinkoff unavailable:', e); }
-
+    } catch(e) {}
     el.innerHTML = html;
   } catch(e) {
     el.innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
   }
 }
 
-// ═══ ПРОФИЛЬ ═══
 function loadProfile() {
   const user = tg?.initDataUnsafe?.user;
   document.getElementById('prof-name').textContent = user ? (user.first_name + ' ' + (user.last_name || '')) : '—';
@@ -627,7 +621,6 @@ function loadProfile() {
   }
 }
 
-// ═══ АЛЕРТЫ / ПОДПИСКИ ═══
 function createAlert() {
   const code = document.getElementById('alert-code').value;
   const dir = document.getElementById('alert-direction').value;
@@ -635,37 +628,30 @@ function createAlert() {
   if (!target) { toast('⚠️'); return; }
   sendCmd(`/alert ${code} ${dir} ${target}`);
 }
-function createSub() {
-  const code = document.getElementById('sub-code').value;
-  const thr = parseFloat(document.getElementById('sub-threshold').value);
-  if (!thr) { toast('⚠️'); return; }
-  sendCmd(`/subscribe ${code} ${thr}`);
-}
 function setDigest() {
   const time = document.getElementById('digest-time').value;
   sendCmd(`/digest ${time}`);
 }
 
-// ═══ ПОДЕЛИТЬСЯ ═══
 function shareRate(code) {
   const rate = rates[code];
   if (!rate) return;
-  const text = `💱 ${code} = ${rate.toFixed(2)} ₽ | Валютный Радар`;
+  const text = `💱 ${code} = ${rate.toFixed(2)} ₽ · Валютный Радар`;
   const url = `https://t.me/share/url?url=${encodeURIComponent('https://t.me')}&text=${encodeURIComponent(text)}`;
   if (tg) tg.openTelegramLink(url); else window.open(url, '_blank');
 }
 function shareApp() {
-  const text = '⚡ Валютный Радар — слежу за курсами валют в реальном времени!';
+  const text = '⚡ Валютный Радар — курсы валют в реальном времени';
   const url = `https://t.me/share/url?url=${encodeURIComponent('https://t.me')}&text=${encodeURIComponent(text)}`;
   if (tg) tg.openTelegramLink(url); else window.open(url, '_blank');
 }
 
-// ═══ КОМАНДЫ БОТУ ═══
 function sendCmd(cmd) {
   if (tg) { tg.sendData(JSON.stringify({cmd})); tg.close(); }
   else toast(cmd);
 }
-function sendCmdSilent(cmd) { /* для будущего — сейчас заглушка */ }
+
+function sendCmdSilent(cmd) { /* заглушка */ }
 function showHint(cmd) { tg?.showAlert(cmd); }
 
 function toast(msg) {
@@ -675,7 +661,6 @@ function toast(msg) {
   setTimeout(() => el.classList.remove('show'), 2000);
 }
 
-// ═══ ТЕМА ═══
 if (localStorage.getItem('theme') === 'light') { document.body.classList.add('light'); document.getElementById('themeBtn').textContent = '☀️'; }
 function toggleTheme() {
   document.body.classList.toggle('light');
@@ -686,13 +671,10 @@ function toggleTheme() {
   if (Object.keys(rates).length) drawChart();
 }
 
-// ═══ АВТООБНОВЛЕНИЕ ═══
 setInterval(() => { if (document.getElementById('page-rates').classList.contains('active')) load(); }, 60000);
 
-// ═══ ИНИЦИАЛИЗАЦИЯ ═══
 function fillSelects() {
-  // Основные селекты — без RUB
-  ['pf-code', 'stats-code', 'alert-code', 'sub-code'].forEach(id => {
+  ['pf-code', 'stats-code', 'alert-code'].forEach(id => {
     const sel = document.getElementById(id);
     if (!sel) return;
     CURRENCIES.forEach(c => {
@@ -701,7 +683,6 @@ function fillSelects() {
       sel.appendChild(o);
     });
   });
-  // Конвертер — с RUB
   ['cv-from', 'cv-to'].forEach(id => {
     const sel = document.getElementById(id);
     if (!sel) return;
@@ -714,7 +695,6 @@ function fillSelects() {
   document.getElementById('cv-from').value = 'USD';
   document.getElementById('cv-to').value = 'RUB';
   document.getElementById('alert-code').value = 'USD';
-  document.getElementById('sub-code').value = 'USD';
 }
 
 fillSelects();
