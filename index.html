@@ -14,9 +14,23 @@
   * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
   html, body { overscroll-behavior: none; overscroll-behavior-y: none; }
   body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; padding:14px 14px 86px; min-height:100vh; transition:color .3s; overflow-x:hidden; }
-  /* ═══ ФИКС: все переводящиеся элементы всегда видимого цвета ═══ */
-  [id^="t-"], .page h1, .section h3, .sub, .dc-label, .dc-value { color: var(--text); }
-  .sub, .muted { color: var(--muted) !important; }
+
+  /* ═══ FORCE COLORS: всё видно при любой смене языка ═══ */
+  body, body * { color: var(--text); }
+  .muted, .sub, .updated, .range, .zoom-hint, .dc-label, .stat-item .lbl,
+  .card .name, .card .usd, .empty-state, .notif-item .time, .loading { color: var(--muted) !important; }
+  .up, .badge.buy, .total, .conv-result { color: var(--green) !important; }
+  .down, .badge.sell { color: var(--red) !important; }
+  .flat { color: var(--muted) !important; }
+  option, optgroup { background: var(--card) !important; color: var(--text) !important; }
+  select, input, textarea { color: var(--text) !important; background: var(--bg) !important; }
+  .modal-inner, .modal-inner * { color: var(--text); }
+  .banner, .banner * { color: var(--text); }
+  .btn { color: white !important; }
+  .btn.sec { color: var(--text) !important; }
+  .nav button { color: var(--muted); }
+  .nav button.active { color: var(--accent); }
+
   h1 { font-size:19px; margin-bottom:2px; text-align:center; font-weight:800; letter-spacing:-.3px; }
   .sub { text-align:center; font-size:11px; color:var(--muted); margin-bottom:4px; }
   .live { text-align:center; font-size:11px; color:var(--green); margin-bottom:14px; display:flex; align-items:center; justify-content:center; gap:5px; font-weight:600; }
@@ -580,7 +594,6 @@ const T = {
 
 Object.keys(T).forEach(lang => { T[lang] = {...T.ru, ...T[lang]}; });
 
-// ═══ ФИКС: отключаем вертикальные свайпы Telegram (pull-to-close) ═══
 const tg = window.Telegram?.WebApp;
 if (tg) {
   tg.ready();
