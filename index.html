@@ -24,7 +24,7 @@
   .card.sel { outline:2px solid var(--accent); }
   .card .code { font-weight:700; font-size:15px; display:flex; align-items:center; gap:4px; }
   .card .name { font-size:11px; color:var(--muted); margin:1px 0 8px; }
-  .card .rate { font-size:19px; font-weight:800; letter-spacing:-.3px; }
+  .card .rate { font-size:19px; font-weight:800; letter-spacing:-.3px; transition:color .3s; }
   .card .usd { font-size:12px; font-weight:600; color:var(--muted); margin-top:2px; }
   .card .trend { font-size:12px; margin-top:5px; font-weight:600; }
   .up { color:var(--green); } .down { color:var(--red); } .flat { color:var(--muted); }
@@ -59,8 +59,10 @@
   .theme-btn { position:absolute; top:12px; right:12px; background:var(--card); border:1px solid var(--border); border-radius:9px; padding:6px 10px; color:var(--text); cursor:pointer; font-size:14px; z-index:5; }
   .lang-btn { position:absolute; top:12px; left:12px; background:var(--card); border:1px solid var(--border); border-radius:9px; padding:6px 10px; color:var(--text); cursor:pointer; font-size:11px; font-weight:800; letter-spacing:.5px; z-index:5; }
   .range { display:flex; justify-content:space-between; font-size:10px; color:var(--muted); margin-bottom:3px; padding:0 4px; }
-  .share-btn { position:absolute; top:8px; right:8px; background:none; border:none; font-size:13px; cursor:pointer; opacity:.5; padding:4px; }
-  .fav-btn { position:absolute; top:8px; left:8px; background:none; border:none; font-size:14px; cursor:pointer; padding:4px; }
+  .card-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:2px; }
+  .card-actions { display:flex; gap:2px; }
+  .icon-btn { background:none; border:none; font-size:14px; cursor:pointer; padding:2px; opacity:.6; line-height:1; }
+  .icon-btn:active { opacity:1; }
   .badge { display:inline-block; padding:2px 8px; border-radius:7px; font-size:11px; font-weight:700; }
   .badge.buy { background:rgba(0,217,163,.15); color:var(--green); }
   .badge.sell { background:rgba(255,84,112,.15); color:var(--red); }
@@ -87,6 +89,10 @@
   .tabs-mini button { flex-shrink:0; padding:7px 12px; background:var(--card); border:1px solid var(--border); border-radius:9px; color:var(--text); font-size:12px; cursor:pointer; font-weight:600; }
   .tabs-mini button.active { background:var(--accent); color:white; border-color:var(--accent); }
   .zoom-hint { text-align:center; font-size:10px; color:var(--muted); margin-top:4px; }
+  .rate-flash-up { animation: flashUp .7s ease; }
+  .rate-flash-down { animation: flashDown .7s ease; }
+  @keyframes flashUp { 0%{box-shadow:0 0 0 2px var(--green) inset;} 100%{box-shadow:0 0 0 2px transparent inset;} }
+  @keyframes flashDown { 0%{box-shadow:0 0 0 2px var(--red) inset;} 100%{box-shadow:0 0 0 2px transparent inset;} }
 </style>
 </head>
 <body>
@@ -274,12 +280,12 @@ const CRYPTO = ['bitcoin','ethereum','the-open-network','solana','binancecoin','
 const CRYPTO_NAMES = {bitcoin:'BTC',ethereum:'ETH','the-open-network':'TON',solana:'SOL',binancecoin:'BNB',tether:'USDT'};
 
 const NAMES = {
-  ru:{USD:'Доллар',EUR:'Евро',KZT:'Тенге',GBP:'Фунт',CNY:'Юань',JPY:'Йена',TRY:'Лира',UAH:'Гривна',AED:'Дирхам',CHF:'Франк',CAD:'Канадский',AUD:'Австралийский',KRW:'Вона',INR:'Рупия',BRL:'Реал',RUB:'Рубль',BTC:'Биткоин',ETH:'Эфириум',TON:'Тонкоин',SOL:'Солана',BNB:'BNB',USDT:'Тевер'},
-  en:{USD:'Dollar',EUR:'Euro',KZT:'Tenge',GBP:'Pound',CNY:'Yuan',JPY:'Yen',TRY:'Lira',UAH:'Hryvnia',AED:'Dirham',CHF:'Franc',CAD:'Canadian',AUD:'Australian',KRW:'Won',INR:'Rupee',BRL:'Real',RUB:'Ruble',BTC:'Bitcoin',ETH:'Ethereum',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'},
-  de:{USD:'Dollar',EUR:'Euro',KZT:'Tenge',GBP:'Pfund',CNY:'Yuan',JPY:'Yen',TRY:'Lira',UAH:'Hrywnja',AED:'Dirham',CHF:'Franken',CAD:'Kanadischer',AUD:'Australischer',KRW:'Won',INR:'Rupie',BRL:'Real',RUB:'Rubel',BTC:'Bitcoin',ETH:'Ethereum',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'},
-  fr:{USD:'Dollar',EUR:'Euro',KZT:'Tenge',GBP:'Livre',CNY:'Yuan',JPY:'Yen',TRY:'Lire',UAH:'Hryvnia',AED:'Dirham',CHF:'Franc',CAD:'Canadien',AUD:'Australien',KRW:'Won',INR:'Roupie',BRL:'Réal',RUB:'Rouble',BTC:'Bitcoin',ETH:'Ethereum',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'},
-  es:{USD:'Dólar',EUR:'Euro',KZT:'Tenge',GBP:'Libra',CNY:'Yuan',JPY:'Yen',TRY:'Lira',UAH:'Grivna',AED:'Dírham',CHF:'Franco',CAD:'Canadiense',AUD:'Australiano',KRW:'Won',INR:'Rupia',BRL:'Real',RUB:'Rublo',BTC:'Bitcoin',ETH:'Ethereum',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'},
-  tr:{USD:'Dolar',EUR:'Euro',KZT:'Tenge',GBP:'Sterlin',CNY:'Yuan',JPY:'Yen',TRY:'Lira',UAH:'Grivna',AED:'Dirhem',CHF:'Frank',CAD:'Kanada',AUD:'Avustralya',KRW:'Won',INR:'Rupi',BRL:'Real',RUB:'Ruble',BTC:'Bitcoin',ETH:'Ethereum',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'}
+  ru:{USD:'Доллар',EUR:'Евро',KZT:'Тенге',GBP:'Фунт',CNY:'Юань',JPY:'Йена',TRY:'Лира',UAH:'Гривна',AED:'Дирхам',CHF:'Франк',CAD:'Канадский доллар',AUD:'Австралийский доллар',KRW:'Вона',INR:'Рупия',BRL:'Реал',RUB:'Рубль',BTC:'Биткоин',ETH:'Эфириум',TON:'Тонкоин',SOL:'Солана',BNB:'BNB',USDT:'Тевер'},
+  en:{USD:'Dollar',EUR:'Euro',KZT:'Tenge',GBP:'Pound',CNY:'Yuan',JPY:'Yen',TRY:'Lira',UAH:'Hryvnia',AED:'Dirham',CHF:'Franc',CAD:'Canadian Dollar',AUD:'Australian Dollar',KRW:'Won',INR:'Rupee',BRL:'Real',RUB:'Ruble',BTC:'Bitcoin',ETH:'Ethereum',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'},
+  de:{USD:'Dollar',EUR:'Euro',KZT:'Tenge',GBP:'Pfund',CNY:'Yuan',JPY:'Yen',TRY:'Lira',UAH:'Hrywnja',AED:'Dirham',CHF:'Franken',CAD:'Kanadischer Dollar',AUD:'Australischer Dollar',KRW:'Won',INR:'Rupie',BRL:'Real',RUB:'Rubel',BTC:'Bitcoin',ETH:'Ethereum',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'},
+  fr:{USD:'Dollar',EUR:'Euro',KZT:'Tenge',GBP:'Livre',CNY:'Yuan',JPY:'Yen',TRY:'Lire',UAH:'Hryvnia',AED:'Dirham',CHF:'Franc',CAD:'Dollar canadien',AUD:'Dollar australien',KRW:'Won',INR:'Roupie',BRL:'Réal',RUB:'Rouble',BTC:'Bitcoin',ETH:'Ethereum',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'},
+  es:{USD:'Dólar',EUR:'Euro',KZT:'Tenge',GBP:'Libra',CNY:'Yuan',JPY:'Yen',TRY:'Lira',UAH:'Grivna',AED:'Dírham',CHF:'Franco',CAD:'Dólar canadiense',AUD:'Dólar australiano',KRW:'Won',INR:'Rupia',BRL:'Real',RUB:'Rublo',BTC:'Bitcoin',ETH:'Ethereum',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'},
+  tr:{USD:'Dolar',EUR:'Euro',KZT:'Tenge',GBP:'Sterlin',CNY:'Yuan',JPY:'Yen',TRY:'Lira',UAH:'Grivna',AED:'Dirhem',CHF:'Frank',CAD:'Kanada Doları',AUD:'Avustralya Doları',KRW:'Won',INR:'Rupi',BRL:'Real',RUB:'Ruble',BTC:'Bitcoin',ETH:'Ethereum',TON:'Toncoin',SOL:'Solana',BNB:'BNB',USDT:'Tether'}
 };
 
 const FLAGS = {USD:'🇺🇸',EUR:'🇪🇺',KZT:'🇰🇿',GBP:'🇬🇧',CNY:'🇨🇳',JPY:'🇯🇵',TRY:'🇹🇷',UAH:'🇺🇦',AED:'🇦🇪',CHF:'🇨🇭',CAD:'🇨🇦',AUD:'🇦🇺',KRW:'🇰🇷',INR:'🇮🇳',BRL:'🇧🇷',RUB:'🇷🇺',BTC:'₿',ETH:'Ξ',TON:'💎',SOL:'◎',BNB:'🟡',USDT:'💵'};
@@ -450,6 +456,7 @@ let statsPeriod = 30, autoOn = localStorage.getItem('autoOn') === 'true';
 let ratesChart = null, statsChart = null;
 let lastRatesSnapshot = {};
 let cryptoCache = {};
+let prevRates = {}; // для плавной анимации
 let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
 let cbrRate = null;
 
@@ -500,7 +507,6 @@ function applyLang() {
   fillSelects();
   if (Object.keys(rates).length) { renderRates(); renderPortfolio(); }
   if (document.getElementById('page-profile').classList.contains('active')) loadProfile();
-  // Перерисовываем металлы, если открыты
   if (document.getElementById('page-metals').classList.contains('active')) loadMetals();
 }
 
@@ -589,6 +595,21 @@ function nav(id, btn) {
   if (id === 'convert') convertPair();
 }
 
+// ═══ ПЛАВНАЯ АНИМАЦИЯ ЧИСЕЛ ═══
+function animateValue(el, from, to, duration = 700, decimals = 2) {
+  if (!el) return;
+  const start = performance.now();
+  const diff = to - from;
+  function step(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+    const current = from + diff * eased;
+    el.textContent = current.toFixed(decimals) + ' ₽';
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
 async function load() {
   const list = document.getElementById('list');
   if (!Object.keys(rates).length) list.innerHTML = '<div class="skeleton"></div>'.repeat(4);
@@ -628,37 +649,80 @@ function notify(title, body) {
   else toast(title + ': ' + body);
 }
 
-function toggleFav(code, e) {
-  if (e) e.stopPropagation();
+function toggleFav(code) {
   const i = favorites.indexOf(code);
   if (i === -1) favorites.push(code); else favorites.splice(i, 1);
   localStorage.setItem('favorites', JSON.stringify(favorites));
   renderRates();
 }
 
+// ═══ РЕНДЕР С ПЛАВНОЙ АНИМАЦИЕЙ ═══
 function renderRates() {
   const sorted = [...CURRENCIES].sort((a, b) => {
     const fa = favorites.includes(a) ? 0 : 1;
     const fb = favorites.includes(b) ? 0 : 1;
     return fa - fb;
   });
-  const html = sorted.map(c => {
-    const rate = rates[c]; if (!rate) return '';
-    const oldRate = history[c];
-    const diff = rate - oldRate, pct = (diff / oldRate) * 100;
+  const list = document.getElementById('list');
+  const isFirstRender = !list.querySelector('.card');
+
+  if (isFirstRender) {
+    const html = sorted.map(c => {
+      const rate = rates[c]; if (!rate) return '';
+      const oldRate = history[c];
+      const diff = rate - oldRate, pct = (diff / oldRate) * 100;
+      let cls = 'flat', arrow = '·';
+      if (diff > 0.01) { cls = 'up'; arrow = '▲'; } else if (diff < -0.01) { cls = 'down'; arrow = '▼'; }
+      const isFav = favorites.includes(c);
+      return `<div class="card ${c === selected ? 'sel' : ''}" data-code="${c}" onclick="selectCur('${c}')">
+        <div class="card-top">
+          <div class="code">${FLAGS[c] || ''} ${c}</div>
+          <div class="card-actions">
+            <button class="icon-btn" onclick="event.stopPropagation();toggleFav('${c}')">${isFav ? '📌' : '☆'}</button>
+            <button class="icon-btn" onclick="event.stopPropagation();shareRate('${c}')">📤</button>
+          </div>
+        </div>
+        <div class="name">${NAMES[LANG]?.[c] || c}</div>
+        <div class="rate" data-rate="${c}">${rate.toFixed(2)} ₽</div>
+        <div class="trend ${cls}" data-trend="${c}">${arrow} ${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</div>
+      </div>`;
+    }).join('');
+    list.innerHTML = `<div class="grid">${html}</div>`;
+    prevRates = {...rates};
+    return;
+  }
+
+  // Обновление — плавная анимация цифр
+  sorted.forEach(c => {
+    const rate = rates[c]; if (!rate) return;
+    const rateEl = list.querySelector(`[data-rate="${c}"]`);
+    const trendEl = list.querySelector(`[data-trend="${c}"]`);
+    const oldRate = prevRates[c] || rate;
+
+    animateValue(rateEl, oldRate, rate, 700, 2);
+
+    if (Math.abs(rate - oldRate) > 0.001) {
+      const card = list.querySelector(`[data-code="${c}"]`);
+      if (card) {
+        const flashClass = rate > oldRate ? 'rate-flash-up' : 'rate-flash-down';
+        card.classList.remove('rate-flash-up', 'rate-flash-down');
+        void card.offsetWidth;
+        card.classList.add(flashClass);
+        setTimeout(() => card.classList.remove(flashClass), 700);
+      }
+    }
+
+    const oldTrend = history[c];
+    const diff = rate - oldTrend, pct = (diff / oldTrend) * 100;
     let cls = 'flat', arrow = '·';
     if (diff > 0.01) { cls = 'up'; arrow = '▲'; } else if (diff < -0.01) { cls = 'down'; arrow = '▼'; }
-    const isFav = favorites.includes(c);
-    return `<div class="card ${c === selected ? 'sel' : ''}" onclick="selectCur('${c}')">
-      <button class="fav-btn" onclick="toggleFav('${c}', event)">${isFav ? '📌' : '☆'}</button>
-      <button class="share-btn" onclick="event.stopPropagation();shareRate('${c}')">📤</button>
-      <div class="code">${FLAGS[c] || ''} ${c}</div>
-      <div class="name">${NAMES[LANG]?.[c] || c}</div>
-      <div class="rate">${rate.toFixed(2)} ₽</div>
-      <div class="trend ${cls}">${arrow} ${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</div>
-    </div>`;
-  }).join('');
-  document.getElementById('list').innerHTML = `<div class="grid">${html}</div>`;
+    if (trendEl) {
+      trendEl.className = 'trend ' + cls;
+      trendEl.textContent = `${arrow} ${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
+    }
+  });
+
+  prevRates = {...rates};
 }
 
 function selectCur(c) { selected = c; renderRates(); drawChart(); }
@@ -727,24 +791,50 @@ async function convertPair() {
   } catch(e) { res.textContent = t('error'); }
 }
 
+// ═══ КРИПТА С ПЛАВНОЙ АНИМАЦИЕЙ ═══
+let prevCrypto = {};
+
 async function loadCrypto() {
   document.getElementById('crypto-list').innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
   try {
     const data = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${CRYPTO.join(',')}&vs_currencies=rub,usd&include_24hr_change=true`).then(r => r.json());
     cryptoCache = {};
     CRYPTO.forEach(id => { if (data[id]) cryptoCache[CRYPTO_NAMES[id]] = data[id]; });
+
     const html = CRYPTO.map(id => {
       const d = data[id]; if (!d) return '';
       const change = d.rub_24h_change || 0;
       const cls = change > 0 ? 'up' : (change < 0 ? 'down' : 'flat');
       const arrow = change > 0 ? '▲' : (change < 0 ? '▼' : '·');
-      return `<div class="card"><div class="code">${CRYPTO_NAMES[id]}</div>
+      return `<div class="card">
+        <div class="code">${CRYPTO_NAMES[id]}</div>
         <div class="name">${NAMES[LANG]?.[CRYPTO_NAMES[id]] || id}</div>
-        <div class="rate">${d.rub.toLocaleString(LANG)} ₽</div>
+        <div class="rate" data-crypto="${CRYPTO_NAMES[id]}">${d.rub.toLocaleString(LANG)} ₽</div>
         <div class="usd">$${d.usd.toLocaleString('en-US')}</div>
-        <div class="trend ${cls}">${arrow} ${change.toFixed(2)}%</div></div>`;
+        <div class="trend ${cls}">${arrow} ${change.toFixed(2)}%</div>
+      </div>`;
     }).join('');
     document.getElementById('crypto-list').innerHTML = `<div class="grid">${html}</div>`;
+
+    // Плавная анимация от старых значений
+    CRYPTO.forEach(id => {
+      const code = CRYPTO_NAMES[id];
+      const el = document.querySelector(`[data-crypto="${code}"]`);
+      const oldVal = prevCrypto[code] || data[id].rub;
+      if (el) {
+        const start = performance.now();
+        const from = oldVal, to = data[id].rub;
+        function step(now) {
+          const p = Math.min((now - start) / 700, 1);
+          const eased = 1 - Math.pow(1 - p, 3);
+          const val = Math.round(from + (to - from) * eased);
+          el.textContent = val.toLocaleString(LANG) + ' ₽';
+          if (p < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      }
+    });
+    CRYPTO.forEach(id => { prevCrypto[CRYPTO_NAMES[id]] = data[id].rub; });
   } catch(e) {
     document.getElementById('crypto-list').innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
   }
@@ -780,7 +870,6 @@ async function loadMetals() {
   const el = document.getElementById('metals-list');
   el.innerHTML = '<div class="skeleton"></div>';
   try {
-    // Прокси через allorigins — обходит CORS
     const url = 'https://www.cbr-xml-daily.ru/daily_json.js';
     const proxied = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
     const data = await fetch(proxied).then(r => r.json());
