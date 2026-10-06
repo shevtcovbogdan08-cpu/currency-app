@@ -14,8 +14,6 @@
   * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
   html, body { overscroll-behavior: none; overscroll-behavior-y: none; }
   body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; padding:14px 14px 86px; min-height:100vh; transition:color .3s; overflow-x:hidden; }
-
-  /* ═══ FORCE COLORS: всё видно при любой смене языка ═══ */
   body, body * { color: var(--text); }
   .muted, .sub, .updated, .range, .zoom-hint, .dc-label, .stat-item .lbl,
   .card .name, .card .usd, .empty-state, .notif-item .time, .loading { color: var(--muted) !important; }
@@ -30,7 +28,6 @@
   .btn.sec { color: var(--text) !important; }
   .nav button { color: var(--muted); }
   .nav button.active { color: var(--accent); }
-
   h1 { font-size:19px; margin-bottom:2px; text-align:center; font-weight:800; letter-spacing:-.3px; }
   .sub { text-align:center; font-size:11px; color:var(--muted); margin-bottom:4px; }
   .live { text-align:center; font-size:11px; color:var(--green); margin-bottom:14px; display:flex; align-items:center; justify-content:center; gap:5px; font-weight:600; }
@@ -88,14 +85,24 @@
   .stat-item .lbl { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
   .stat-item .val { font-size:14px; font-weight:800; margin-top:3px; }
   .stat-spark { display:block; margin:6px auto 0; opacity:.8; }
+  /* ═══ КНОПКА ЯЗЫКА — теперь справа под темой, яркая ═══ */
+  .lang-btn {
+    position:fixed; top:58px; right:12px;
+    background:var(--accent); border:1px solid var(--accent);
+    border-radius:9px; padding:8px 12px;
+    color:white !important; cursor:pointer;
+    font-size:11px; font-weight:800; letter-spacing:.5px;
+    z-index:99;
+    box-shadow:0 4px 14px rgba(46,134,222,.45);
+  }
+  .lang-btn:active { transform: scale(.95); }
   .theme-btn { position:absolute; top:12px; right:12px; background:var(--card); border:1px solid var(--border); border-radius:9px; padding:6px 10px; color:var(--text); cursor:pointer; font-size:14px; z-index:5; }
-  .lang-btn { position:absolute; top:12px; left:12px; background:var(--card); border:1px solid var(--border); border-radius:9px; padding:6px 10px; color:var(--text); cursor:pointer; font-size:11px; font-weight:800; letter-spacing:.5px; z-index:5; }
   .range { display:flex; justify-content:space-between; font-size:10px; color:var(--muted); margin-bottom:3px; padding:0 4px; }
   .card-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:2px; }
   .card-actions { display:flex; gap:2px; }
   .icon-btn { background:none; border:none; font-size:14px; cursor:pointer; padding:2px; opacity:.6; line-height:1; position:relative; overflow:hidden; }
   .icon-btn:active { opacity:1; }
-  .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; padding:0 44px; }
   .page-share { background:var(--card); border:1px solid var(--border); border-radius:9px; padding:6px 10px; color:var(--text); cursor:pointer; font-size:14px; position:relative; overflow:hidden; }
   .page-share:active { background:var(--accent); color:white; }
   .badge { display:inline-block; padding:2px 8px; border-radius:7px; font-size:11px; font-weight:700; }
@@ -135,8 +142,8 @@
   .ripple { position:absolute; border-radius:50%; background:rgba(255,255,255,.45); transform:scale(0); animation:rippleAnim .6s ease-out; pointer-events:none; }
   @keyframes rippleAnim { to{transform:scale(4);opacity:0} }
   .modal-inner { animation: slideUp .35s cubic-bezier(.2,.8,.2,1); color: var(--text); }
-  @keyframes slideUp { from{transform:translateY(60px);opacity:0} to{transform:translateY(0);opacity:1} }
-  .banner-stack { position:fixed; top:60px; left:14px; right:14px; z-index:998; display:flex; flex-direction:column; gap:6px; pointer-events:none; }
+  @keyframes slideUp { from{transform:translateY(-60px);opacity:0} to{transform:translateY(0);opacity:1} }
+  .banner-stack { position:fixed; top:110px; left:14px; right:14px; z-index:998; display:flex; flex-direction:column; gap:6px; pointer-events:none; }
   .banner { background:var(--card); border-left:4px solid var(--accent); border-radius:12px; padding:12px 14px; box-shadow:0 8px 24px rgba(0,0,0,.4); display:flex; gap:10px; align-items:center; animation: bannerIn .4s cubic-bezier(.2,.8,.2,1); pointer-events:auto; cursor:pointer; color: var(--text); }
   .banner.up { border-color: var(--green); }
   .banner.down { border-color: var(--red); }
@@ -155,8 +162,8 @@
 </head>
 <body>
 
-<button class="lang-btn" onclick="openLang()" id="langBtn">RU</button>
 <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+<button class="lang-btn" onclick="openLang()" id="langBtn">RU</button>
 <div class="ptr" id="ptr">↓</div>
 <div class="toast" id="toast"></div>
 <div class="banner-stack" id="bannerStack"></div>
@@ -634,7 +641,7 @@ function hapticForTrend(trend) {
 }
 
 document.addEventListener('click', e => {
-  const t = e.target.closest('.btn, .icon-btn, .nav button, .zoom-btns button, .page-share');
+  const t = e.target.closest('.btn, .icon-btn, .nav button, .zoom-btns button, .page-share, .lang-btn');
   if (!t) return;
   const rect = t.getBoundingClientRect();
   const size = Math.max(rect.width, rect.height);
@@ -947,7 +954,7 @@ function openLang() {
   document.getElementById('langPickModal')?.remove();
   const div = document.createElement('div');
   div.id = 'langPickModal';
-  div.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:flex-end;justify-content:center;padding:20px';
+  div.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:flex-start;justify-content:center;padding:80px 20px 20px';
   div.innerHTML = `<div class="modal-inner" style="background:var(--card);color:var(--text);border-radius:16px;padding:16px;width:100%;max-width:340px">
     <h3 style="text-align:center;margin-bottom:12px;font-size:15px;color:var(--text)">${t('langPick')}</h3>
     ${html}
@@ -999,7 +1006,7 @@ const NAV_ORDER = ['rates','convert','crypto','oil','metals','stocks','stats','b
 
 let touchStartX = 0, touchStartY = 0, swiped = false;
 document.addEventListener('touchstart', e => {
-  if (e.target.closest('.chart-wrap') || e.target.closest('input') || e.target.closest('select') || e.target.closest('.ptr') || e.target.closest('.zoom-btns')) return;
+  if (e.target.closest('.chart-wrap') || e.target.closest('input') || e.target.closest('select') || e.target.closest('.ptr') || e.target.closest('.zoom-btns') || e.target.closest('.lang-btn')) return;
   touchStartX = e.touches[0].clientX;
   touchStartY = e.touches[0].clientY;
   swiped = false;
