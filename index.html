@@ -12,7 +12,11 @@
   :root { --bg:#0f1a2e; --card:#1b2a4e; --accent:#2E86DE; --green:#00D9A3; --red:#ff5470; --text:#e6ecf5; --muted:#8fa3bf; --border:#253456; --skeleton:#253456; }
   body.light { --bg:#f4f6fa; --card:#ffffff; --accent:#2E86DE; --green:#00a878; --red:#e63946; --text:#1a2332; --muted:#6b7a90; --border:#e1e6ee; --skeleton:#e1e6ee; }
   * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  html, body { overscroll-behavior: none; overscroll-behavior-y: none; }
   body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; padding:14px 14px 86px; min-height:100vh; transition:color .3s; overflow-x:hidden; }
+  /* ═══ ФИКС: все переводящиеся элементы всегда видимого цвета ═══ */
+  [id^="t-"], .page h1, .section h3, .sub, .dc-label, .dc-value { color: var(--text); }
+  .sub, .muted { color: var(--muted) !important; }
   h1 { font-size:19px; margin-bottom:2px; text-align:center; font-weight:800; letter-spacing:-.3px; }
   .sub { text-align:center; font-size:11px; color:var(--muted); margin-bottom:4px; }
   .live { text-align:center; font-size:11px; color:var(--green); margin-bottom:14px; display:flex; align-items:center; justify-content:center; gap:5px; font-weight:600; }
@@ -110,19 +114,16 @@
   .rate-flash-down { animation: flashDown .7s ease; }
   @keyframes flashUp { 0%{box-shadow: inset 0 0 0 2px var(--green)} 100%{box-shadow: inset 0 0 0 0 transparent} }
   @keyframes flashDown { 0%{box-shadow: inset 0 0 0 2px var(--red)} 100%{box-shadow: inset 0 0 0 0 transparent} }
-  .ptr { position:fixed; top:-60px; left:50%; transform:translateX(-50%); width:50px; height:50px; background:var(--card); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; z-index:100; transition:top .2s; box-shadow:0 4px 20px rgba(0,0,0,.3); }
+  .ptr { position:fixed; top:-60px; left:50%; transform:translateX(-50%); width:50px; height:50px; background:var(--card); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; z-index:100; transition:top .2s; box-shadow:0 4px 20px rgba(0,0,0,.3); color:var(--text); }
   .ptr.pulled { top:20px; }
   .ptr.spin { animation:spin 1s linear infinite; }
   @keyframes spin { to{transform:translateX(-50%) rotate(360deg)} }
-  /* Ripple */
   .ripple { position:absolute; border-radius:50%; background:rgba(255,255,255,.45); transform:scale(0); animation:rippleAnim .6s ease-out; pointer-events:none; }
   @keyframes rippleAnim { to{transform:scale(4);opacity:0} }
-  /* Modal slide-up */
-  .modal-inner { animation: slideUp .35s cubic-bezier(.2,.8,.2,1); }
+  .modal-inner { animation: slideUp .35s cubic-bezier(.2,.8,.2,1); color: var(--text); }
   @keyframes slideUp { from{transform:translateY(60px);opacity:0} to{transform:translateY(0);opacity:1} }
-  /* Banner stack */
   .banner-stack { position:fixed; top:60px; left:14px; right:14px; z-index:998; display:flex; flex-direction:column; gap:6px; pointer-events:none; }
-  .banner { background:var(--card); border-left:4px solid var(--accent); border-radius:12px; padding:12px 14px; box-shadow:0 8px 24px rgba(0,0,0,.4); display:flex; gap:10px; align-items:center; animation: bannerIn .4s cubic-bezier(.2,.8,.2,1); pointer-events:auto; cursor:pointer; }
+  .banner { background:var(--card); border-left:4px solid var(--accent); border-radius:12px; padding:12px 14px; box-shadow:0 8px 24px rgba(0,0,0,.4); display:flex; gap:10px; align-items:center; animation: bannerIn .4s cubic-bezier(.2,.8,.2,1); pointer-events:auto; cursor:pointer; color: var(--text); }
   .banner.up { border-color: var(--green); }
   .banner.down { border-color: var(--red); }
   .banner.out { animation: bannerOut .3s ease forwards; }
@@ -130,12 +131,10 @@
   @keyframes bannerOut { to{transform:translateY(-80px);opacity:0} }
   .banner-icon { font-size:20px; }
   .banner-text { flex:1; font-size:13px; line-height:1.35; }
-  /* Empty state */
   .empty-state { text-align:center; padding:40px 20px; color:var(--muted); }
   .empty-state .emoji { font-size:48px; margin-bottom:12px; opacity:.7; }
   .empty-state .txt { font-size:13px; }
-  /* Notifications history */
-  .notif-item { padding:10px 12px; background:var(--bg); border-radius:11px; margin-bottom:6px; font-size:12px; display:flex; gap:10px; align-items:flex-start; }
+  .notif-item { padding:10px 12px; background:var(--bg); border-radius:11px; margin-bottom:6px; font-size:12px; display:flex; gap:10px; align-items:flex-start; color: var(--text); }
   .notif-item .ico { font-size:16px; }
   .notif-item .time { color:var(--muted); font-size:10px; margin-top:2px; }
 </style>
@@ -581,8 +580,18 @@ const T = {
 
 Object.keys(T).forEach(lang => { T[lang] = {...T.ru, ...T[lang]}; });
 
+// ═══ ФИКС: отключаем вертикальные свайпы Telegram (pull-to-close) ═══
 const tg = window.Telegram?.WebApp;
-if (tg) { tg.ready(); tg.expand(); }
+if (tg) {
+  tg.ready();
+  tg.expand();
+  try {
+    if (typeof tg.disableVerticalSwipes === 'function') tg.disableVerticalSwipes();
+    if (typeof tg.isVerticalSwipesEnabled !== 'undefined') tg.isVerticalSwipesEnabled = false;
+    if (typeof tg.enableClosingConfirmation === 'function') tg.enableClosingConfirmation();
+  } catch(e) {}
+}
+
 const sysTheme = tg?.colorScheme || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
 if (!localStorage.getItem('theme')) localStorage.setItem('theme', sysTheme);
 
@@ -611,7 +620,6 @@ function hapticForTrend(trend) {
   } catch(e) {}
 }
 
-// ═══ RIPPLE ═══
 document.addEventListener('click', e => {
   const t = e.target.closest('.btn, .icon-btn, .nav button, .zoom-btns button, .page-share');
   if (!t) return;
@@ -626,13 +634,11 @@ document.addEventListener('click', e => {
   setTimeout(() => ripple.remove(), 600);
 });
 
-// ═══ КАСКАД ═══
 function applyCascade(container) {
   const cards = container.querySelectorAll('.card');
   cards.forEach((c, i) => { c.style.animationDelay = (i * 30) + 'ms'; });
 }
 
-// ═══ УТИЛИТЫ ═══
 function emptyState(emoji, text) {
   return `<div class="empty-state"><div class="emoji">${emoji}</div><div class="txt">${text}</div></div>`;
 }
@@ -660,7 +666,6 @@ function pulseChart() {
   setTimeout(() => el.classList.remove('updating'), 800);
 }
 
-// ═══ АНИМАЦИЯ ЧИСЕЛ ═══
 function animateValue(el, from, to, duration = 700, decimals = 2) {
   if (!el) return;
   const start = performance.now();
@@ -685,7 +690,6 @@ function animateStatValues(min, avg, max) {
   window._prevStats = { min, avg, max };
 }
 
-// ═══ БАННЕРЫ + ГРУППИРОВКА ═══
 let notifQueue = [];
 let notifTimer = null;
 function queueNotification(text, type = 'flat') {
@@ -731,7 +735,6 @@ function removeBanner(b) {
   setTimeout(() => b.remove(), 300);
 }
 
-// ═══ ИСТОРИЯ УВЕДОМЛЕНИЙ ═══
 function addNotifHistory(text, icon = '🔔') {
   const history = JSON.parse(localStorage.getItem('notifHistory') || '[]');
   history.unshift({
@@ -770,7 +773,6 @@ function clearNotifHistory() {
   haptic('medium');
 }
 
-// ═══ TOGGLES ═══
 function togglePush() {
   pushOn = !pushOn;
   localStorage.setItem('pushOn', pushOn);
@@ -790,7 +792,6 @@ function toggleQuiet() {
   haptic('light');
 }
 
-// ═══ SHARE ═══
 function sharePage(page) {
   const texts = {
     rates: '💱 Курсы валют к рублю — Валютный Радар',
@@ -811,7 +812,6 @@ function sharePage(page) {
   haptic('light');
 }
 
-// ═══ ЦЕЛЬ ПОРТФЕЛЯ ═══
 function setTarget() {
   const v = parseFloat(document.getElementById('target-value').value);
   if (!v || v <= 0) { toast('⚠️'); return; }
@@ -833,7 +833,7 @@ function renderTarget() {
   const filled = Math.round(pct / 5);
   const bar = '█'.repeat(filled) + '░'.repeat(20 - filled);
   el.innerHTML = `
-    <div style="font-size:13px;line-height:1.6">
+    <div style="font-size:13px;line-height:1.6;color:var(--text)">
       <div>${LANG === 'ru' ? 'Цель' : 'Target'}: <b>${target.toLocaleString('ru-RU')} ₽</b></div>
       <div>${LANG === 'ru' ? 'Сейчас' : 'Now'}: <b>${total.toFixed(2)} ₽</b></div>
       <div style="font-family:monospace;font-size:12px;letter-spacing:-1px;margin-top:4px">${bar}</div>
@@ -841,7 +841,6 @@ function renderTarget() {
     </div>`;
 }
 
-// ═══ SPARKLINE ═══
 function sparklineSVG(values, color, w = 70, h = 20) {
   if (!values || values.length < 2) return '';
   const min = Math.min(...values), max = Math.max(...values);
@@ -936,7 +935,7 @@ function openLang() {
   const div = document.createElement('div');
   div.id = 'langPickModal';
   div.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:flex-end;justify-content:center;padding:20px';
-  div.innerHTML = `<div class="modal-inner" style="background:var(--card);border-radius:16px;padding:16px;width:100%;max-width:340px">
+  div.innerHTML = `<div class="modal-inner" style="background:var(--card);color:var(--text);border-radius:16px;padding:16px;width:100%;max-width:340px">
     <h3 style="text-align:center;margin-bottom:12px;font-size:15px;color:var(--text)">${t('langPick')}</h3>
     ${html}
     <button class="btn sec" style="margin-top:8px" onclick="document.getElementById('langPickModal').remove()">✕</button>
@@ -1020,12 +1019,13 @@ document.addEventListener('touchmove', e => {
   if (!isPulling) return;
   const dy = e.touches[0].clientY - pullStartY;
   if (dy > 0 && window.scrollY === 0) {
+    e.preventDefault();
     pullDistance = Math.min(dy * 0.5, 80);
     ptr.style.top = (pullDistance - 60) + 'px';
     if (pullDistance > 40) { ptr.textContent = '↻'; ptr.classList.add('pulled'); }
     else { ptr.textContent = '↓'; ptr.classList.remove('pulled'); }
   }
-}, {passive: true});
+}, {passive: false});
 document.addEventListener('touchend', () => {
   if (!isPulling) return;
   isPulling = false;
@@ -1093,7 +1093,6 @@ function checkRateChanges() {
     if (old && now && Math.abs((now - old) / old * 100) > pushThreshold) {
       const dir = now > old ? 'up' : 'down';
       const pct = ((now - old) / old * 100).toFixed(2);
-      const arrow = dir === 'up' ? '📈' : '📉';
       queueNotification(`<b>${c}</b> ${dir === 'up' ? 'вырос' : 'упал'} на <b>${pct}%</b> → ${now.toFixed(2)} ₽`, dir);
     }
   });
@@ -1718,7 +1717,6 @@ function fillSelects() {
   }
 }
 
-// Инициализация
 document.getElementById('push-threshold').value = pushThreshold;
 fillSelects();
 applyLang();
