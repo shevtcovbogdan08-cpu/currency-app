@@ -171,16 +171,22 @@
 <div class="page" id="page-profile">
   <h1 id="t-pr-title">Профиль</h1>
   <div class="sub" id="t-pr-sub">Твои данные</div>
+
   <div class="section">
     <h3 id="t-pr-user">Пользователь</h3>
     <div class="row"><span id="t-pr-name">Имя</span><span id="prof-name">—</span></div>
     <div class="row"><span id="t-pr-lang">Язык</span><span id="prof-lang">—</span></div>
   </div>
+
   <div class="section">
     <h3 id="t-pr-pf">Портфель</h3>
-    <div id="prof-portfolio"><div class="loading">Пусто</div></div>
+    <select id="prof-pf-code"></select>
+    <input type="number" id="prof-pf-amount" placeholder="Количество" step="0.01">
+    <button class="btn" onclick="addToPortfolioProfile()" id="t-pr-pf-add">Добавить актив</button>
+    <div id="prof-portfolio" style="margin-top:10px"><div class="loading">Пусто</div></div>
     <div class="total" id="prof-total"></div>
   </div>
+
   <button class="btn" onclick="shareApp()" id="t-pr-share">Поделиться ботом</button>
 </div>
 
@@ -254,7 +260,8 @@ const T = {
     crTitle:'Крипта', crSub:'₽ и $ · 24ч',
     stTitle:'Статистика', stSub:'Мин · среднее · макс',
     bTitle:'Банки', bSub:'ЦБ РФ и Тинькофф', bBtn:'Обновить',
-    prTitle:'Профиль', prSub:'Твои данные', prUser:'Пользователь', prName:'Имя', prLang:'Язык', prPf:'Портфель', prShare:'Поделиться ботом',
+    prTitle:'Профиль', prSub:'Твои данные', prUser:'Пользователь', prName:'Имя', prLang:'Язык',
+    prPf:'Портфель', prPfAdd:'Добавить актив', prShare:'Поделиться ботом',
     mTitle:'Ещё', mAuto:'Автоуведомления', mAutoLabel:'USD · EUR · KZT', mAutoHint:'Порог 1 ₽',
     mAlert:'Алерт по курсу', mAlertBtn:'Создать',
     mDigest:'Сводка раз в день', mDigestBtn:'Включить', mDigestOff:'Выключить',
@@ -272,7 +279,8 @@ const T = {
     crTitle:'Crypto', crSub:'₽ and $ · 24h',
     stTitle:'Statistics', stSub:'Min · avg · max',
     bTitle:'Banks', bSub:'CBR and Tinkoff', bBtn:'Refresh',
-    prTitle:'Profile', prSub:'Your data', prUser:'User', prName:'Name', prLang:'Language', prPf:'Portfolio', prShare:'Share bot',
+    prTitle:'Profile', prSub:'Your data', prUser:'User', prName:'Name', prLang:'Language',
+    prPf:'Portfolio', prPfAdd:'Add asset', prShare:'Share bot',
     mTitle:'More', mAuto:'Auto-notifications', mAutoLabel:'USD · EUR · KZT', mAutoHint:'Threshold 1 ₽',
     mAlert:'Price alert', mAlertBtn:'Create',
     mDigest:'Daily digest', mDigestBtn:'Enable', mDigestOff:'Disable',
@@ -303,7 +311,7 @@ function applyLang() {
     crTitle:'crTitle', crSub:'crSub', stTitle:'stTitle', stSub:'stSub',
     bTitle:'bTitle', bSub:'bSub', bBtn:'bBtn',
     prTitle:'prTitle', prSub:'prSub', prUser:'prUser', prName:'prName', prLang:'prLang',
-    prPf:'prPf', prShare:'prShare',
+    prPf:'prPf', prPfAdd:'prPfAdd', prShare:'prShare',
     mTitle:'mTitle', mAuto:'mAuto', mAutoLabel:'mAutoLabel', mAutoHint:'mAutoHint',
     mAlert:'mAlert', mAlertBtn:'mAlertBtn', mDigest:'mDigest', mDigestBtn:'mDigestBtn',
     mDigestOff:'mDigestOff', mAnalytics:'mAnalytics', mRate:'mRate', mHist:'mHist',
@@ -406,7 +414,6 @@ async function drawChart() {
   }
   paintChart('chart', values, selected);
 
-  // Блок «Сейчас / 24ч назад»
   if (values.length >= 2) {
     const now = values[values.length - 1];
     const old = values[values.length - 2];
@@ -493,8 +500,23 @@ function addToPortfolio() {
   renderPortfolio();
 }
 
+function addToPortfolioProfile() {
+  const code = document.getElementById('prof-pf-code').value;
+  const amount = parseFloat(document.getElementById('prof-pf-amount').value);
+  if (!amount || amount <= 0) { tg?.showAlert('⚠️'); return; }
+  const pf = getPortfolio();
+  pf[code] = (pf[code] || 0) + amount;
+  savePortfolio(pf);
+  document.getElementById('prof-pf-amount').value = '';
+  renderPortfolio();
+  loadProfile();
+  toast('✅ ' + code + ' +' + amount);
+}
+
 function removeFromPortfolio(code) {
-  const pf = getPortfolio(); delete pf[code]; savePortfolio(pf); renderPortfolio();
+  const pf = getPortfolio(); delete pf[code]; savePortfolio(pf);
+  renderPortfolio();
+  if (document.getElementById('page-profile').classList.contains('active')) loadProfile();
 }
 
 function renderPortfolio() {
@@ -607,17 +629,20 @@ function loadProfile() {
   document.getElementById('prof-lang').textContent = LANG === 'en' ? '🇬🇧 English' : '🇷🇺 Русский';
   const pf = getPortfolio();
   const codes = Object.keys(pf);
+  const el = document.getElementById('prof-portfolio');
+  const totalEl = document.getElementById('prof-total');
   if (codes.length) {
     let total = 0, html = '';
     codes.forEach(c => {
       const val = pf[c] * (rates[c] || 0); total += val;
-      html += `<div class="row"><span>${FLAGS[c] || ''} ${c}: ${pf[c].toFixed(2)}</span><span>${val.toFixed(2)} ₽</span></div>`;
+      html += `<div class="row"><span>${FLAGS[c] || ''} <b>${c}</b> ${pf[c].toFixed(2)}</span>
+        <span>${val.toFixed(2)} ₽ <button class="del" onclick="removeFromPortfolio('${c}')">✕</button></span></div>`;
     });
-    document.getElementById('prof-portfolio').innerHTML = html;
-    document.getElementById('prof-total').textContent = t('total') + ': ' + total.toFixed(2) + ' ₽';
+    el.innerHTML = html;
+    totalEl.textContent = t('total') + ': ' + total.toFixed(2) + ' ₽';
   } else {
-    document.getElementById('prof-portfolio').innerHTML = `<div class="loading">${t('empty')}</div>`;
-    document.getElementById('prof-total').textContent = '';
+    el.innerHTML = `<div class="loading">${t('empty')}</div>`;
+    totalEl.textContent = '';
   }
 }
 
@@ -674,7 +699,7 @@ function toggleTheme() {
 setInterval(() => { if (document.getElementById('page-rates').classList.contains('active')) load(); }, 60000);
 
 function fillSelects() {
-  ['pf-code', 'stats-code', 'alert-code'].forEach(id => {
+  ['pf-code', 'stats-code', 'alert-code', 'prof-pf-code'].forEach(id => {
     const sel = document.getElementById(id);
     if (!sel) return;
     CURRENCIES.forEach(c => {
