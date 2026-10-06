@@ -155,7 +155,7 @@
 
 <div class="page" id="page-metals">
   <h1 id="t-mt-title">Металлы</h1>
-  <div class="sub" id="t-mt-sub">ЦБ РФ · ₽/грамм</div>
+  <div class="sub" id="t-mt-sub">₽/грамм · live</div>
   <div id="metals-list"><div class="skeleton"></div></div>
 </div>
 
@@ -305,7 +305,7 @@ const T = {
   ru:{title:'Валютный Радар',live:'Live · автообновление',dcNow:'Сейчас',dcOld:'24ч назад',
     convTitle:'Конвертер',convSub:'Мгновенный обмен',convBtn:'Обменять',
     crTitle:'Крипта',crSub:'₽ и $ · 24ч',oilTitle:'Нефть',oilSub:'Brent · WTI',
-    mtTitle:'Металлы',mtSub:'ЦБ РФ · ₽/грамм',skTitle:'Акции',skSub:'Индексы и акции',
+    mtTitle:'Металлы',mtSub:'₽/грамм · live',skTitle:'Акции',skSub:'Индексы и акции',
     stTitle:'Статистика',stSub:'Мин · среднее · макс',
     bTitle:'Банки',bSub:'ЦБ РФ · Тинькофф',bBtn:'Обновить',
     clTitle:'Калькулятор',clSub:'Ипотека и вклад',
@@ -331,7 +331,7 @@ const T = {
   en:{title:'Currency Radar',live:'Live · auto-refresh',dcNow:'Now',dcOld:'24h ago',
     convTitle:'Converter',convSub:'Instant exchange',convBtn:'Convert',
     crTitle:'Crypto',crSub:'₽ and $ · 24h',oilTitle:'Oil',oilSub:'Brent · WTI',
-    mtTitle:'Metals',mtSub:'CBR · ₽/gram',skTitle:'Stocks',skSub:'Indices & stocks',
+    mtTitle:'Metals',mtSub:'₽/gram · live',skTitle:'Stocks',skSub:'Indices & stocks',
     stTitle:'Statistics',stSub:'Min · avg · max',
     bTitle:'Banks',bSub:'CBR · Tinkoff',bBtn:'Refresh',
     clTitle:'Calculator',clSub:'Mortgage & deposit',
@@ -357,7 +357,7 @@ const T = {
   de:{title:'Währungsradar',live:'Live',dcNow:'Jetzt',dcOld:'vor 24h',
     convTitle:'Umrechner',convSub:'Sofortiger Tausch',convBtn:'Umtauschen',
     crTitle:'Krypto',crSub:'₽ und $ · 24h',oilTitle:'Öl',oilSub:'Brent · WTI',
-    mtTitle:'Metalle',mtSub:'ZBR · ₽/Gramm',skTitle:'Aktien',skSub:'Indizes & Aktien',
+    mtTitle:'Metalle',mtSub:'₽/Gramm · live',skTitle:'Aktien',skSub:'Indizes & Aktien',
     stTitle:'Statistik',stSub:'Min · Ø · Max',
     bTitle:'Banken',bSub:'ZBR · Tinkoff',bBtn:'Aktualisieren',
     clTitle:'Rechner',clSub:'Hypothek & Einlage',
@@ -383,7 +383,7 @@ const T = {
   fr:{title:'Radar Devises',live:'Live',dcNow:'Maintenant',dcOld:'il y a 24h',
     convTitle:'Convertisseur',convSub:'Échange instantané',convBtn:'Convertir',
     crTitle:'Crypto',crSub:'₽ et $ · 24h',oilTitle:'Pétrole',oilSub:'Brent · WTI',
-    mtTitle:'Métaux',mtSub:'BCR · ₽/g',skTitle:'Actions',skSub:'Indices & actions',
+    mtTitle:'Métaux',mtSub:'₽/g · live',skTitle:'Actions',skSub:'Indices & actions',
     stTitle:'Statistiques',stSub:'Min · moy · max',
     bTitle:'Banques',bSub:'BCR · Tinkoff',bBtn:'Actualiser',
     clTitle:'Calculateur',clSub:'Prêt & dépôt',
@@ -409,7 +409,7 @@ const T = {
   es:{title:'Radar de Divisas',live:'Live',dcNow:'Ahora',dcOld:'hace 24h',
     convTitle:'Convertidor',convSub:'Cambio instantáneo',convBtn:'Convertir',
     crTitle:'Cripto',crSub:'₽ y $ · 24h',oilTitle:'Petróleo',oilSub:'Brent · WTI',
-    mtTitle:'Metales',mtSub:'BCR · ₽/g',skTitle:'Acciones',skSub:'Índices y acciones',
+    mtTitle:'Metales',mtSub:'₽/g · live',skTitle:'Acciones',skSub:'Índices y acciones',
     stTitle:'Estadísticas',stSub:'Mín · med · máx',
     bTitle:'Bancos',bSub:'BCR · Tinkoff',bBtn:'Actualizar',
     clTitle:'Calculadora',clSub:'Hipoteca y depósito',
@@ -435,7 +435,7 @@ const T = {
   tr:{title:'Döviz Radarı',live:'Canlı',dcNow:'Şimdi',dcOld:'24s önce',
     convTitle:'Çevirici',convSub:'Anında',convBtn:'Çevir',
     crTitle:'Kripto',crSub:'₽ ve $ · 24s',oilTitle:'Petrol',oilSub:'Brent · WTI',
-    mtTitle:'Metaller',mtSub:'MB · ₽/g',skTitle:'Hisseler',skSub:'Endeks & hisse',
+    mtTitle:'Metaller',mtSub:'₽/g · canlı',skTitle:'Hisseler',skSub:'Endeks & hisse',
     stTitle:'İstatistik',stSub:'Min · ort · maks',
     bTitle:'Bankalar',bSub:'MB · Tinkoff',bBtn:'Yenile',
     clTitle:'Hesap',clSub:'Kredi & mevduat',
@@ -633,7 +633,6 @@ function toggleTheme() {
 
 const NAV_ORDER = ['rates','convert','crypto','oil','metals','stocks','stats','banks','calc','profile','more'];
 
-// ═══ СВАЙП (простой, без параллакса) ═══
 let touchStartX = 0, touchStartY = 0, swiped = false;
 document.addEventListener('touchstart', e => {
   if (e.target.closest('.chart-wrap') || e.target.closest('input') || e.target.closest('select') || e.target.closest('.ptr')) return;
@@ -656,7 +655,6 @@ document.addEventListener('touchend', e => {
   haptic('light');
 }, {passive: true});
 
-// ═══ PULL-TO-REFRESH ═══
 let pullStartY = 0, pullDistance = 0, isPulling = false;
 const ptr = document.getElementById('ptr');
 document.addEventListener('touchstart', e => {
@@ -973,59 +971,40 @@ async function loadOil() {
   }
 }
 
-// ═══ МЕТАЛЛЫ — параллельно все прокси ═══
+// ═══ МЕТАЛЛЫ — тот же API, что и курсы ═══
 async function loadMetals() {
   const el = document.getElementById('metals-list');
   el.innerHTML = '<div class="skeleton"></div>';
-  const targetUrl = 'https://www.cbr-xml-daily.ru/daily_json.js';
-  const proxies = [
-    targetUrl,
-    'https://corsproxy.io/?url=' + encodeURIComponent(targetUrl),
-    'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(targetUrl),
-    'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl),
-    'https://cors.eu.org/' + targetUrl
-  ];
-  const fetchWithTimeout = (url) => {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 4000);
-    return fetch(url, { signal: ctrl.signal, headers: { 'Accept': 'application/json' } })
-      .then(r => r.ok ? r.json() : null)
-      .then(j => (j && j.Valute && j.Valute.XAU) ? j : null)
-      .catch(() => null)
-      .finally(() => clearTimeout(timer));
-  };
-  const results = await Promise.all(proxies.map(u => fetchWithTimeout(u)));
-  const data = results.find(r => r !== null);
-  if (!data) {
-    el.innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>
-      <button class="btn" onclick="loadMetals()" style="margin-top:8px">🔄 ${t('retry')}</button>`;
-    return;
+  try {
+    const data = await fetch('https://latest.currency-api.pages.dev/v1/currencies/rub.json').then(r => r.json());
+    const rub = data.rub || {};
+    const metals = [
+      { code: 'XAU', icon: '🥇', nameKey: 'metalGold', key: 'xau' },
+      { code: 'XAG', icon: '🥈', nameKey: 'metalSilver', key: 'xag' },
+      { code: 'XPT', icon: '⚪', nameKey: 'metalPlatinum', key: 'xpt' },
+      { code: 'XPD', icon: '⚫', nameKey: 'metalPalladium', key: 'xpd' }
+    ];
+    const htmls = [];
+    for (const m of metals) {
+      const rate = rub[m.key];
+      if (!rate || rate <= 0) continue;
+      const pricePerOz = 1 / rate;
+      const pricePerGram = pricePerOz / 31.1035;
+      htmls.push(`<div class="card">
+        <div class="code">${m.icon} ${m.code}</div>
+        <div class="name">${t(m.nameKey)}</div>
+        <div class="rate">${pricePerGram.toLocaleString('ru-RU', {maximumFractionDigits:2})} ₽</div>
+        <div class="usd">${t('perGram')}</div>
+      </div>`);
+    }
+    if (htmls.length) el.innerHTML = `<div class="grid">${htmls.join('')}</div>`;
+    else el.innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
+  } catch(e) {
+    el.innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
   }
-  const meta = {
-    'XAU': { icon: '🥇', nameKey: 'metalGold' },
-    'XAG': { icon: '🥈', nameKey: 'metalSilver' },
-    'XPT': { icon: '⚪', nameKey: 'metalPlatinum' },
-    'XPD': { icon: '⚫', nameKey: 'metalPalladium' }
-  };
-  const htmls = [];
-  for (const [code, m] of Object.entries(meta)) {
-    const v = data.Valute[code];
-    if (!v) continue;
-    const nominal = parseFloat(v.Nominal) || 1;
-    const value = parseFloat(String(v.Value).replace(',', '.'));
-    const pricePerGram = value / nominal;
-    htmls.push(`<div class="card">
-      <div class="code">${m.icon} ${code}</div>
-      <div class="name">${t(m.nameKey)}</div>
-      <div class="rate">${pricePerGram.toLocaleString('ru-RU', {maximumFractionDigits:2})} ₽</div>
-      <div class="usd">${t('perGram')}</div>
-    </div>`);
-  }
-  if (htmls.length) el.innerHTML = `<div class="grid">${htmls.join('')}</div>`;
-  else el.innerHTML = `<div class="loading" style="color:var(--red)">${t('error')}</div>`;
 }
 
-// ═══ АКЦИИ — параллельно все тикеры ═══
+// ═══ АКЦИИ — параллельно ═══
 async function loadStocks() {
   document.getElementById('stocks-list').innerHTML = '<div class="skeleton"></div>';
   const tickers = {'S&P 500':'^GSPC', 'Газпром':'GAZP.ME', 'Сбер':'SBER.ME', 'Мосбиржа':'IMOEX.ME', 'Apple':'AAPL', 'Tesla':'TSLA'};
