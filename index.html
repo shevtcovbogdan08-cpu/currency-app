@@ -6,6 +6,7 @@
 <title>Валютный Радар</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
 <style>
   :root { --bg:#0f1a2e; --card:#1b2a4e; --accent:#2E86DE; --green:#00D9A3; --red:#ff5470; --text:#e6ecf5; --muted:#8fa3bf; --border:#253456; --skeleton:#253456; }
@@ -41,8 +42,11 @@
   .skeleton.short { height:40px; }
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
   .loading { text-align:center; color:var(--muted); padding:30px 0; font-size:13px; }
-  .chart-wrap { position:relative; height:200px; background:var(--card); border-radius:13px; padding:8px; margin-bottom:10px; }
+  .chart-wrap { position:relative; height:200px; background:var(--card); border-radius:13px; padding:8px; margin-bottom:6px; }
   .chart-wrap canvas { width:100% !important; height:100% !important; display:block; }
+  .zoom-btns { display:flex; gap:6px; justify-content:center; margin-bottom:10px; }
+  .zoom-btns button { padding:8px 16px; background:var(--card); border:1px solid var(--border); border-radius:9px; color:var(--text); font-size:14px; font-weight:700; cursor:pointer; }
+  .zoom-btns button:active { background:var(--accent); color:white; }
   .section { background:var(--card); border-radius:13px; padding:12px; margin-bottom:8px; }
   .section h3 { font-size:13px; margin-bottom:8px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
   .row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid var(--border); font-size:13px; }
@@ -177,7 +181,12 @@
   </div>
   <div class="stat-grid" id="stats-grid"></div>
   <div class="chart-wrap"><canvas id="stats-chart"></canvas></div>
-  <div class="zoom-hint">🔍 Тап + свайп для зума</div>
+  <div class="zoom-btns">
+    <button onclick="zoomStats(1.3)">➕</button>
+    <button onclick="zoomStats(0.7)">➖</button>
+    <button onclick="resetZoomStats()">↺</button>
+  </div>
+  <div class="zoom-hint">🔍 2 пальца — зум · 1 палец — сдвиг</div>
 </div>
 
 <div class="page" id="page-banks">
@@ -635,7 +644,7 @@ const NAV_ORDER = ['rates','convert','crypto','oil','metals','stocks','stats','b
 
 let touchStartX = 0, touchStartY = 0, swiped = false;
 document.addEventListener('touchstart', e => {
-  if (e.target.closest('.chart-wrap') || e.target.closest('input') || e.target.closest('select') || e.target.closest('.ptr')) return;
+  if (e.target.closest('.chart-wrap') || e.target.closest('input') || e.target.closest('select') || e.target.closest('.ptr') || e.target.closest('.zoom-btns')) return;
   touchStartX = e.touches[0].clientX;
   touchStartY = e.touches[0].clientY;
   swiped = false;
@@ -942,7 +951,6 @@ async function loadCrypto() {
 async function loadOil() {
   document.getElementById('oil-list').innerHTML = '<div class="skeleton"></div>';
   try {
-    const result = {};
     const fetchOil = async (name, ticker) => {
       try {
         const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
@@ -971,7 +979,6 @@ async function loadOil() {
   }
 }
 
-// ═══ МЕТАЛЛЫ — тот же API, что и курсы ═══
 async function loadMetals() {
   const el = document.getElementById('metals-list');
   el.innerHTML = '<div class="skeleton"></div>';
@@ -1004,7 +1011,6 @@ async function loadMetals() {
   }
 }
 
-// ═══ АКЦИИ — параллельно ═══
 async function loadStocks() {
   document.getElementById('stocks-list').innerHTML = '<div class="skeleton"></div>';
   const tickers = {'S&P 500':'^GSPC', 'Газпром':'GAZP.ME', 'Сбер':'SBER.ME', 'Мосбиржа':'IMOEX.ME', 'Apple':'AAPL', 'Tesla':'TSLA'};
@@ -1047,6 +1053,22 @@ function setPeriod(days, btn) {
   haptic('light'); loadStats();
 }
 
+function zoomStats(factor) {
+  if (statsChart && typeof statsChart.zoom === 'function') {
+    statsChart.zoom(factor);
+  } else {
+    toast('⚠️ Zoom не готов');
+  }
+  haptic('light');
+}
+
+function resetZoomStats() {
+  if (statsChart && typeof statsChart.resetZoom === 'function') {
+    statsChart.resetZoom();
+  }
+  haptic('light');
+}
+
 async function loadStats() {
   document.getElementById('stats-grid').innerHTML = '<div class="skeleton short"></div>';
   const code = document.getElementById('stats-code').value || 'USD';
@@ -1079,7 +1101,15 @@ async function loadStats() {
       animation: { duration: 600, easing: 'easeOutCubic' },
       plugins: {
         legend: { display: false },
-        zoom: { pan: { enabled: true, mode: 'x' }, zoom: { wheel: { enabled: true, speed: 0.1 }, pinch: { enabled: true }, drag: { enabled: false }, mode: 'x' } }
+        zoom: {
+          pan: { enabled: true, mode: 'x' },
+          zoom: {
+            wheel: { enabled: true, speed: 0.1 },
+            pinch: { enabled: true },
+            drag: { enabled: false },
+            mode: 'x'
+          }
+        }
       },
       scales: {
         x: { ticks: { color: isLight ? '#6b7a90' : '#8fa3bf', font: {size: 9}, maxTicksLimit: 6 }, grid: { display: false } },
